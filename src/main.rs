@@ -1,5 +1,8 @@
 mod trauma;
-mod qol;
+pub mod sqrt;
+mod combat;
+
+
 fn main() {
     println!("Hello, world!");
 }

@@ -1,0 +1,49 @@
+Trust
+Trust is the foundation of any healthy relationship. It involves relying on and having confidence in the other person.
+Maslow's Hierarchy of Needs bais: Trust satisfies the need for safety.
+Attachment Theory basis: Trust is closely linked to attachment theory, which suggests that individuals form emotional bonds with others based on the expectation of support and care. Trust develops when individuals feel secure and believe their needs will be met by their attachment figures.
+Cognitive Basis: Trust is also rooted in cognitive processes, where individuals assess the reliability and consistency of others' behaviors. This assessment contributes to the development of trust over time.
+
+Care
+Care involves showing concern, empathy, and consideration for the well-being of the other person. It reflects emotional support and attentiveness.
+Maslow's Hierarchy of Needs bais: Care fulfills the need for belongingness.
+Empathy and Compassion basis: The dimension of care is deeply connected to empathy and compassion. Empathy allows individuals to understand and share the feelings of others, fostering a sense of care and emotional support in relationships.
+Social Exchange Theory basis: The concept of care can be explained by social exchange theory, which posits that individuals engage in relationships where the benefits (including emotional support) outweigh the costs.
+
+Respect
+Respect involves recognizing and valuing the opinions, boundaries, and autonomy of the other person. It's about treating each other with dignity and understanding.
+Maslow's Hierarchy of Needs bais: Respect addresses the need for esteem and self-actualization.
+Social Identity Theory: Respect involves recognizing and valuing the unique identity of each individual. Social identity theory suggests that people categorize themselves and others into social groups, and respect is enhanced when individuals appreciate the diversity and uniqueness of others.
+Self-Determination Theory: Respect for autonomy, a key aspect of respect, aligns with self-determination theory, emphasizing the importance of individuals feeling in control of their choices and actions within a relationship.
+
+struct Character {
+	name: String,
+	
+	/// Each character in the simulation has a trust Quotient, representing the degree of confidence and reliance they have in others. This variable is influenced by past interactions, reliability, and consistency of behavior.
+	trust_Quotient: f64,
+	/// Characters possess a care quotient, indicating their capacity for empathy, compassion, and emotional support. This variable reflects their willingness to consider the well-being of others in their interactions.
+	care_quotient:f64,
+	/// The respect quotient measures the extent to which characters recognize and value the opinions, boundaries, and autonomy of others. It reflects their ability to treat others with dignity and consideration.
+	respect_quotient: f64,
+}
+
+struct Relationship {
+	/// This variable represents the level of trust within a specific relationship. It is influenced by the trust levels of both individuals and their past interactions.
+	trust: f64,
+	/// The care in relationship variable captures the emotional support and consideration within a specific relationship. It is influenced by the care indices of both individuals.
+	care: f64, 
+	/// Respect in relationship measures the degree of mutual respect within a specific relationship. It is influenced by the respect quotients of both individuals.
+	respect: f64,
+	
+	/// Buddy represents the level of friendship, camaraderie, and companionship in the relationship. A high value along this dimension indicates a strong friendship, where individuals enjoy spending time together, share common interests, and provide support for each other as buddies.
+	buddy: f64, 
+	/// Romance signifies the romantic or intimate aspect of the relationship. A higher value along this dimension suggests a deeper emotional and physical connection characterized by romantic feelings, affection, and intimacy.
+	romance:f64,
+	/// Cool measures the perceived social popularity or status within the simulated environment. A higher value indicates that the individuals in the relationship are considered 'cool'.
+	cool: f64,
+}
+
+struct SocialState {
+	characters: Vec<Character>,
+	relationships: HashMap<(usize, usize), Relationship>,
+}

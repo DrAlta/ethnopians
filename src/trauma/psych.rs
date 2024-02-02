@@ -1,9 +1,8 @@
 use std::collections::BTreeMap;
 
-use crate::qol::AddOrInsert;
+use qol::AddOrInsert;
 
-use fraction::{GenericFraction, ToPrimitive};
-type Fraction = GenericFraction::<u32>;
+use fraction64::Fraction;
 
 use super::{Event, TraumaExperience, TraumaExperienceType};
 
@@ -85,31 +84,31 @@ impl Psych {
         coping_support: Fraction
     ) {
         // how much trauma was caused by the event
-        let trauma = traumatic_stress - coping_support;
+        let trauma = traumatic_stress.clone() - coping_support;
 
         // the effects of that trauma
          
         // If it was out of her confortzone it was a bad experince
         // use 1 / confortzone to map 0 to inf to inf to 0
-        let trauma_threshold = Fraction::from(1) / self.location_in_comfort_zone;
+        let trauma_threshold = Fraction::from(1) / self.location_in_comfort_zone.clone();
         let bad_experience_ka = trauma > trauma_threshold;
 
         // effects of her ability to handle that type of experince
         if bad_experience_ka {
             // decrease abiity to handle. thefather out of her comfortzone the bigger the decrease use every time 
-            let x = traumatic_stress.max(trauma);
-            let trauma_overload = x - trauma_threshold;
+            let x = traumatic_stress.clone().max(trauma.clone());
+            let trauma_overload = x.clone() - trauma_threshold.clone();
 
-            let gradient_delta = Fraction::from(
+            let gradient_delta = Fraction::try_from(
                 (
                     1.0 - (
                         (
-                            trauma_overload.to_f64().expect("Couldn't convert trauma_overload to an f64") + 1.0
+                            Into::<f64>::into(trauma_overload) + 1.0
                         ).powi(-1)
                     )
                 ) 
                 * 2.0
-            );
+            ).unwrap();
 
             let (gradient, y_intercept) = self.get_ability_to_handle_emotional_experience_type(&experience_type);
             let new_gradient = gradient + gradient_delta;
@@ -121,21 +120,21 @@ impl Psych {
             // Calculate the increase in her ability to handle this type of experience
             // the farther away fom her confort zone the less of an improvment in her ability
             // comfort_zone_factor is 1 is she is at the center of her comfortzone and decreases the father out she is
-            let comfort_zone_factor =  Fraction::from(1) / ( Fraction::from(1) + (Fraction::new(1_u32,2_u32) * self.location_in_comfort_zone));
+            let comfort_zone_factor =  Fraction::from(1) / ( Fraction::from(1) + (Fraction::try_new(1,2).unwrap() * self.location_in_comfort_zone.clone()));
             let (gradient, y_intercept) = self.get_ability_to_handle_emotional_experience_type(&experience_type);
             // the 4 is fearly arbitray. the biger the value the slowing value grows
-            let base_gradient_improvement_percent = traumatic_stress / (traumatic_stress + Fraction::new(4_u32,1_u32));
-            let new_gradient = gradient - (gradient * base_gradient_improvement_percent * comfort_zone_factor);
+            let base_gradient_improvement_percent = traumatic_stress.clone() / (traumatic_stress.clone() + Fraction::try_new(4,1).unwrap());
+            let new_gradient = gradient.clone() - (gradient * base_gradient_improvement_percent * comfort_zone_factor);
 
-            let good_experience_factor = Fraction::from(
+            let good_experience_factor = Fraction::try_from(
                 (
                     (
                         self.get_num_good_experiences(&experience_type) + 1
                     ) as f64
                 )
-                     .sqrt());
-            let perscent_over_threshold = (traumatic_stress / trauma_threshold) - Fraction::from(1);
-            let new_y_intercept = y_intercept - (y_intercept * perscent_over_threshold * good_experience_factor);
+                     .sqrt()).unwrap();
+            let perscent_over_threshold = (traumatic_stress.clone() / trauma_threshold) - Fraction::from(1);
+            let new_y_intercept = y_intercept.clone() - (y_intercept * perscent_over_threshold * good_experience_factor);
             self.set_ability_to_handle_emotional_experience_type(experience_type.clone(), (new_gradient, new_y_intercept));
         }
         self.recent_experiences.push(TraumaExperience::simple_new(experience_type, trauma, traumatic_stress))

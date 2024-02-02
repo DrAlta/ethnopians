@@ -1,0 +1,1 @@
+//! how attractive and how effective an amenity is depends on the amenities around it and how close that are.

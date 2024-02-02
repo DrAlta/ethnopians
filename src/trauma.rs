@@ -1,5 +1,17 @@
-use fraction::GenericFraction;
-type Fraction = GenericFraction::<u32>;
+//! events have base_trauma_stress
+//! base_trauma_stress is uses as a x value into a line equation that is the girls ability to handle trauma
+//! this gives the effective_traumatic_stress of the event
+//! comf_zone is how much traumatic_stress she can handle
+//! trauma  is the traumatic_stress left over after she handled it `trauma = effective_traumatic_stress - comfort_zone`
+//! trauma of 1 is is enough to be a bad experince when at loc+in_comf_zone 0.0
+//! trauma cause the slope to decrease
+//! calc new line with that slope so that effective_traumatic_stress produced by the same base_traumatic_stress the same
+//! 
+//! is effe_traumatic_stress == comf_zone then use the new line as the new ablit ot handle trauma
+//! 
+//! let b =   effective_traumatic_stress / comfurt_zone
+//! final_x_intercept = ((intermediat_x-intecept - old_x_interceop) * b) + old_x_intercept
+use fraction64::Fraction;
 
 
 mod psych;
