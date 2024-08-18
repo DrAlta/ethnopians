@@ -1,3 +1,26 @@
+//! start 08-17-2024
+//! when a traumaic eperine is handles succes fuly we'll set the slop of the line use to get how tramix an enevet if based on the base tramaicness of the event to be closer to 0 then adjust the xintersept so that it is closer
+//! 
+//! when a theumatic event isn't coped with successfully then we find the slop of a line with the same intercept as the old one but goes throu a point hights then adjust ithe ix intercept so that the event would have the same final traumaticness
+//! 
+//! ?maby avg the old and new x-intercept based on how much trauma they have?
+//! ```
+//! // the weight on the new x_intercept is the percentage of her thrematic experinces have turned out that way
+//! // we ad 1 to the demon so we don't devide by sero then we ass 0.5 to the numer so that with out any experinces it's 50/50
+//! let delta_base = (number_of_suceessfuly_handlerd_trauma + 0.5) / ((number_of_suceessfuly_handlerd_trauma +  number_of_unsuceessfuly_handlerd_trauma) + 1.0)` 
+//! let (old_weight, new_weight ) = if was_handled_successfulyy {
+//!     (
+//!        1.0 - delta_base,
+//!        delta_Base
+//!     )
+//! } else {
+//!     (
+//!        delta_Base
+//!        1.0 - delta_base,
+//!     }
+//! ```
+//! end 08-17-2024
+
 //! events have base_trauma_stress
 //! base_trauma_stress is uses as a x value into a line equation that is the girls ability to handle trauma
 //! this gives the effective_traumatic_stress of the event
