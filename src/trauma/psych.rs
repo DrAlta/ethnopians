@@ -103,7 +103,7 @@ impl Psych {
                 (
                     1.0 - (
                         (
-                            Into::<f64>::into(trauma_overload) + 1.0
+                            Into::<f64>::into(&trauma_overload) + 1.0
                         ).powi(-1)
                     )
                 ) 

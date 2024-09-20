@@ -37,7 +37,7 @@
 //! *Kick and striker damage is figured from Combat ST
 //! *Armed damage is figured from Combat ST x 4/5
 
-use fraction64::Fraction as Number;
+use crate::Number;
 
 
 
