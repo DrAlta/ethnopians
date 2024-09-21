@@ -11,4 +11,9 @@ fraction64 = { version = "0.1.15", git = "https://github.com/DrAlta/fraction64.g
 qol = { version = "0.1.14", git = "https://github.com/DrAlta/rust_quality_of_life.git"}
 
 [features]
+defaults = ["debug", "error", "todo", "trace"]
 combat = []
+debug = []
+error = []
+todo = []
+trace = []

@@ -1,7 +1,22 @@
 use std::collections::{HashMap, HashSet};
 
-use qol::{logy, BiHashMap, PushOrInsert};
+use qol::{logy, BiHashMap};
 use crate::{ActionID, ActorID, Desire, TimeIndex};
+
+//start placeholder
+mod get_actions;
+pub use get_actions::get_actions;
+//end placeholder
+
+mod action_desire;
+pub use action_desire::ActionDesire;
+mod calc_actors_most_desired_action_for_each_acte;
+pub use calc_actors_most_desired_action_for_each_acte::calc_actors_most_desired_action_for_each_actee;
+mod calc_recieved_desire_total;
+pub use calc_recieved_desire_total::calc_recieved_desire_total;
+mod h_plus;
+pub use h_plus::h_plus;
+
 
 type IntentID = String;
 type RelationID = String;
@@ -18,21 +33,6 @@ type Value = ();
 type Volition<'c> = &'c ();
 type IntentOrActionID = ();
 
-pub fn get_actions<'c>(
-    _actions: &HashMap<ActionID, Action>,
-    _intent_roots: &HashMap<IntentID, Vec<ActionID>>,
-    _volitions: &BiHashMap<ActorID, ActorID, Vec<Volition<'c>>>,
-    _now: TimeIndex,
-    _db: &mut DbInstance,
-    _bindings: &HashMap<String, cozo::DataValue>,
-    (_defaults, _relations_roles, _durations): (
-        &HashMap<RelationID, Value>,
-        &HashMap<RelationID, Vec<RoleID>>,
-        &HashMap<RelationID, TimeIndex>,
-    ),
-) -> Result<BiHashMap::<ActorID, ActorID, HashMap<ActionID, HashMap<IntentOrActionID, Desire>>>, String> {
-    todo!()
-}
 
 fn total_action_weights(_action_heirarchy:BiHashMap::<ActorID, ActorID, HashMap<ActionID, HashMap<IntentOrActionID, Desire>>>) ->
     BiHashMap::<ActorID, ActorID, HashMap::<ActionID, Desire>>
@@ -87,35 +87,12 @@ pub fn social_sim<'c>(
     let action_weights_hierarchy = total_action_weights(action_hierarchy);
 
     // 2b if they both want to interact with each other they do add the char of the pair with highest desire to the set $InitInteractions
-
-    let mut most_desired_action: HashMap<InitiatorId, (ActionDesire, ResponderId)> = HashMap::new();
-    action_weights_hierarchy.iter().for_each(|((initiator, responder), weight_for_actions)|{
-
-        let mut most_desired_action_maybe = most_desired_action.get(initiator).cloned();
-
-        match (&most_desired_action_maybe, get_most_desired_action(weight_for_actions)) {
-            (Some(most_desired_action), Some(new_action)) => {
-                if new_action.weight > most_desired_action.0.weight {
-                    most_desired_action_maybe = Some((new_action, responder.clone()));
-                } 
-            },
-            (None, Some(new_action)) => {
-                most_desired_action_maybe = Some((new_action, responder.clone()));
-            },
-            (None, None)| (Some(_), None) => ()
-        }
-
-        let Some(action_most_desired) =most_desired_action_maybe else {
-            return;
-        };
-
-        most_desired_action.insert(initiator.clone(), action_most_desired);
-    });
+    let actors_most_desired_action_for_each_actee = calc_actors_most_desired_action_for_each_actee(&action_weights_hierarchy);
 
     let mut init_interactions = HashSet::new();
 
-    for (initiator, (_action_most_desired, responder)) in &most_desired_action{
-        let _responders_desired_action = most_desired_action.get(responder);
+    for (initiator, (_action_most_desired, responder)) in &actors_most_desired_action_for_each_actee{
+        let _responders_desired_action = actors_most_desired_action_for_each_actee.get(responder);
 
         let (lowest_char_id, highest_char_id) = if responder < initiator {
             (responder, initiator)
@@ -233,66 +210,12 @@ pub fn social_sim<'c>(
 }
 
 
-/// this is wrong but might be useful. it collects the max desires of eveyone else to interacting with everyone that isn't interacting with someone 
-pub fn recieved_desire_total<'c>(
-    action_weights_hierarchy: &BiHashMap<ActorID, ActorID, HashMap<ActionID, Desire>>,
-    actions: &HashMap<ActionID, Action>,
-    intent_roots: &HashMap<IntentID, Vec<ActionID>>,
-    volitions: &BiHashMap<ActorID, ActorID, Vec<Volition<'c>>>,
-    now: TimeIndex,
-    db: &mut DbInstance,
-    bindings: &HashMap<String, cozo::DataValue>,
-    (defaults, relations_roles, durations): (
-        &HashMap<RelationID, Value>,
-        &HashMap<RelationID, Vec<RoleID>>,
-        &HashMap<RelationID, TimeIndex>,
-    ),
-) -> HashMap<ActorID, Desire>{
-    let recieved_desires = action_weights_hierarchy
-        .iter()
-        .fold(
-            HashMap::new(),
-            |
-                mut acc,
-                (
-                    (_initiator, responder), 
-                    weigths
-                )
-            |  {
-                /* this filters out colecting the receives desires for actors that have already chosen who to act with
-                if init_interactions.iter().any(|&(a,b)| { a == responder || b == responder }) {
-                    return acc;
-                }
-                */
-                if let Some((_action_id, max_desire)) = weigths.iter().max_by(|&(_, a), &(_, b)| {
-                    a.cmp(b)
-                }) {
-                    acc.push_or_insert(responder, max_desire);
 
-                };
-                acc
-            }
-        );
-    recieved_desires.into_iter().map(
-        |(actor_id, desires)|{
-            (actor_id.clone(), h_plus(desires.into_iter().map(|x|x.clone())))
-        }
-    ).collect()
-
-}
 
 ////////////////////////
-#[derive(Debug, Clone)]
-pub struct ActionDesire {
-    pub action_id: ActionID,
-    pub weight: Desire
-}
 fn get_most_desired_action(weight_for_actions: &HashMap<ActionID, Desire>) -> Option<ActionDesire> {
     let _ = weight_for_actions;
     todo!()
 }
 
 
-fn h_plus<O: std::ops::Add, T: Into<O>, I: Iterator<Item = T>>(_iter:I) -> O {
-    todo!()
-}
