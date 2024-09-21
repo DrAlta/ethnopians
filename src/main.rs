@@ -1,9 +1,8 @@
-mod action_id;
-pub use action_id::ActionID;
-mod actor_id;
-pub use actor_id::ActorID;
+mod types;
+pub use types::{ActionID, ActorID, Desire, TimeIndex};
 mod trauma;
 pub mod sqrt;
+#[cfg(feature = "combat")]
 mod combat;
 
 pub mod social_sim;

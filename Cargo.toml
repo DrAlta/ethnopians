@@ -6,6 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+derive_more = { version = "1.0.0", features = ["add", "add_assign", "mul"] }
 fraction64 = { version = "0.1.15", git = "https://github.com/DrAlta/fraction64.git"}
 qol = { version = "0.1.14", git = "https://github.com/DrAlta/rust_quality_of_life.git"}
 
+[features]
+combat = []

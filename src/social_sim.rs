@@ -1,14 +1,11 @@
 use std::collections::{HashMap, HashSet};
 
 use qol::{logy, BiHashMap, PushOrInsert};
-use crate::{ActionID, ActorID};
+use crate::{ActionID, ActorID, Desire, TimeIndex};
 
-type Desire = Int;
 type IntentID = String;
 type RelationID = String;
 type RoleID = String;
-type TimeIndex = i64;
-type Int = i64;
 
 type ResponderId = ActorID;
 type InitiatorId = ActorID;
@@ -33,12 +30,12 @@ pub fn get_actions<'c>(
         &HashMap<RelationID, Vec<RoleID>>,
         &HashMap<RelationID, TimeIndex>,
     ),
-) -> Result<BiHashMap::<ActorID, ActorID, HashMap<ActionID, HashMap<IntentOrActionID, Int>>>, String> {
+) -> Result<BiHashMap::<ActorID, ActorID, HashMap<ActionID, HashMap<IntentOrActionID, Desire>>>, String> {
     todo!()
 }
 
-fn total_action_weights(_action_heirarchy:BiHashMap::<ActorID, ActorID, HashMap<ActionID, HashMap<IntentOrActionID, Int>>>) ->
-    BiHashMap::<ActorID, ActorID, HashMap::<ActionID, Int>>
+fn total_action_weights(_action_heirarchy:BiHashMap::<ActorID, ActorID, HashMap<ActionID, HashMap<IntentOrActionID, Desire>>>) ->
+    BiHashMap::<ActorID, ActorID, HashMap::<ActionID, Desire>>
 {
     todo!()
 }
@@ -145,7 +142,7 @@ pub fn social_sim<'c>(
             if init_interactions.contains(&(lowest_char_id, highest_char_id)) {
                 return None;
             }
-            let h_plused = h_plus::<Int,_,_>(
+            let h_plused = h_plus::<Desire,_,_>(
                 weight_for_actions.iter().map(
                     |(_, weight)| weight.clone()
                 )
@@ -157,7 +154,7 @@ pub fn social_sim<'c>(
     // 5 foreach char X that isn't interacting, calculate <X>RDtotal = Hplus of char X's desires to interact with everyone that wants to interact with them.(their desire to interact with someone)
 
     // lets start out be finding who everone wants to interact with
-    let returned_desires: BiHashMap<ActorID, ActorID, Desire> = action_weights_hierarchy
+    let who_they_want_to_interact_with: BiHashMap<ActorID, ActorID, Desire> = action_weights_hierarchy
         .get_inner()
         .iter()
         .filter_map(
@@ -231,8 +228,27 @@ pub fn social_sim<'c>(
         );
 
 */
-    /* this is wrong but might be useful. it collects the max desires of eveyone else to interacting with everyone that isn't interacting with someone 
-    let recieved_desire_total = action_weights_hierarchy
+    // 6 Char A, that isn't already interacting, with the highest <nowiki><A>RDtotal</nowiki> interacts with a the char B that wants to interact with them, that has the highest <nowiki><A>FD<B></nowiki>. if ether is tied choose the one with the <nowiki><B>FD<A></nowiki> is highest
+
+}
+
+
+/// this is wrong but might be useful. it collects the max desires of eveyone else to interacting with everyone that isn't interacting with someone 
+pub fn recieved_desire_total<'c>(
+    action_weights_hierarchy: &BiHashMap<ActorID, ActorID, HashMap<ActionID, Desire>>,
+    actions: &HashMap<ActionID, Action>,
+    intent_roots: &HashMap<IntentID, Vec<ActionID>>,
+    volitions: &BiHashMap<ActorID, ActorID, Vec<Volition<'c>>>,
+    now: TimeIndex,
+    db: &mut DbInstance,
+    bindings: &HashMap<String, cozo::DataValue>,
+    (defaults, relations_roles, durations): (
+        &HashMap<RelationID, Value>,
+        &HashMap<RelationID, Vec<RoleID>>,
+        &HashMap<RelationID, TimeIndex>,
+    ),
+) -> HashMap<ActorID, Desire>{
+    let recieved_desires = action_weights_hierarchy
         .iter()
         .fold(
             HashMap::new(),
@@ -243,9 +259,11 @@ pub fn social_sim<'c>(
                     weigths
                 )
             |  {
+                /* this filters out colecting the receives desires for actors that have already chosen who to act with
                 if init_interactions.iter().any(|&(a,b)| { a == responder || b == responder }) {
                     return acc;
                 }
+                */
                 if let Some((_action_id, max_desire)) = weigths.iter().max_by(|&(_, a), &(_, b)| {
                     a.cmp(b)
                 }) {
@@ -255,17 +273,21 @@ pub fn social_sim<'c>(
                 acc
             }
         );
-*/
-    // 6 Char A, that isn't already interacting, with the highest <nowiki><A>RDtotal</nowiki> interacts with a the char B that wants to interact with them, that has the highest <nowiki><A>FD<B></nowiki>. if ether is tied choose the one with the <nowiki><B>FD<A></nowiki> is highest
+    recieved_desires.into_iter().map(
+        |(actor_id, desires)|{
+            (actor_id.clone(), h_plus(desires.into_iter().map(|x|x.clone())))
+        }
+    ).collect()
 
 }
+
 ////////////////////////
 #[derive(Debug, Clone)]
 pub struct ActionDesire {
     pub action_id: ActionID,
-    pub weight: Int
+    pub weight: Desire
 }
-fn get_most_desired_action(weight_for_actions: &HashMap<ActionID, Int>) -> Option<ActionDesire> {
+fn get_most_desired_action(weight_for_actions: &HashMap<ActionID, Desire>) -> Option<ActionDesire> {
     let _ = weight_for_actions;
     todo!()
 }
