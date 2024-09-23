@@ -1,6 +1,6 @@
 use derive_more::derive::{Add,Sub,Mul,Div,Rem, AddAssign};
 
-#[derive(Debug,Clone, PartialEq, Eq, PartialOrd, Ord,Add,Sub,Mul,Div,Rem, AddAssign)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord,Add,Sub,Mul,Div,Rem, AddAssign)]
 pub struct Desire(i64);
 
 impl std::fmt::Display for Desire {

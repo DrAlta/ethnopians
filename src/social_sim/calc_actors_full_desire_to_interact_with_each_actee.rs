@@ -12,13 +12,14 @@ pub fn calc_actors_full_desire_to_interact_with_each_actee(
 
         action_weights_hierarchy.iter().filter_map(
             |((initiator, responder), weight_for_actions)|{
-    
+
+                /* this filtered out already interacting actors
+
                 let (lowest_char_id, highest_char_id) = if responder < initiator {
                     (responder, initiator)
                 } else {
                     (initiator, responder)
                 };
-                /* this filtered out already interacting actors
                 if init_interactions.contains(&(lowest_char_id, highest_char_id)) {
                     return None;
                 }

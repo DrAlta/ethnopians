@@ -10,21 +10,35 @@ pub use get_actions::get_actions;
 
 mod action_desire;
 pub use action_desire::ActionDesire;
+
 mod actors_most_desired_person_to_interact_with;
 pub use actors_most_desired_person_to_interact_with::actors_most_desired_person_to_interact_with;
+
 mod calc_actors_full_desire_to_interact_with_each_actee;
 pub use calc_actors_full_desire_to_interact_with_each_actee::calc_actors_full_desire_to_interact_with_each_actee;
+
 mod calc_actors_most_desired_action_for_each_actee;
 pub use calc_actors_most_desired_action_for_each_actee::calc_actors_most_desired_action_for_each_actee;
+
+mod calc_actors_most_desired_action_with_actee;
+pub use calc_actors_most_desired_action_with_actee::calc_actors_most_desired_action_with_actee;
+
+mod calc_actors_most_desired_action;
+pub use calc_actors_most_desired_action::calc_actors_most_desired_action;
+
 mod calc_recieved_desire_total;
 pub use calc_recieved_desire_total::calc_recieved_desire_total;
+
 mod calc_h_plus_of_desires_towards_actors;
 pub use calc_h_plus_of_desires_towards_actors::calc_h_plus_of_desires_towards_actors;
+
 mod calc_h_plus_of_full_desires_towards_actors;
 pub use calc_h_plus_of_full_desires_towards_actors::calc_h_plus_of_full_desires_towards_actors;
+
 mod h_plus;
 pub use h_plus::h_plus;
-
+mod r#move;
+pub use r#move::Move;
 
 type IntentID = String;
 type RelationID = String;
@@ -76,7 +90,7 @@ pub fn social_sim<'c>(
     ),
 ){
     // 1 the set $PrevInteractions is empty
-    let prev_interactions = HashSet::new();
+    let prev_interactions = HashMap::<ActorID, Option<Move>>::new();
 
     // 2a Calculate the desire to do every action to every person, 
     let Ok(action_hierarchy) = get_actions( 
@@ -98,29 +112,80 @@ pub fn social_sim<'c>(
     let action_weights_hierarchy = total_action_weights(action_hierarchy);
 
     // 2b if they both want to interact with each other they do add the char of the pair with highest desire to the set $InitInteractions
+    let mut init_interactions = HashMap::new();
     
-    let full_desire: BiHashMap<InitiatorId, ResponderId, Desire> = calc_actors_full_desire_to_interact_with_each_actee(&action_weights_hierarchy);
-
+    let full_desire: BiHashMap<ActorID, ActorID, Desire> = calc_actors_full_desire_to_interact_with_each_actee(&action_weights_hierarchy);
 
     let actors_most_desired_person_to_interact_with = actors_most_desired_person_to_interact_with(&full_desire);
 
-    let mut init_interactions = HashSet::new();
-
-    for (initiator, (_action_most_desired, responder)) in &actors_most_desired_action_for_each_actee{
-        let _responders_desired_action = actors_most_desired_action_for_each_actee.get(responder);
-
-        let (lowest_char_id, highest_char_id) = if responder < initiator {
-            (responder, initiator)
-        } else {
-            (initiator, responder)
-        };
-        init_interactions.insert((lowest_char_id, highest_char_id));
+    // 2c now we see is they want to interact with each other.
+    for (actor_id, actee_id) in &actors_most_desired_person_to_interact_with {
+        if let Some(thing) = actors_most_desired_person_to_interact_with.get(actee_id) {
+            if actor_id == thing {
+                init_interactions.insert(actor_id.clone(), actee_id.clone());
+            }
+        } 
     }
 
+
     // 3 if $InitInteractions is not a subset of $PrevInteractions have everyone in $InitInteractions interact and go to step 4. If $InitInteractions is a subset of $PrevInteractions the scene ends.
-    if init_interactions.is_subset(&prev_interactions) {
+    // 3a is any item on init_interactions is not in prev_interactions return early
+    if init_interactions.iter().any(|(actor_id, actee_id)| {
+        // if actor was the that made initatde the move check is the actee was the same
+        if let Some(Some(Move { actor_id: _, actee_id:prev_actee, action_id: _ }))= prev_interactions.get(actor_id) {
+            return actee_id != prev_actee; 
+        }
+        // the actor wasn't the initator so check if the actee initated an action with the actor
+        let Some(Some(Move { actor_id: prev_actor_id, actee_id: _, action_id: _ }))= prev_interactions.get(actee_id) else {
+            return true;
+        };
+        return actor_id != prev_actor_id; 
+        
+    }){
         return
     };
+
+    let mut interactions = HashMap::<ActorID, Option<Move>>::new();
+    for (actor_id, _) in &init_interactions {
+        let Some(actee_id) = actors_most_desired_person_to_interact_with.get(actor_id) else {
+            continue;
+        };
+        match (calc_actors_most_desired_action_with_actee(actor_id, actee_id, &action_weights_hierarchy), calc_actors_most_desired_action_with_actee(actee_id, actor_id, &action_weights_hierarchy)) {
+            (None, None) => continue,
+            (None, Some(ActionDesire { action_id: actees_desired_action_id, weight:actees_desire_for_actor })) => {
+                interactions.insert(
+                    actee_id.clone(), 
+                    Some(Move::new(actee_id.clone(), actor_id.clone(), actees_desired_action_id))
+                );
+                interactions.insert(actor_id.clone(), None);
+            },
+            (Some(ActionDesire { action_id: actors_desired_action_id, weight:actors_desire_for_actee }), None) => {
+                interactions.insert(
+                    actor_id.clone(), 
+                    Some(Move::new(actor_id.clone(), actee_id.clone(), actors_desired_action_id))
+                );
+                interactions.insert(actee_id.clone(), None);
+            },
+            (Some(ActionDesire { action_id: actors_desired_action_id, weight:actors_desire_for_actee }), Some(ActionDesire { action_id: actees_desired_action_id, weight:actees_desire_for_actor })) => {
+                if actors_desire_for_actee >= actees_desire_for_actor {
+                    interactions.insert(
+                        actor_id.clone(), 
+                        Some(Move::new(actor_id.clone(), actee_id.clone(), actors_desired_action_id))
+                    );
+                    interactions.insert(actee_id.clone(), None);
+                } else {
+                    interactions.insert(
+                        actee_id.clone(), 
+                        Some(Move::new(actee_id.clone(), actor_id.clone(), actees_desired_action_id))
+                    );
+                    interactions.insert(actor_id.clone(), None);
+                }
+            },
+        };
+
+
+
+    }
 
     // 4 Calculate <X>FD<Y>= Hplus of char X's desires to interact with char Y that isn't already interacting.(their desire to interact with Y)
 
