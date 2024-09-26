@@ -8,13 +8,11 @@ type IntentID = String;
 type RelationID = String;
 type RoleID = String;
 
-type ResponderId = ActorID;
-type InitiatorId = ActorID;
 type Action = ();
-mod cozo{
-   pub type DataValue = ();
+mod cozo {
+    pub type DataValue = ();
 }
-type DbInstance =();
+type DbInstance = ();
 type Value = ();
 type Volition<'c> = &'c ();
 type IntentOrActionID = ();
@@ -31,6 +29,7 @@ pub fn get_actions<'c>(
         &HashMap<RelationID, Vec<RoleID>>,
         &HashMap<RelationID, TimeIndex>,
     ),
-) -> Result<BiHashMap::<ActorID, ActorID, HashMap<ActionID, HashMap<IntentOrActionID, Desire>>>, String> {
+) -> Result<BiHashMap<ActorID, ActorID, HashMap<ActionID, HashMap<IntentOrActionID, Desire>>>, String>
+{
     todo!()
 }

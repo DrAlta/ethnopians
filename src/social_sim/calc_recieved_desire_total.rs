@@ -6,10 +6,10 @@ use crate::{ActionID, ActorID, Desire};
 
 use super::h_plus;
 
-/// this is wrong but might be useful. it collects the max desires of eveyone else to interacting with everyone that isn't interacting with someone 
+/// this is wrong but might be useful. it collects the max desires of eveyone else to interacting with everyone that isn't interacting with someone
 pub fn calc_recieved_desire_total(
     action_weights_hierarchy: &BiHashMap<ActorID, ActorID, HashMap<ActionID, Desire>>,
-) -> HashMap<ActorID, Desire>{
+) -> HashMap<ActorID, Desire> {
     let recieved_desires = action_weights_hierarchy
         .iter()
         .fold(
@@ -17,7 +17,7 @@ pub fn calc_recieved_desire_total(
             |
                 mut acc,
                 (
-                    (_initiator, responder), 
+                    (_initiator, responder),
                     weigths
                 )
             |  {
@@ -37,10 +37,13 @@ pub fn calc_recieved_desire_total(
                 acc
             }
         );
-    recieved_desires.into_iter().map(
-        |(actor_id, desires)|{
-            (actor_id.clone(), h_plus(desires.into_iter().map(|x|x.clone())))
-        }
-    ).collect()
-
+    recieved_desires
+        .into_iter()
+        .map(|(actor_id, desires)| {
+            (
+                actor_id.clone(),
+                h_plus(desires.into_iter().map(|x| x.clone())),
+            )
+        })
+        .collect()
 }

@@ -5,7 +5,7 @@ use qol::BiHashMap;
 use crate::{ActorID, Desire};
 
 pub fn actors_most_desired_person_to_interact_with(
-    full_desires: &BiHashMap<ActorID, ActorID, Desire>
+    full_desires: &BiHashMap<ActorID, ActorID, Desire>,
 ) -> HashMap<ActorID, ActorID> {
     full_desires.get_inner().iter().map(|(actor, desires)| {
         let (desided_partner, _desire) = desires

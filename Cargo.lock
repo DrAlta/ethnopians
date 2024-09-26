@@ -86,6 +86,7 @@ dependencies = [
  "derive_more",
  "fraction64",
  "qol",
+ "thats_so_random",
 ]
 
 [[package]]
@@ -98,6 +99,11 @@ dependencies = [
  "quote",
  "unicode-ident",
 ]
+
+[[package]]
+name = "thats_so_random"
+version = "0.2.2"
+source = "git+https://github.com/DrAlta/thats_so_random.rs.git#419fae01d67588acc3968da7b8f4b9f75dc6aab0"
 
 [[package]]
 name = "unicode-ident"

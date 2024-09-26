@@ -6,25 +6,29 @@ use crate::{ActionID, ActorID, Desire};
 
 use super::{get_most_desired_action, ActionDesire};
 
-pub fn calc_actors_most_desired_action_for_each_actee(action_weights_hierarchy: &BiHashMap<ActorID, ActorID, HashMap<ActionID, Desire>>) -> HashMap<ActorID, (ActionDesire, ActorID)>{
+pub fn calc_actors_most_desired_action_for_each_actee(
+    action_weights_hierarchy: &BiHashMap<ActorID, ActorID, HashMap<ActionID, Desire>>,
+) -> HashMap<ActorID, (ActionDesire, ActorID)> {
     let mut most_desired_action: HashMap<ActorID, (ActionDesire, ActorID)> = HashMap::new();
-    for ((actor, actee), weight_for_actions) in action_weights_hierarchy{
-
+    for ((actor, actee), weight_for_actions) in action_weights_hierarchy {
         let mut most_desired_action_maybe = most_desired_action.get(actor).cloned();
 
-        match (&most_desired_action_maybe, get_most_desired_action(weight_for_actions)) {
+        match (
+            &most_desired_action_maybe,
+            get_most_desired_action(weight_for_actions),
+        ) {
             (Some(most_desired_action), Some(new_action)) => {
                 if new_action.weight > most_desired_action.0.weight {
                     most_desired_action_maybe = Some((new_action, actee.clone()));
-                } 
-            },
+                }
+            }
             (None, Some(new_action)) => {
                 most_desired_action_maybe = Some((new_action, actee.clone()));
-            },
-            (None, None)| (Some(_), None) => ()
+            }
+            (None, None) | (Some(_), None) => (),
         }
 
-        let Some(action_most_desired) =most_desired_action_maybe else {
+        let Some(action_most_desired) = most_desired_action_maybe else {
             continue;
         };
 
