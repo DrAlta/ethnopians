@@ -2,7 +2,7 @@ type NodeID = usize;
 
 #[derive(Debug)]
 pub enum Behaviour {
-    Sequence,
+    Sequence{program_counter: NodeID},
     Fallback,
     Add,
     Print,
@@ -20,7 +20,6 @@ pub struct BehaviourTree {
     pub nodes: Vec<Behaviour>,
     pub running: Vec<NodeID>,
     pub stack: Vec<Item>,
-    pub program_counter: usize,
     
 }
 impl BehaviourTree {
@@ -28,16 +27,25 @@ impl BehaviourTree {
     todo!()
     }
     pub fn sequence_tick(&mut self) {
+        let Some(self_id) = self.running.last() else {
+            panic!();
+        };
+        let Some(Behaviour::Sequence{program_counter}) = self.nodes.get_mut(*self_id) else {
+            panic!();
+          //  return;
+        };
         match self.stack.pop() {
             Some(Item::Success) => {
-                self.running.push(self.program_counter.clone());
-                self.program_counter += 1;
+                *program_counter += 1;
+                self.running.push(program_counter.clone());
             },
             Some(Item::Falure) => {
+                *program_counter = 0;
                 self.stack.push(Item::Falure);
                 self.running.pop();
             },
             _ => {
+                *program_counter = 0;
                 self.stack.push(Item::Falure);
                 self.running.pop();
             }
@@ -47,7 +55,6 @@ impl BehaviourTree {
 
     pub fn add_tick(&mut self) {
         self.running.pop();
-        self.program_counter += 1;
         let Some(Item::Int(a)) = self.stack.pop() else {
             self.stack.push(Item::Falure);
             return;
@@ -62,7 +69,6 @@ impl BehaviourTree {
     }
     pub fn print_tick(&mut self) {
         self.running.pop();
-        self.program_counter += 1;
         let Some(a) = self.stack.pop() else {
             println!("Nothing on stack to print!");
             return;
@@ -77,7 +83,7 @@ impl BehaviourTree {
         let x = self.nodes.get(*last);
         //println!("doing: {x:?}");
         match x {
-            Some(Behaviour::Sequence) => {
+            Some(Behaviour::Sequence{..}) => {
                 self.sequence_tick()
             },
             Some(Behaviour::Fallback) => {
@@ -90,24 +96,27 @@ impl BehaviourTree {
                 self.print_tick()
             },
             _ => {
-                return false;
+                panic!();
+                //return false;
             }
         };
         true
     }
 }
 
-fn main(){
+pub fn main(){
     let mut bt = BehaviourTree {
-        nodes: vec![Behaviour::Sequence, Behaviour::Add, Behaviour::Add, Behaviour::Print],
+        nodes: vec![Behaviour::Sequence{program_counter: 0}, Behaviour::Add, Behaviour::Add, Behaviour::Print],
         running: vec![0],
         stack: vec![Item::Int(3),Item::Int(2),Item::Int(1),Item::Success],
-        program_counter: 1,
     };
     let mut c = 0;
-    while !bt.running.is_empty() {
-    //println!("Loop:{c}\n{bt:?}");
-        bt.tick();
+    //while !bt.running.is_empty() {
+    while c < 7 {
+        println!("Loop:{c}\n{bt:?}");
+        if ! bt.tick() {
+            return
+        };
         c += 1;
     }
 }
