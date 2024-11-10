@@ -1,6 +1,7 @@
 mod types;
 pub use types::{ActionID, ActorID, Desire, TimeIndex};
 
+pub mod behavior_tree;
 mod brothel;
 #[cfg(feature = "combat")]
 mod combat;

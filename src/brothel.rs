@@ -1,4 +1,4 @@
-//! 
+//!
 type Trait = String;
 mod client;
 //pub use client::Client;

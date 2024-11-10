@@ -102,8 +102,8 @@ dependencies = [
 
 [[package]]
 name = "thats_so_random"
-version = "0.2.2"
-source = "git+https://github.com/DrAlta/thats_so_random.rs.git#419fae01d67588acc3968da7b8f4b9f75dc6aab0"
+version = "0.2.3"
+source = "git+https://github.com/DrAlta/thats_so_random.rs.git#95648a839e77da9618ea05ca53b5144189fcdc6b"
 
 [[package]]
 name = "unicode-ident"
