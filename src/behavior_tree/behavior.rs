@@ -17,7 +17,8 @@ impl Behavior {
         stack: &mut Vec<Item>,
         running: &mut Vec<NodeID>,
     ) -> Result<Treeturn, String> {
-        println!(
+        logy!(
+            "trace-behavior-tree",
             "----\nDoing {self:?}\nPC:{:?}\nstack:{:?}",
             running.last(),
             stack
@@ -57,9 +58,9 @@ impl Behavior {
                     logy!("trace-behavior-tree", "seq last behavior successed");
                     continue;
                 }
-                Treeturn::Falure => {
+                Treeturn::Failure => {
                     running.pop();
-                    return Ok(Treeturn::Falure);
+                    return Ok(Treeturn::Failure);
                 }
                 Treeturn::Running(mut vec) => {
                     running.pop();
