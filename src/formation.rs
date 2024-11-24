@@ -1,10 +1,10 @@
 use crate::{Vec2, vec2};
 
-fn columns(a:Vec2, b: Vec2, num_units: usize, unit_space: f32) -> Vec<Vec2> {
+pub fn columns(a:Vec2, b: Vec2, num_units: usize, unit_space: f32) -> Vec<Vec2> {
     let len = a.distance(b);
     let columns = (len / unit_space).floor().max(1.0);
     let column_spaceing = len / columns;
-    println!("leb:{len} columns:{columns} column_spaceing:{column_spaceing} c:{}", ((a + b) * 0.5));
+    println!("len:{len} columns:{columns} column_spaceing:{column_spaceing} c:{}", ((a + b) * 0.5));
     let left_vector = (b-a).normalize() * column_spaceing;
     //println!("a:{a} b:{b} c:{}", ((a + b) * 0.5));
     let center = (a + b) * 0.5 ;

@@ -1,13 +1,11 @@
 #![feature(btree_cursors)]
 mod types;
-pub use types::{ActionID, ActorID, Desire, TimeIndex};
+pub use types::{ActionID, ActorID, Desire, Steering, radians_to_u8, u8_to_radians, TimeIndex};
 
-#[cfg(not(feature = "macro"))]
-mod vec2;
-#[cfg(not(feature = "macro"))]
-pub use vec2::{Vec2, vec2};
+#[cfg(not(feature = "macroquad"))]
+pub use types::{Vec2, vec2};
 
-#[cfg(feature = "macro")]
+#[cfg(feature = "macroquad")]
 pub use macroquad::math::{Vec2, vec2};
 
 pub mod behavior_tree;
@@ -16,7 +14,6 @@ pub mod combat;
 pub mod formation;
 pub mod sandbox;
 pub mod social_sim;
-pub mod steering;
 mod trauma;
 
 pub mod sqrt;

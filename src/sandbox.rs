@@ -18,39 +18,19 @@ grass: take water and sunlight and produce fiber when harvested
 Spear: used long range(father than reach of axe) deals damage; use close range pushed target away
 
 */
-use std::collections::HashMap;
+
+pub const MAX_ENERGY: i16 = 100;
 
 pub mod interaction;
 
-#[derive(Debug,PartialEq, Eq, PartialOrd, Ord, Clone)]
-pub enum Item {
-    Agent,
-
-    Axe,
-    Food,
-    Stone,
-    Stick,
-    Wood,
-
-    House,
-    Tree,
-    Veggie,
-}
-
-
-
-#[derive(Debug, PartialEq, PartialOrd, Clone)]
-pub enum Location {
-    Inventory(usize),
-    World{x:f32, y:f32},
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct World{
-    pub locations: HashMap<usize, Location>,
-    pub hp: HashMap<usize, i16>,
-    pub r#type: HashMap<usize, Item>,
-}
+mod acts;
+pub use acts::Acts;
+mod item;
+pub use item::Item;
+mod location;
+pub use location::Location;
+mod world;
+pub use world::World;
 
 fn within_range(x1:f32, y1:f32, x2:f32, y2:f32, dist: f32) -> bool {
     let x_off= x1 - x2;
@@ -207,18 +187,10 @@ impl World {
         }
     }
 }
-*/
 trait Interaction<O> {
    // const ENUM: E;
     fn available(&self, object: &O) -> bool;
     fn interact(&self, object: &mut O);
 }
 
-#[derive(Debug,PartialEq, Eq, PartialOrd, Ord, Clone)]
-pub enum Acts{
-    Attack,
-    Heal,
-    Use,
-}
-impl Acts {}
-
+*/

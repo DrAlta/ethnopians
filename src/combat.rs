@@ -39,25 +39,26 @@
 
 use crate::Number;
 
-struct Creature {
+pub struct Creature {
     // This stricking strangth. it instanances stench of your muscles you can pring into forch when attacking
-    combat_st: Number,
+    pub combat_st: Number,
     // This is the steanch for listing thing. it is the force of the musles you can use to carry something.
-    load_st: Number,
+    pub load_st: Number,
 }
 impl Creature {
-    fn get_combat_st(&self) -> Number {
+    pub fn get_combat_st(&self) -> Number {
         self.combat_st.clone()
     }
-    fn get_load_st(&self) -> Number {
+    pub fn get_load_st(&self) -> Number {
         self.load_st.clone()
     }
 }
 
-fn calc_weapon(
+pub fn calc_weapon(
     // the weapons lenth in meters
     length: Number,
     // weapons weight in pounds. here are 453.59237 grams (g) in 1 pound (lb)
     weight: Number,
 ) {
+    todo!("{length}{weight}")
 }

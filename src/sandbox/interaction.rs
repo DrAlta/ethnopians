@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+mod r#use;
+
 use super::{Item, Location, World};
 
 
@@ -24,79 +26,10 @@ pub enum Return {
     Commands(Vec<Command>),
 }
 
-fn use_object(agent_idx: usize, direct_object_idx:usize, world: &World) -> Return {
-    let Some(Item::Agent) = world.r#type.get(&agent_idx) else {
-        return Return::ActionInvalid("Agent not found!".to_owned());
-    };
-
-    match world.locations.get(&direct_object_idx) {
-        Some(Location::Inventory(inventory)) => {
-            if inventory != &agent_idx {
-                return Return::ActionInvalid("Object in someone else's inventory".to_owned())
-            }
-        },
-        Some(Location::World { x, y }) => {
-            let Some(Location::World{x: agent_x, y: agent_y}) = world.locations.get(&agent_idx) else {
-                return Return::ActionInvalid("Actor not in the world with object".to_owned())
-            }; 
-            if super::within_range(*agent_x, *agent_y, *x, *y, 20.0) {
-                return Return::ActionInvalid("object is too far away!".to_owned())
-            };
-        },
-        None => {
-            return Return::ActionInvalid("object not found!".to_owned());
-        },
-    }
-    let Some(building) = world.r#type.get(&direct_object_idx) else {
-        return Return::ActionInvalid("object not found!".to_owned());
-    };
-    match building {
-        Item::Agent => todo!(),
-        Item::Axe => todo!(),
-        Item::Food => todo!(),
-        Item::Stone => todo!(),
-        Item::Stick => todo!(),
-        Item::Wood => todo!(),
-        Item::House => {
-            let Some(hp) = world.hp.get(&agent_idx) else {
-                return Return::ActionInvalid("agent doesn't have hp".to_owned())
-            };
-            let excess = ((hp + 10) - 100).max(0);
-            let rest= 10 - excess;
-            let mut ret = vec![Command::Rest{agent_idx, ammount: rest}];
-
-            if excess != 0 {
-                ret.push(Command::Heal{agent_idx, ammount: excess})
-            }
-            return Return::Commands(ret)
-        },
-        Item::Tree => { 
-            let Some(direct_idx) = world.r#type.iter().find_map(|(idx, obj)|{
-                if obj == &Item::Axe && Some(&Location::Inventory(agent_idx)) == world.locations.get(idx) { 
-                    Some(idx)
-                } else {
-                    None
-                }
-            }) else {
-                return Return::ActionInvalid("Agent doesn't have an axe!".to_owned());
-            };
-            return Return::Commands(vec![
-                Command::Remove(direct_object_idx),
-                Command::AddItem{item:Item::Wood, loc:Location::Inventory(agent_idx)}
-            ])
-        },
-        Item::Veggie => {
-            return Return::Commands(vec![
-                Command::Remove(direct_object_idx),
-                Command::AddItem{item:Item::Food, loc:Location::Inventory(agent_idx)}
-            ])
-        },
-    }
-}
 
 fn get_interactions() -> Vec<Interaction> {
     vec![
-        Interaction{ act: use_object }
+        Interaction{ act: r#use::use_object }
     ]
 }
 
@@ -120,6 +53,9 @@ pub fn main(){
             (1, Location::Inventory(0)),
             (2, Location::World { x: 10.0, y: 0.0 }),
         ]),
+        energy: HashMap::from([
+            (0, 10)
+        ]),
         hp: HashMap::from([
             (0, 10)
         ]),
@@ -135,7 +71,11 @@ pub fn main(){
         2,
         &world
     );
-
+    let acts = get_interactions();
+    println!("Available actions:");
+    for idx in &available_commands {
+        println!("{idx}:{:?}", acts[*idx]);
+    }
 }
 
 #[cfg(test)]
@@ -152,7 +92,10 @@ mod tests {
                 (1, Location::Inventory(0)),
                 (2, Location::World { x: 10.0, y: 0.0 }),
             ]),
-            hp: HashMap::from([
+            energy: HashMap::from([
+                (0, 10)
+            ]),
+                hp: HashMap::from([
                 (0, 10)
             ]),
             r#type: HashMap::from([
