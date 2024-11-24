@@ -3,6 +3,14 @@ name = "sapiesims"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "sapiebin"
+path = "src/bin.rs"
+
+[lib]
+name = "sapielib"
+path = "src/lib.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -10,12 +18,15 @@ derive_more = { version = "1.0.0", features = ["add", "add_assign", "mul"] }
 fraction64 = { version = "0.1.15", git = "https://github.com/DrAlta/fraction64.git"}
 thats_so_random = {version = "0.2.3", git = "https://github.com/DrAlta/thats_so_random.rs.git"}
 qol = { version = "0.1.14", git = "https://github.com/DrAlta/rust_quality_of_life.git"}
+macroquad = { version = "0.4.13", optional = true }
+
 
 [features]
-defaults = ["debug", "error", "todo", "trace"]
+default = ["debug", "error", "todo", "trace"]
 combat = []
 debug = []
 error = []
 todo = []
 trace = ["trace-behavior-tree"]
 trace-behavior-tree = []
+macro = ["macroquad"]

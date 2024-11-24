@@ -1,6 +1,7 @@
 mod behavior;
 pub use behavior::Behavior;
 mod item;
+pub mod layout;
 pub use item::Item;
 mod treeturn;
 pub use treeturn::Treeturn;
