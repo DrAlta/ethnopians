@@ -1,4 +1,4 @@
-use sapielib::combat::{Creature, calc_weapon};
+use similib::combat::{Creature, calc_weapon};
 
 fn main() {
     println!("Hello, world!");

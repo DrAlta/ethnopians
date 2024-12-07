@@ -6,18 +6,21 @@
 //! ?maby avg the old and new x-intercept based on how much trauma they have?
 //! ```
 //! // the weight on the new x_intercept is the percentage of her thrematic experinces have turned out that way
-//! // we ad 1 to the demon so we don't devide by sero then we ass 0.5 to the numer so that with out any experinces it's 50/50
-//! let delta_base = (number_of_suceessfuly_handlerd_trauma + 0.5) / ((number_of_suceessfuly_handlerd_trauma +  number_of_unsuceessfuly_handlerd_trauma) + 1.0)`
-//! let (old_weight, new_weight ) = if was_handled_successfulyy {
-//!     (
-//!        1.0 - delta_base,
-//!        delta_Base
-//!     )
-//! } else {
-//!     (
-//!        delta_Base
-//!        1.0 - delta_base,
-//!     }
+//! // we add 1 to the demon so we don't devide by zero then we add 0.5 to the numer so that with out any experinces it's 50/50
+//! pub fn calc_weights_for_updated_x_intercept(was_handled_successfully:bool, number_of_unsuccessfully_handled_trauma: f64, number_of_successfully_handled_trauma: f64) {
+//!     let delta_base = (number_of_successfully_handled_trauma + 0.5) / ((number_of_successfully_handled_trauma +  number_of_unsuccessfully_handled_trauma) + 1.0);
+//!     let (weight_of_old_x_intercept, weight_of_new_x_intercept ) = if was_handled_successfully {
+//!         (
+//!             1.0 - delta_base,
+//!             delta_base,
+//!         )
+//!     } else {
+//!         (
+//!             delta_base,
+//!             1.0 - delta_base,
+//!         )
+//!     };
+//! }
 //! ```
 //! end 08-17-2024
 

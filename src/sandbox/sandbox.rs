@@ -19,20 +19,8 @@ Spear: used long range(father than reach of axe) deals damage; use close range p
 
 */
 
-pub const MAX_ENERGY: i16 = 100;
 
-pub mod interaction;
-
-mod acts;
-pub use acts::Acts;
-mod item;
-pub use item::Item;
-mod location;
-pub use location::Location;
-mod world;
-pub use world::World;
-
-fn within_range(x1:f32, y1:f32, x2:f32, y2:f32, dist: f32) -> bool {
+pub fn within_range(x1:f32, y1:f32, x2:f32, y2:f32, dist: f32) -> bool {
     let x_off= x1 - x2;
     let y_off= y1 - y2;
     ((x_off * x_off) + (y_off * y_off)) > (dist * dist) 
