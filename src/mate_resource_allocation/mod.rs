@@ -19,9 +19,13 @@ pub fn compute_investment(sensitivity: Number, values: &HashMap<AgentId, Number>
         let mult = second / first;
         let mult = ((mult * sensitivity) + (1.0-sensitivity)) / 2.0;
         let this_recieved = recieved.get(id).cloned().unwrap_or(0.into());
+        if id == &1 {
+            println!("first:{first}, second:{second}, mult:{mult}, given:{this_given}, revieved:{this_recieved}, {this_given} * {this_recieved} * {mult}:{}", this_given * this_recieved * mult);
+        }
         (*id, this_given * this_recieved * mult)
 
     }).collect();
+    println!("shares{investment_share:?}");
     let total_shares: Number = investment_share.iter().map(|(_, x)|x).sum();
     investment_share.into_iter().map(|(id, share)| {
         (id, share/total_shares)
@@ -57,14 +61,14 @@ mod tests {
             (1, 1.0),
             (2, 1.0),
         ]);
-        let given2 = compute_investment(0.50, &values, &recieved, &given);
+        let given2 = compute_investment(1.0, &values, &recieved, &given);
         let recieved2 = HashMap::from([
             (0, 1.0),
             (1, 1.0),
             (2, 1.0),
         ]);
-        let given3 = compute_investment(0.50, &values, &recieved2, &given2);
-        let given4 = compute_investment(0.50, &values, &recieved2, &given3);
+        let given3 = compute_investment(1.0, &values, &recieved2, &given2);
+        let given4 = compute_investment(1.0, &values, &recieved2, &given3);
         println!("1:{:?}", given.iter().collect::<BTreeMap<&AgentId, &Number>>());
 
         println!("2:{:?}", given2.iter().collect::<BTreeMap<&AgentId, &Number>>());
