@@ -12,6 +12,7 @@ pub mod behavior_tree;
 mod brothel;
 pub mod combat;
 pub mod formation;
+pub mod mate_resource_allocation;
 pub mod sandbox;
 pub mod social_sim;
 mod trauma;
