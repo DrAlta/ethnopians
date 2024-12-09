@@ -19,11 +19,10 @@ Spear: used long range(father than reach of axe) deals damage; use close range p
 
 */
 
-
-pub fn within_range(x1:f32, y1:f32, x2:f32, y2:f32, dist: f32) -> bool {
-    let x_off= x1 - x2;
-    let y_off= y1 - y2;
-    ((x_off * x_off) + (y_off * y_off)) > (dist * dist) 
+pub fn within_range(x1: f32, y1: f32, x2: f32, y2: f32, dist: f32) -> bool {
+    let x_off = x1 - x2;
+    let y_off = y1 - y2;
+    ((x_off * x_off) + (y_off * y_off)) > (dist * dist)
 }
 /*
 impl World {
@@ -143,7 +142,7 @@ impl World {
                 self.items.remove(direct_idx.max(indirect_idx));
                 self.items.remove(direct_idx.min(indirect_idx));
                 self.items.push((
-                    Item::Axe, 
+                    Item::Axe,
                     Location::Agent(agent_idx)
                 ));
                 Ok(format!("{agent_idx} created an Axe from {direct_idx} and {indirect_idx}"))

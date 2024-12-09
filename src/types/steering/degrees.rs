@@ -1,6 +1,6 @@
 use super::radians_to_u8;
 
-pub trait Degrees{
+pub trait Degrees {
     fn degrees(self) -> u8;
 }
 

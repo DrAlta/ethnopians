@@ -1,12 +1,12 @@
 #![feature(btree_cursors)]
 mod types;
-pub use types::{ActionID, ActorID, Desire, Steering, radians_to_u8, u8_to_radians, TimeIndex};
+pub use types::{radians_to_u8, u8_to_radians, ActionID, ActorID, Desire, Steering, TimeIndex};
 
 #[cfg(not(feature = "macroquad"))]
-pub use types::{Vec2, vec2};
+pub use types::{vec2, Vec2};
 
 #[cfg(feature = "macroquad")]
-pub use macroquad::math::{Vec2, vec2};
+pub use macroquad::math::{vec2, Vec2};
 
 pub mod behavior_tree;
 mod brothel;
@@ -20,4 +20,3 @@ mod trauma;
 pub mod sqrt;
 
 pub type Number = f64;
-

@@ -1,12 +1,15 @@
-use std::{ops::{Add,Div,Mul,Rem,Sub,AddAssign,DivAssign,MulAssign,RemAssign,SubAssign},iter::Sum};
+use std::{
+    iter::Sum,
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign},
+};
 
-#[derive(Debug,Clone, Copy,PartialEq, PartialOrd)]
-pub struct Vec2{
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
+pub struct Vec2 {
     pub x: f32,
     pub y: f32,
 }
-impl Vec2{
-    pub const ZERO: Vec2 = Vec2{x:0.0, y:0.0};
+impl Vec2 {
+    pub const ZERO: Vec2 = Vec2 { x: 0.0, y: 0.0 };
     pub fn normalize(self) -> Self {
         self.mul(self.length().recip())
     }
@@ -21,12 +24,12 @@ impl Vec2{
     }
     pub fn length(self) -> f32 {
         self.length_squared().sqrt()
-    }}
-
-pub fn vec2(x: f32, y: f32) -> Vec2{
-    Vec2 { x, y}
+    }
 }
 
+pub fn vec2(x: f32, y: f32) -> Vec2 {
+    Vec2 { x, y }
+}
 
 impl Div<Vec2> for Vec2 {
     type Output = Self;

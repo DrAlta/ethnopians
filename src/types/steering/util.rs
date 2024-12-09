@@ -10,10 +10,7 @@ pub fn radians_to_u8(radians: f32) -> u8 {
     u8_value
 }
 
-
 pub fn u8_to_radians(value: u8) -> f32 {
     let degrees = value as f32;
     degrees * std::f32::consts::PI / 128.0
 }
-
-
