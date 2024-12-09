@@ -8,7 +8,6 @@ type AgentId = usize;
 /// this also add response of not investing in investing in someone who we aren't effective in investing in
 /// and also makes us more responsive to the reletive ammount of attention given us as if they are giving more that the other then the share will get a boost which then couses us to invest more into them whou should couse us to give them more
 pub fn compute_investment(
-    sensitivity: Number,
     values: &HashMap<AgentId, Number>,
     recieved: &HashMap<AgentId, Number>,
     given: &HashMap<AgentId, Number>,
@@ -39,7 +38,7 @@ mod tests {
         let values = HashMap::from([(0, 1.0), (1, 1.0), (2, 1.0), (3, 1.0)]);
         let recieved = HashMap::from([(0, 1.0), (1, 3.0), (2, 1.0), (3, 1.0)]);
         let given = HashMap::from([(0, 1.0), (1, 1.0), (2, 1.0), (3, 1.0)]);
-        let given2: HashMap<AgentId, Number> = compute_investment(1.0, &values, &recieved, &given)
+        let given2: HashMap<AgentId, Number> = compute_investment(&values, &recieved, &given)
             .into_iter()
             .map(|(id, value)| (id, value * 10.0))
             .collect();
