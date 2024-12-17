@@ -1,22 +1,22 @@
-use crate::sandbox::{within_range, Item, Location, World, MAX_ENERGY};
+use crate::sandbox::{within_range, Item, Location, ObjectId, World, MAX_ENERGY};
 
 use super::super::{Return, UseObject};
 use super::Command;
 
 impl UseObject<Command> for Command {
-    fn use_object(agent_idx: usize, object_idx: usize, world: &World) -> Return<Command> {
+    fn use_object(agent_id: ObjectId, object_id: ObjectId, world: &World) -> Return<Command> {
         // get the agent
-        let Some(Item::Agent) = world.r#type.get(&agent_idx) else {
+        let Some(Item::Agent) = world.r#type.get(&agent_id) else {
             return Return::ActionInvalid("Agent not found!".to_owned());
         };
 
         // get object's location and check if it is in the agents's invetory/
         // if not check if it's in range of the agent.
-        match world.locations.get(&object_idx) {
+        match world.locations.get(&object_id) {
             // the object is in an inventory, so check if it's the agents' inventory
             Some(Location::Inventory(inventory)) => {
                 // is it the agents' inventory
-                if inventory != &agent_idx {
+                if inventory != &agent_id {
                     return Return::ActionInvalid("Object in someone else's inventory".to_owned());
                 }
             }
@@ -26,7 +26,7 @@ impl UseObject<Command> for Command {
                 let Some(Location::World {
                     x: agent_x,
                     y: agent_y,
-                }) = world.locations.get(&agent_idx)
+                }) = world.locations.get(&agent_id)
                 else {
                     return Return::ActionInvalid("Actor not in the world with object".to_owned());
                 };
@@ -41,7 +41,7 @@ impl UseObject<Command> for Command {
             }
         }
         // get the object's type
-        let Some(object) = world.r#type.get(&object_idx) else {
+        let Some(object) = world.r#type.get(&object_id) else {
             return Return::ActionInvalid("object not found!".to_owned());
         };
         // decide what to do based on the objects type
@@ -54,19 +54,19 @@ impl UseObject<Command> for Command {
             Item::Wood => todo!(),
             // the objet was a house, agent will sleep in it to regain energy and maybe health
             Item::House => {
-                let Some(energy) = world.energy.get(&agent_idx) else {
+                let Some(energy) = world.energy.get(&agent_id) else {
                     return Return::ActionInvalid("agent doesn't have energy".to_owned());
                 };
                 let excess = ((energy + 10) - MAX_ENERGY).max(0);
                 let rest: i16 = 10 - excess;
                 let mut ret = vec![Command::Rest {
-                    agent_idx,
+                    agent_id,
                     ammount: rest,
                 }];
 
                 if excess != 0 {
                     ret.push(Command::Heal {
-                        agent_idx,
+                        agent_id,
                         ammount: excess,
                     })
                 }
@@ -75,7 +75,7 @@ impl UseObject<Command> for Command {
             Item::Tree => {
                 let Some(_axe_idx) = world.r#type.iter().find_map(|(idx, obj)| {
                     if obj == &Item::Axe
-                        && Some(&Location::Inventory(agent_idx)) == world.locations.get(idx)
+                        && Some(&Location::Inventory(agent_id)) == world.locations.get(idx)
                     {
                         Some(idx)
                     } else {
@@ -85,19 +85,19 @@ impl UseObject<Command> for Command {
                     return Return::ActionInvalid("Agent doesn't have an axe!".to_owned());
                 };
                 return Return::Commands(vec![
-                    Command::Remove(object_idx),
+                    Command::Remove(object_id),
                     Command::AddItem {
                         item: Item::Wood,
-                        loc: Location::Inventory(agent_idx),
+                        loc: Location::Inventory(agent_id),
                     },
                 ]);
             }
             Item::Veggie => {
                 return Return::Commands(vec![
-                    Command::Remove(object_idx),
+                    Command::Remove(object_id),
                     Command::AddItem {
                         item: Item::Food,
-                        loc: Location::Inventory(agent_idx),
+                        loc: Location::Inventory(agent_id),
                     },
                 ])
             }

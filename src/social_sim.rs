@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{ActionID, ActorID, Desire, TimeIndex};
+use crate::{ActionId, ActorId, Desire, TimeIndex};
 use qol::{logy, BiHashMap};
 
 //start placeholder
@@ -40,9 +40,9 @@ pub use h_plus::h_plus;
 mod r#move;
 pub use r#move::Move;
 
-type IntentID = String;
-type RelationID = String;
-type RoleID = String;
+type IntentId = String;
+type RelationId = String;
+type RoleId = String;
 
 type Action = ();
 mod cozo {
@@ -51,15 +51,15 @@ mod cozo {
 type DbInstance = ();
 type Value = ();
 type Volition<'c> = &'c ();
-type IntentOrActionID = ();
+type IntentOrActionId = ();
 
 fn total_action_weights(
     _action_heirarchy: BiHashMap<
-        ActorID,
-        ActorID,
-        HashMap<ActionID, HashMap<IntentOrActionID, Desire>>,
+        ActorId,
+        ActorId,
+        HashMap<ActionId, HashMap<IntentOrActionId, Desire>>,
     >,
-) -> BiHashMap<ActorID, ActorID, HashMap<ActionID, Desire>> {
+) -> BiHashMap<ActorId, ActorId, HashMap<ActionId, Desire>> {
     todo!()
 }
 
@@ -78,20 +78,20 @@ It's not clear what I emnt by 'want to interact with' I'm taking it as meaning a
 8 go to step 2
 */
 pub fn social_sim<'c>(
-    actions: &HashMap<ActionID, Action>,
-    intent_roots: &HashMap<IntentID, Vec<ActionID>>,
-    volitions: &BiHashMap<ActorID, ActorID, Vec<Volition<'c>>>,
+    actions: &HashMap<ActionId, Action>,
+    intent_roots: &HashMap<IntentId, Vec<ActionId>>,
+    volitions: &BiHashMap<ActorId, ActorId, Vec<Volition<'c>>>,
     now: TimeIndex,
     db: &mut DbInstance,
     bindings: &HashMap<String, cozo::DataValue>,
     (defaults, relations_roles, durations): (
-        &HashMap<RelationID, Value>,
-        &HashMap<RelationID, Vec<RoleID>>,
-        &HashMap<RelationID, TimeIndex>,
+        &HashMap<RelationId, Value>,
+        &HashMap<RelationId, Vec<RoleId>>,
+        &HashMap<RelationId, TimeIndex>,
     ),
 ) {
     // 1 the set $PrevInteractions is empty
-    let prev_interactions = HashMap::<ActorID, Option<Move>>::new();
+    let prev_interactions = HashMap::<ActorId, Option<Move>>::new();
 
     // 2a Calculate the desire to do every action to every person,
     let Ok(action_hierarchy) = get_actions(
@@ -111,7 +111,7 @@ pub fn social_sim<'c>(
     // 2b if they both want to interact with each other they do add the char of the pair with highest desire to the set $InitInteractions
     let mut init_interactions = HashMap::new();
 
-    let full_desire: BiHashMap<ActorID, ActorID, Desire> =
+    let full_desire: BiHashMap<ActorId, ActorId, Desire> =
         calc_actors_full_desire_to_interact_with_each_actee(&action_weights_hierarchy);
 
     let actors_most_desired_person_to_interact_with =
@@ -152,7 +152,7 @@ pub fn social_sim<'c>(
         return;
     };
     // 3b init_interaction was a subset on prev_interaction so now have the the inital actor interact
-    let mut interactions = HashMap::<ActorID, Option<Move>>::new();
+    let mut interactions = HashMap::<ActorId, Option<Move>>::new();
     for (actor_id, _) in &init_interactions {
         let Some(actee_id) = actors_most_desired_person_to_interact_with.get(actor_id) else {
             continue;
@@ -251,7 +251,7 @@ pub fn social_sim<'c>(
 }
 
 ////////////////////////
-fn get_most_desired_action(weight_for_actions: &HashMap<ActionID, Desire>) -> Option<ActionDesire> {
+fn get_most_desired_action(weight_for_actions: &HashMap<ActionId, Desire>) -> Option<ActionDesire> {
     let _ = weight_for_actions;
     todo!()
 }

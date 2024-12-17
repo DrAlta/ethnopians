@@ -1,14 +1,14 @@
 [package]
-name = "simiens"
+name = "ethnopians"
 version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "simibin"
+name = "ethnopia"
 path = "src/bin.rs"
 
 [lib]
-name = "similib"
+name = "ethnolib"
 path = "src/lib.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -19,6 +19,7 @@ fraction64 = { version = "0.1.15", git = "https://github.com/DrAlta/fraction64.g
 thats_so_random = {version = "0.2.3", git = "https://github.com/DrAlta/thats_so_random.rs.git"}
 qol = { version = "0.1.14", git = "https://github.com/DrAlta/rust_quality_of_life.git"}
 macroquad = { version = "0.4.13", optional = true }
+base64 = "0.22.1"
 
 
 [features]

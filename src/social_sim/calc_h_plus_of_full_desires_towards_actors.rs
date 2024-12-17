@@ -2,13 +2,13 @@ use std::collections::HashMap;
 
 use qol::{BiHashMap, PushOrInsert};
 
-use crate::{ActorID, Desire};
+use crate::{ActorId, Desire};
 
 use super::h_plus;
 
 pub fn calc_h_plus_of_full_desires_towards_actors(
-    full_desires: &BiHashMap<ActorID, ActorID, Desire>,
-) -> HashMap<ActorID, Desire> {
+    full_desires: &BiHashMap<ActorId, ActorId, Desire>,
+) -> HashMap<ActorId, Desire> {
     let mut acc = HashMap::new();
     for ((_actor, actee), desire) in full_desires {
         acc.push_or_insert(actee, desire);

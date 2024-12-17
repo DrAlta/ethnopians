@@ -1,7 +1,7 @@
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct ActorID(usize);
+pub struct ActorId(usize);
 
-type Id = ActorID;
+type Id = ActorId;
 
 impl Into<usize> for &Id {
     fn into(self) -> usize {

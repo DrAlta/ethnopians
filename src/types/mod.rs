@@ -4,9 +4,9 @@ mod vec2;
 pub use vec2::{vec2, Vec2};
 
 mod action_id;
-pub use action_id::ActionID;
+pub use action_id::ActionId;
 mod actor_id;
-pub use actor_id::ActorID;
+pub use actor_id::ActorId;
 mod desire;
 pub use desire::Desire;
 mod steering;

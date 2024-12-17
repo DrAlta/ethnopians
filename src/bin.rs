@@ -1,4 +1,4 @@
-use similib::combat::{calc_weapon, Creature};
+use ethnolib::combat::{calc_weapon, Creature};
 
 fn main() {
     println!("Hello, world!");

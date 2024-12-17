@@ -2,14 +2,14 @@ use std::collections::HashMap;
 
 use qol::{logy, BiHashMap, PushOrInsert};
 
-use crate::{ActionID, ActorID, Desire};
+use crate::{ActionId, ActorId, Desire};
 
 use super::h_plus;
 
 /// this is wrong but might be useful. it collects the max desires of eveyone else to interacting with everyone that isn't interacting with someone
 pub fn calc_recieved_desire_total(
-    action_weights_hierarchy: &BiHashMap<ActorID, ActorID, HashMap<ActionID, Desire>>,
-) -> HashMap<ActorID, Desire> {
+    action_weights_hierarchy: &BiHashMap<ActorId, ActorId, HashMap<ActionId, Desire>>,
+) -> HashMap<ActorId, Desire> {
     let recieved_desires = action_weights_hierarchy
         .iter()
         .fold(

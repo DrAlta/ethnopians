@@ -1,7 +1,7 @@
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct ActionID(usize);
+pub struct ActionId(usize);
 
-type Id = ActionID;
+type Id = ActionId;
 
 impl Into<usize> for &Id {
     fn into(self) -> usize {

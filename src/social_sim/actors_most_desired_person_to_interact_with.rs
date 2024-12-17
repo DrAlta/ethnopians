@@ -2,11 +2,11 @@ use std::collections::HashMap;
 
 use qol::BiHashMap;
 
-use crate::{ActorID, Desire};
+use crate::{ActorId, Desire};
 
 pub fn actors_most_desired_person_to_interact_with(
-    full_desires: &BiHashMap<ActorID, ActorID, Desire>,
-) -> HashMap<ActorID, ActorID> {
+    full_desires: &BiHashMap<ActorId, ActorId, Desire>,
+) -> HashMap<ActorId, ActorId> {
     full_desires.get_inner().iter().map(|(actor, desires)| {
         let (desided_partner, _desire) = desires
             .iter()

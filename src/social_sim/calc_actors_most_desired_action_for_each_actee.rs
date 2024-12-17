@@ -2,14 +2,14 @@ use std::collections::HashMap;
 
 use qol::BiHashMap;
 
-use crate::{ActionID, ActorID, Desire};
+use crate::{ActionId, ActorId, Desire};
 
 use super::{get_most_desired_action, ActionDesire};
 
 pub fn calc_actors_most_desired_action_for_each_actee(
-    action_weights_hierarchy: &BiHashMap<ActorID, ActorID, HashMap<ActionID, Desire>>,
-) -> HashMap<ActorID, (ActionDesire, ActorID)> {
-    let mut most_desired_action: HashMap<ActorID, (ActionDesire, ActorID)> = HashMap::new();
+    action_weights_hierarchy: &BiHashMap<ActorId, ActorId, HashMap<ActionId, Desire>>,
+) -> HashMap<ActorId, (ActionDesire, ActorId)> {
+    let mut most_desired_action: HashMap<ActorId, (ActionDesire, ActorId)> = HashMap::new();
     for ((actor, actee), weight_for_actions) in action_weights_hierarchy {
         let mut most_desired_action_maybe = most_desired_action.get(actor).cloned();
 

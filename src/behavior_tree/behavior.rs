@@ -1,6 +1,6 @@
 use qol::logy;
 
-use super::{Item, NodeID, Treeturn};
+use super::{Item, NodeId, Treeturn};
 
 #[derive(Debug)]
 pub enum Behavior {
@@ -15,7 +15,7 @@ impl Behavior {
     pub fn tick(
         &self,
         stack: &mut Vec<Item>,
-        running: &mut Vec<NodeID>,
+        running: &mut Vec<NodeId>,
     ) -> Result<Treeturn, String> {
         logy!(
             "trace-behavior-tree",
@@ -36,7 +36,7 @@ impl Behavior {
     pub fn fallback_tick(
         _behaviors: &Vec<Behavior>,
         _stack: &mut Vec<Item>,
-        _running: &mut Vec<NodeID>,
+        _running: &mut Vec<NodeId>,
     ) -> Result<Treeturn, String> {
         todo!()
     }
@@ -44,7 +44,7 @@ impl Behavior {
     pub fn sequence_tick(
         behaviors: &Vec<Behavior>,
         stack: &mut Vec<Item>,
-        running: &mut Vec<NodeID>,
+        running: &mut Vec<NodeId>,
     ) -> Result<Treeturn, String> {
         for (program_counter, behavoir) in behaviors.iter().enumerate() {
             if let Some(thing) = running.last() {
@@ -77,7 +77,7 @@ impl Behavior {
         return Ok(Treeturn::Success);
     }
 
-    pub fn add_tick(stack: &mut Vec<Item>, running: &mut Vec<NodeID>) -> Result<Treeturn, String> {
+    pub fn add_tick(stack: &mut Vec<Item>, running: &mut Vec<NodeId>) -> Result<Treeturn, String> {
         running.pop();
         let Some(Item::Int(a)) = stack.pop() else {
             return Err("top of stack wasn't an int".into());
@@ -93,7 +93,7 @@ impl Behavior {
     pub fn lit_tick(
         lit: i64,
         stack: &mut Vec<Item>,
-        running: &mut Vec<NodeID>,
+        running: &mut Vec<NodeId>,
     ) -> Result<Treeturn, String> {
         running.pop();
         stack.push(Item::Int(lit));
@@ -102,7 +102,7 @@ impl Behavior {
 
     pub fn print_tick(
         stack: &mut Vec<Item>,
-        running: &mut Vec<NodeID>,
+        running: &mut Vec<NodeId>,
     ) -> Result<Treeturn, String> {
         running.pop();
 

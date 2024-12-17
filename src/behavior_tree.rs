@@ -6,7 +6,7 @@ pub use item::Item;
 mod treeturn;
 pub use treeturn::Treeturn;
 
-type NodeID = String;
+type NodeId = String;
 
 #[cfg(test)]
 mod tests {

@@ -2,11 +2,11 @@ use std::collections::HashMap;
 
 use qol::BiHashMap;
 
-use crate::{ActionID, ActorID, Desire, TimeIndex};
+use crate::{ActionId, ActorId, Desire, TimeIndex};
 
-type IntentID = String;
-type RelationID = String;
-type RoleID = String;
+type IntentId = String;
+type RelationId = String;
+type RoleId = String;
 
 type Action = ();
 mod cozo {
@@ -15,21 +15,21 @@ mod cozo {
 type DbInstance = ();
 type Value = ();
 type Volition<'c> = &'c ();
-type IntentOrActionID = ();
+type IntentOrActionId = ();
 
 pub fn get_actions<'c>(
-    _actions: &HashMap<ActionID, Action>,
-    _intent_roots: &HashMap<IntentID, Vec<ActionID>>,
-    _volitions: &BiHashMap<ActorID, ActorID, Vec<Volition<'c>>>,
+    _actions: &HashMap<ActionId, Action>,
+    _intent_roots: &HashMap<IntentId, Vec<ActionId>>,
+    _volitions: &BiHashMap<ActorId, ActorId, Vec<Volition<'c>>>,
     _now: TimeIndex,
     _db: &mut DbInstance,
     _bindings: &HashMap<String, cozo::DataValue>,
     (_defaults, _relations_roles, _durations): (
-        &HashMap<RelationID, Value>,
-        &HashMap<RelationID, Vec<RoleID>>,
-        &HashMap<RelationID, TimeIndex>,
+        &HashMap<RelationId, Value>,
+        &HashMap<RelationId, Vec<RoleId>>,
+        &HashMap<RelationId, TimeIndex>,
     ),
-) -> Result<BiHashMap<ActorID, ActorID, HashMap<ActionID, HashMap<IntentOrActionID, Desire>>>, String>
+) -> Result<BiHashMap<ActorId, ActorId, HashMap<ActionId, HashMap<IntentOrActionId, Desire>>>, String>
 {
     todo!()
 }

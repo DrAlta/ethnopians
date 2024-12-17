@@ -2,13 +2,13 @@ use std::collections::HashMap;
 
 use qol::BiHashMap;
 
-use crate::{ActionID, ActorID, Desire};
+use crate::{ActionId, ActorId, Desire};
 
 use super::h_plus;
 
 pub fn calc_actors_full_desire_to_interact_with_each_actee(
-    action_weights_hierarchy: &BiHashMap<ActorID, ActorID, HashMap<ActionID, Desire>>,
-) -> BiHashMap<ActorID, ActorID, Desire> {
+    action_weights_hierarchy: &BiHashMap<ActorId, ActorId, HashMap<ActionId, Desire>>,
+) -> BiHashMap<ActorId, ActorId, Desire> {
     action_weights_hierarchy
         .iter()
         .filter_map(|((initiator, responder), weight_for_actions)| {

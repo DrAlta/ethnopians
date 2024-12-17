@@ -4,6 +4,7 @@ pub mod interaction;
 
 mod acts;
 pub use acts::Acts;
+pub mod collision;
 mod command;
 pub use command::Command;
 mod item;
@@ -18,3 +19,5 @@ mod use_object;
 pub use use_object::UseObject;
 mod world;
 pub use world::World;
+
+pub type ObjectId = u64;

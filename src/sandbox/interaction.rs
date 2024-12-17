@@ -1,10 +1,10 @@
-use super::{Return, UseObject, World};
+use super::{ObjectId, Return, UseObject, World};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct Interaction<Command> {
     //    pub av: fn (&Agent, &Item) ->bool,
     pub name: String,
-    pub act: fn(usize, usize, &World) -> Return<Command>,
+    pub act: fn(ObjectId, ObjectId, &World) -> Return<Command>,
 }
 
 impl<Command> std::fmt::Display for Interaction<Command> {
@@ -21,8 +21,8 @@ pub fn get_interactions<Command: UseObject<Command>>() -> Vec<Interaction<Comman
 }
 
 pub fn foofoo<Command: UseObject<Command>>(
-    ag: usize,
-    direct_object: usize,
+    ag: ObjectId,
+    direct_object: ObjectId,
     world: &World,
 ) -> Vec<usize> {
     get_interactions()
@@ -59,6 +59,7 @@ mod tests {
             ]),
             energy: HashMap::from([(0, 10)]),
             hp: HashMap::from([(0, 10)]),
+            sizes: HashMap::new(),
             r#type: HashMap::from([(0, Item::Agent), (1, Item::Axe), (2, Item::Tree)]),
         };
 
