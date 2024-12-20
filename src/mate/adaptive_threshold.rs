@@ -1,7 +1,7 @@
 use crate::Number;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
-pub struct Agent{
+pub struct Agent {
     pub value: Number,
     pub threshold: Number,
     pub current_choices_value: Number,
@@ -14,13 +14,13 @@ impl Agent {
                 let delta = date.value - threshold;
                 println!("threshold:{threshold} date:{}, delta:{delta}", date.value);
                 delta / threshold
-            },
+            }
             std::cmp::Ordering::Equal => 0.0,
             std::cmp::Ordering::Greater => {
                 let delta = date.value - threshold;
                 println!("delta:{delta}");
                 date.value / delta
-            },
+            }
         }
     }
     pub fn update_threshold(&mut self, rejected: bool, date: &Agent) {
@@ -35,7 +35,6 @@ impl Agent {
             self.threshold += step;
         }
     }
-    
 }
 
 #[cfg(test)]
@@ -45,78 +44,65 @@ mod tests {
 
     fn agents() -> (Agent, Agent) {
         (
-            Agent{ 
-                value: 10.0, 
-                threshold: 5.0, 
+            Agent {
+                value: 10.0,
+                threshold: 5.0,
                 current_choices_value: 10.0,
             },
-            Agent{
-                value: 10.0, 
-                threshold: 5.0, 
+            Agent {
+                value: 10.0,
+                threshold: 5.0,
                 current_choices_value: 10.0,
-            }
+            },
         )
     }
 
     #[test]
-    fn reject_test(){
+    fn reject_test() {
         let (mut a, date) = agents();
         a.update_threshold(true, &date);
         assert_eq!(
             a,
-            Agent{
-                value: 10.0, 
-                threshold: 4.75, 
-                current_choices_value: 10.0,    
+            Agent {
+                value: 10.0,
+                threshold: 4.75,
+                current_choices_value: 10.0,
             }
         );
     }
     #[test]
-    fn twict_threshold_desirability_test(){
+    fn twict_threshold_desirability_test() {
         let (mut a, date) = agents();
-        assert_eq!(
-            a.date_desirability_of_switching(&date),
-            0.0
-        )
+        assert_eq!(a.date_desirability_of_switching(&date), 0.0)
     }
     #[test]
-    fn at_threshold_desirability_test(){
+    fn at_threshold_desirability_test() {
         let (mut a, _) = agents();
-        let date = Agent{
-            value: 10.0, 
-            threshold: 5.0, 
+        let date = Agent {
+            value: 10.0,
+            threshold: 5.0,
             current_choices_value: 10.0,
         };
-        assert_eq!(
-            a.date_desirability_of_switching(&date),
-            0.0
-        )
+        assert_eq!(a.date_desirability_of_switching(&date), 0.0)
     }
     #[test]
-    fn half_threshold_desirability_test(){
+    fn half_threshold_desirability_test() {
         let (mut a, _) = agents();
-        let date = Agent{
-            value: 5.0, 
-            threshold: 5.0, 
+        let date = Agent {
+            value: 5.0,
+            threshold: 5.0,
             current_choices_value: 10.0,
         };
-        assert_eq!(
-            a.date_desirability_of_switching(&date),
-            -0.5
-        )
+        assert_eq!(a.date_desirability_of_switching(&date), -0.5)
     }
     #[test]
-    fn zero_value_desirability_test(){
+    fn zero_value_desirability_test() {
         let (mut a, _) = agents();
-        let date = Agent{
-            value: 0.0, 
-            threshold: 5.0, 
+        let date = Agent {
+            value: 0.0,
+            threshold: 5.0,
             current_choices_value: 10.0,
         };
-        assert_eq!(
-            a.date_desirability_of_switching(&date),
-            -1.0
-        )
+        assert_eq!(a.date_desirability_of_switching(&date), -1.0)
     }
-
 }

@@ -6,13 +6,13 @@ use super::Command;
 impl UseObject<Command> for Command {
     fn use_object(agent_id: ObjectId, object_id: ObjectId, world: &World) -> Return<Command> {
         // get the agent
-        let Some(Item::Agent) = world.r#type.get(&agent_id) else {
+        let Some(Item::Agent) = world.get_type(&agent_id) else {
             return Return::ActionInvalid("Agent not found!".to_owned());
         };
 
         // get object's location and check if it is in the agents's invetory/
         // if not check if it's in range of the agent.
-        match world.locations.get(&object_id) {
+        match world.get_location(&object_id) {
             // the object is in an inventory, so check if it's the agents' inventory
             Some(Location::Inventory(inventory)) => {
                 // is it the agents' inventory
@@ -26,7 +26,7 @@ impl UseObject<Command> for Command {
                 let Some(Location::World {
                     x: agent_x,
                     y: agent_y,
-                }) = world.locations.get(&agent_id)
+                }) = world.get_location(&agent_id)
                 else {
                     return Return::ActionInvalid("Actor not in the world with object".to_owned());
                 };
@@ -41,7 +41,7 @@ impl UseObject<Command> for Command {
             }
         }
         // get the object's type
-        let Some(object) = world.r#type.get(&object_id) else {
+        let Some(object) = world.get_type(&object_id) else {
             return Return::ActionInvalid("object not found!".to_owned());
         };
         // decide what to do based on the objects type
@@ -54,7 +54,7 @@ impl UseObject<Command> for Command {
             Item::Wood => todo!(),
             // the objet was a house, agent will sleep in it to regain energy and maybe health
             Item::House => {
-                let Some(energy) = world.energy.get(&agent_id) else {
+                let Some(energy) = world.get_energy(&agent_id) else {
                     return Return::ActionInvalid("agent doesn't have energy".to_owned());
                 };
                 let excess = ((energy + 10) - MAX_ENERGY).max(0);
@@ -73,9 +73,9 @@ impl UseObject<Command> for Command {
                 return Return::Commands(ret);
             }
             Item::Tree => {
-                let Some(_axe_idx) = world.r#type.iter().find_map(|(idx, obj)| {
+                let Some(_axe_idx) = world.type_iter().find_map(|(idx, obj)| {
                     if obj == &Item::Axe
-                        && Some(&Location::Inventory(agent_id)) == world.locations.get(idx)
+                        && Some(&Location::Inventory(agent_id)) == world.get_location(idx)
                     {
                         Some(idx)
                     } else {

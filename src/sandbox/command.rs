@@ -6,10 +6,9 @@ mod use_object;
 pub enum Command {
     AddItem { item: Item, loc: Location },
     Remove(ObjectId),
-    Damage { agent_id: ObjectId, ammout: i16 },
+    Damage { agent_id: ObjectId, ammount: i16 },
     Rest { agent_id: ObjectId, ammount: i16 },
     Heal { agent_id: ObjectId, ammount: i16 },
 
     SetLocation { agent_id: ObjectId, loc: Location },
-
 }

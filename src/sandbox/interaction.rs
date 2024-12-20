@@ -51,17 +51,17 @@ mod tests {
 
     #[test]
     pub fn over_test() {
-        let world = super::World {
-            locations: HashMap::from([
+        let world = super::World::from((
+            HashMap::from([
                 (0, Location::World { x: 0.0, y: 0.0 }),
                 (1, Location::Inventory(0)),
                 (2, Location::World { x: 10.0, y: 0.0 }),
             ]),
-            energy: HashMap::from([(0, 10)]),
-            hp: HashMap::from([(0, 10)]),
-            sizes: HashMap::new(),
-            r#type: HashMap::from([(0, Item::Agent), (1, Item::Axe), (2, Item::Tree)]),
-        };
+            HashMap::from([(0, 10)]),
+            HashMap::from([(0, 10)]),
+            HashMap::new(),
+            HashMap::from([(0, Item::Agent), (1, Item::Axe), (2, Item::Tree)]),
+        ));
 
         let available_commands = foofoo::<Command>(0, 2, &world);
 
