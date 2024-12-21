@@ -34,19 +34,19 @@ impl
     ) -> Self {
         let mut highest_id = 0;
         if let Some(value) = locations.keys().max() {
-            highest_id = *value;
+            highest_id = value.clone();
         }
         if let Some(value) = energy.keys().max() {
-            highest_id = highest_id.max(*value);
+            highest_id = highest_id.max(value.clone());
         }
         if let Some(value) = hp.keys().max() {
-            highest_id = highest_id.max(*value);
+            highest_id = highest_id.max(value.clone());
         }
         if let Some(value) = sizes.keys().max() {
-            highest_id = highest_id.max(*value);
+            highest_id = highest_id.max(value.clone());
         }
         if let Some(value) = r#type.keys().max() {
-            highest_id = highest_id.max(*value);
+            highest_id = highest_id.max(value.clone());
         }
 
         Self {
@@ -76,7 +76,7 @@ impl World {
     pub fn get_type(&self, id: &ObjectId) -> Option<&Item> {
         self.r#type.get(id)
     }
-    pub fn type_iter(&self) -> std::collections::hash_map::Iter<'_, u64, Item> {
+    pub fn type_iter(&self) -> std::collections::hash_map::Iter<'_, ObjectId, Item> {
         self.r#type.iter()
     }
 }

@@ -11,6 +11,7 @@ mod item;
 pub use item::Item;
 mod location;
 pub use location::Location;
+mod movement;
 mod r#return;
 pub use r#return::Return;
 mod sandbox;
@@ -20,4 +21,4 @@ pub use use_object::UseObject;
 mod world;
 pub use world::World;
 
-pub type ObjectId = u64;
+pub type ObjectId = usize;
