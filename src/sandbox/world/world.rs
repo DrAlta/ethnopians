@@ -1,18 +1,16 @@
 use std::collections::HashMap;
 
-use super::{Item, Location, ObjectId};
-
-mod execute_commands;
+use crate::sandbox::{Item, Location, ObjectId};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct World {
-    locations: HashMap<ObjectId, Location>,
-    energy: HashMap<ObjectId, i16>,
-    hp: HashMap<ObjectId, i16>,
-    sizes: HashMap<ObjectId, (f32, f32)>,
-    r#type: HashMap<ObjectId, Item>,
-    highest_id: ObjectId,
-    movement: HashMap<ObjectId, ((f32,f32), f32)>,
+    pub (super) locations: HashMap<ObjectId, Location>,
+    pub (super) energy: HashMap<ObjectId, i16>,
+    pub (super) hp: HashMap<ObjectId, i16>,
+    pub (super) sizes: HashMap<ObjectId, (f32, f32)>,
+    pub (super) r#type: HashMap<ObjectId, Item>,
+    pub (super) highest_id: ObjectId,
+    pub (super) movement: HashMap<ObjectId, ((f32,f32), f32)>,
 }
 
 impl

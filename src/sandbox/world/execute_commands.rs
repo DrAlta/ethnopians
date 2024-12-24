@@ -1,6 +1,4 @@
-use crate::sandbox::Command;
-
-use super::World;
+use crate::sandbox::{Command, World};
 
 impl World {
     pub fn execute_command(&mut self, command: Command) {

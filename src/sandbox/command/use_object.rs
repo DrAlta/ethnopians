@@ -134,7 +134,6 @@ mod tests {
 
     use super::*;
 
-    const GRID_SIZE: f32 = 5.0;
     #[test]
     pub fn no_agent_test() {
         let acts = get_interactions::<Command>();
