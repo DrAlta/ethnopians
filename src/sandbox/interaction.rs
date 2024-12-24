@@ -61,8 +61,8 @@ mod tests {
             HashMap::from([(0, 10)]),
             HashMap::new(),
             HashMap::from([(0, Item::Agent), (1, Item::Axe), (2, Item::Tree)]),
+            HashMap::new(),
         ));
-
         let available_commands = foofoo::<Command>(0, 2, &world);
 
         assert_eq!(available_commands, vec![0]);

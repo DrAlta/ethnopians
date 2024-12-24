@@ -21,7 +21,7 @@ impl UseObject<Command> for Command {
                 }
             }
             // THe object is in the world, so check if it is in range of the agent
-            Some(Location::World { x, y }) => {
+            Some(Location::World { x: object_x, y: object_y }) => {
                 // get the agent's location in the world.
                 let Some(Location::World {
                     x: agent_x,
@@ -31,18 +31,40 @@ impl UseObject<Command> for Command {
                     return Return::ActionInvalid("Actor not in the world with object".to_owned());
                 };
                 // check is they are within range
-                if within_range(*agent_x, *agent_y, *x, *y, 20.0) {
+                let (agent_center_x, agent_center_y) = if let Some(size) =world.get_size(&agent_id) {
+                    (
+                        agent_x + (size.0 * 0.5),
+                        agent_y + (size.1 * 0.5),
+                    )
+                } else {
+                    (
+                        *agent_x,
+                        *agent_y
+                    )
+                };
+                let (object_center_x, object_center_y) = if let Some(size) =world.get_size(&agent_id) {
+                    (
+                        object_x + (size.0 * 0.5),
+                        object_y + (size.1 * 0.5),
+                    )
+                } else {
+                    (
+                        *object_x,
+                        *object_y
+                    )
+                };
+                if within_range(agent_center_x, agent_center_y, object_center_x, object_center_y, 20.0) {
                     return Return::ActionInvalid("object is too far away!".to_owned());
                 };
             }
             // there is no location recorded for the object
             None => {
-                return Return::ActionInvalid("object not found!".to_owned());
+                return Return::ActionInvalid("object's location not found!".to_owned());
             }
         }
         // get the object's type
         let Some(object) = world.get_type(&object_id) else {
-            return Return::ActionInvalid("object not found!".to_owned());
+            return Return::ActionInvalid("object's type not found!".to_owned());
         };
         // decide what to do based on the objects type
         match object {
@@ -102,5 +124,142 @@ impl UseObject<Command> for Command {
                 ])
             }
         }
+    }
+}
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+
+    use crate::sandbox::interaction::get_interactions;
+
+    use super::*;
+
+    const GRID_SIZE: f32 = 5.0;
+    #[test]
+    pub fn no_agent_test() {
+        let acts = get_interactions::<Command>();
+        let world = World::new(
+            HashMap::new(),
+            HashMap::new(),
+            HashMap::new(),
+            HashMap::new(),
+            HashMap::from([
+                (0, Item::Food)
+            ]),
+            HashMap::new(),
+        );
+        let x = (acts[0].act)(42, 0, &world);
+        assert_eq!(
+            x,
+            Return::ActionInvalid("Agent not found!".into())
+        )
+    }
+    #[test]
+    pub fn someones_else_object_test() {
+        let acts = get_interactions::<Command>();
+        let world = World::new(
+            HashMap::from([
+                (42, Location::Inventory(2)),
+            ]),
+            HashMap::new(),
+            HashMap::new(),
+            HashMap::new(),
+            HashMap::from([
+                (0, Item::Agent)
+            ]),
+            HashMap::new(),
+        );
+        let x = (acts[0].act)(0, 42, &world);
+        assert_eq!(
+            x,
+            Return::ActionInvalid("Object in someone else's inventory".into())
+        )
+    }
+    #[test]
+    pub fn agent_in_another_world_test() {
+        let acts = get_interactions::<Command>();
+        let world = World::new(
+            HashMap::from([
+                (0, Location::Inventory(2)),
+                (42, Location::World { x: 1.0, y: 1.0 }),
+            ]),
+            HashMap::new(),
+            HashMap::new(),
+            HashMap::new(),
+            HashMap::from([
+                (0, Item::Agent)
+            ]),
+            HashMap::new(),
+        );
+        let x = (acts[0].act)(0, 42, &world);
+        assert_eq!(
+            x,
+            Return::ActionInvalid("Actor not in the world with object".into())
+        )
+    }
+    #[test]
+    pub fn too_far_test() {
+        let acts = get_interactions::<Command>();
+        let world = World::new(
+            HashMap::from([
+                (0, Location::World { x: 0.0, y: 0.0 }),
+                (42, Location::World { x: 0.0, y: 100.0 }),
+            ]),
+            HashMap::new(),
+            HashMap::new(),
+            HashMap::new(),
+            HashMap::from([
+                (0, Item::Agent)
+            ]),
+            HashMap::new(),
+        );
+        let x = (acts[0].act)(0, 42, &world);
+        assert_eq!(
+            x,
+            Return::ActionInvalid("object is too far away!".into())
+        )
+    }
+    #[test]
+    pub fn no_object_location_test() {
+        let acts = get_interactions::<Command>();
+        let world = World::new(
+            HashMap::from([
+                (0, Location::World { x: 0.0, y: 0.0 }),
+            ]),
+            HashMap::new(),
+            HashMap::new(),
+            HashMap::new(),
+            HashMap::from([
+                (0, Item::Agent)
+            ]),
+            HashMap::new(),
+        );
+        let x = (acts[0].act)(0, 42, &world);
+        assert_eq!(
+            x,
+            Return::ActionInvalid("object's location not found!".into())
+        )
+    }
+    #[test]
+    pub fn no_object_type_test() {
+        let acts = get_interactions::<Command>();
+        let world = World::new(
+            HashMap::from([
+                (0, Location::World { x: 0.0, y: 0.0 }),
+                (42, Location::World { x: 0.0, y: 0.0 }),
+            ]),
+            HashMap::new(),
+            HashMap::new(),
+            HashMap::new(),
+            HashMap::from([
+                (0, Item::Agent)
+            ]),
+            HashMap::new(),
+        );
+        let x = (acts[0].act)(0, 42, &world);
+        assert_eq!(
+            x,
+            Return::ActionInvalid("object's type not found!".into())
+        )
     }
 }

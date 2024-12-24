@@ -12,6 +12,7 @@ pub struct World {
     sizes: HashMap<ObjectId, (f32, f32)>,
     r#type: HashMap<ObjectId, Item>,
     highest_id: ObjectId,
+    movement: HashMap<ObjectId, ((f32,f32), f32)>,
 }
 
 impl
@@ -21,17 +22,32 @@ impl
         HashMap<ObjectId, i16>,
         HashMap<ObjectId, (f32, f32)>,
         HashMap<ObjectId, Item>,
+        HashMap<ObjectId, ((f32,f32), f32)>,
     )> for World
 {
     fn from(
-        (locations, energy, hp, sizes, r#type): (
+        (locations, energy, hp, sizes, r#type, movement): (
             HashMap<ObjectId, Location>,
             HashMap<ObjectId, i16>,
             HashMap<ObjectId, i16>,
             HashMap<ObjectId, (f32, f32)>,
             HashMap<ObjectId, Item>,
+            HashMap<ObjectId, ((f32,f32), f32)>,
         ),
     ) -> Self {
+        Self::new(locations, energy, hp, sizes, r#type, movement)
+    }
+}
+
+impl World {
+    pub fn new(
+        locations: HashMap<ObjectId, Location>,
+        energy: HashMap<ObjectId, i16>,
+        hp: HashMap<ObjectId, i16>,
+        sizes: HashMap<ObjectId, (f32, f32)>,
+        r#type: HashMap<ObjectId, Item>,
+        movement: HashMap<ObjectId, ((f32,f32), f32)>,    
+    )->Self {
         let mut highest_id = 0;
         if let Some(value) = locations.keys().max() {
             highest_id = value.clone();
@@ -48,6 +64,9 @@ impl
         if let Some(value) = r#type.keys().max() {
             highest_id = highest_id.max(value.clone());
         }
+        if let Some(value) = movement.keys().max() {
+            highest_id = highest_id.max(value.clone());
+        }
 
         Self {
             locations,
@@ -56,13 +75,8 @@ impl
             sizes,
             r#type,
             highest_id,
+            movement,
         }
-    }
-}
-
-impl World {
-    pub fn get_location(&self, id: &ObjectId) -> Option<&Location> {
-        self.locations.get(id)
     }
     pub fn get_energy(&self, id: &ObjectId) -> Option<&i16> {
         self.energy.get(id)
@@ -70,11 +84,33 @@ impl World {
     pub fn get_hp(&self, id: &ObjectId) -> Option<&i16> {
         self.hp.get(id)
     }
+    pub fn get_location(&self, id: &ObjectId) -> Option<&Location> {
+        self.locations.get(id)
+    }
+    pub fn insert_location(&mut self, id: ObjectId, loc: Location) -> Option<Location> {
+        self.locations.insert(id, loc)
+    }
+    pub fn get_movement(&self, id: &ObjectId) -> Option<&((f32, f32), f32)> {
+        self.movement.get(id)
+    }
     pub fn get_size(&self, id: &ObjectId) -> Option<&(f32, f32)> {
         self.sizes.get(id)
     }
     pub fn get_type(&self, id: &ObjectId) -> Option<&Item> {
         self.r#type.get(id)
+    }
+    // interators
+    pub fn energy_iter(&self) -> std::collections::hash_map::Iter<'_, usize, i16> {
+        self.energy.iter()
+    }
+    pub fn hp_iter(&self) -> std::collections::hash_map::Iter<'_, usize, i16> {
+        self.hp.iter()
+    }
+    pub fn locations_iter(&self) -> std::collections::hash_map::Iter<'_, usize, Location> {
+        self.locations.iter()
+    }
+    pub fn movement_iter(&self) -> std::collections::hash_map::Iter<'_, usize, ((f32, f32), f32)> {
+        self.movement.iter()
     }
     pub fn type_iter(&self) -> std::collections::hash_map::Iter<'_, ObjectId, Item> {
         self.r#type.iter()
