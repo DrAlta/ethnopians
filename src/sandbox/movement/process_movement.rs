@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
-use broad_phase::{AARect, Entity};
+use broad_phase::{AARect, Entity, AABB};
 use qol::logy;
 
 use crate::{sandbox::{Command, Location, ObjectId, Return, World}, Vec2};
 
-use super::{moveit, setup_avals_map};
+use super::{moveit, setup_avals_map, Prev};
 
 pub fn process_movement(max_step: f32, time_step: f32, world:&World) -> 
 (Return<Command>, Vec<[HashMap::<ObjectId, Entity>;3]>) {
@@ -32,7 +32,7 @@ pub fn process_movement(max_step: f32, time_step: f32, world:&World) ->
     let mut froms = HashMap::<ObjectId, Entity>::new();
     #[allow(unused_mut)]
     let mut history = Vec::new();
-    let mut last_froms = HashMap::<ObjectId, Entity>::new();
+    let mut last_froms = HashMap::<ObjectId, (f32, f32)>::new();
     for step_number in 1..(number_of_substeps as usize + 1){
         logy!("debug", "processing step {step_number}");
         let desired = world.movement_iter().filter_map(
@@ -71,8 +71,13 @@ pub fn process_movement(max_step: f32, time_step: f32, world:&World) ->
         .collect();
 
         let (avals, map) = setup_avals_map(collisions, rearendings);
-    
-        [froms, collisions, rearendings] = moveit(desired, avals, map, world);
+        [froms, collisions, rearendings] = if step_number == 0 {
+            moveit(desired, avals, map, world)
+        } else {
+            let prev = Previous{ sizes: world.raw_sizes(), locations: &last_froms };
+            moveit(desired, avals, map, &prev )
+        };
+        /*
         for unit_id in collisions.keys() {
             if let Some((_, entity)) = last_froms.iter().find(|&(k, _)|{
                 k == unit_id
@@ -89,9 +94,13 @@ pub fn process_movement(max_step: f32, time_step: f32, world:&World) ->
                 rearendings.insert(unit_id.clone(), readended_entity);
             }
         }
+        */
 
 
-        last_froms = froms.clone();
+        last_froms = froms.iter().map(|(id, entity)|{
+            (id.clone(), (entity.get_min_x(), entity.get_min_y()))
+        })
+        .collect();
         #[cfg(feature = "move_history")]
         history.push([froms.clone(), collisions.clone(), rearendings.clone()]);
 
@@ -99,6 +108,7 @@ pub fn process_movement(max_step: f32, time_step: f32, world:&World) ->
         
     }
     let mut commands = Vec::new();
+    /*
     for (unit_id, entity) in rearendings {
         let Entity::AARect(AARect{ min_x, min_y, .. }) = entity else {
             continue;
@@ -109,7 +119,7 @@ pub fn process_movement(max_step: f32, time_step: f32, world:&World) ->
         if (min_x - x).abs() > f32::EPSILON || (min_y - y).abs() > f32::EPSILON {
             commands.push(Command::SetLocation { agent_id: unit_id, loc: Location::World { x: min_x, y: min_y } });
         }
-    }
+    }*/
     for (unit_id, entity) in froms {
         let Entity::AARect(AARect{ min_x, min_y, .. }) = entity else {
             continue;
@@ -123,4 +133,20 @@ pub fn process_movement(max_step: f32, time_step: f32, world:&World) ->
     }
     (Return::Commands(commands), history)
 
+}
+
+struct Previous<'a> {
+    pub sizes: &'a HashMap<ObjectId, (f32, f32)>,
+    pub locations: &'a HashMap<ObjectId, (f32, f32)>,
+}
+impl<'a> Prev for Previous<'a> {
+    fn get_location(&self, id: &ObjectId) -> Option<(f32, f32)> {
+        let (x,y) =self.locations.get(id)?;
+        Some((*x, *y))
+    }
+
+    fn get_size(&self, id: &ObjectId) -> Option<(f32, f32)> {
+        let (w, h) =self.sizes.get(id)?;
+        Some((*w, *h))
+    }
 }

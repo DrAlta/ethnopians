@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::sandbox::{Item, Location, ObjectId};
+use crate::sandbox::{Item, Location, ObjectId, Prev};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct World {
@@ -113,6 +113,11 @@ impl World {
     pub fn type_iter(&self) -> std::collections::hash_map::Iter<'_, ObjectId, Item> {
         self.r#type.iter()
     }
+    //raws
+    pub fn raw_sizes(&self) -> &HashMap<ObjectId, (f32, f32)> {
+        &self.sizes
+    }
+
 }
 
 impl World {
@@ -137,5 +142,19 @@ impl World {
             }
             return new_id;
         }
+    }
+}
+
+impl Prev for World {
+    fn get_location(&self, id: &ObjectId) -> Option<(f32, f32)> {
+        let Some(Location::World { x, y }) = self.get_location(id) else {
+            return None;
+        };
+        Some((*x, *y))
+    }
+
+    fn get_size(&self, id: &ObjectId) -> Option<(f32, f32)> {
+        let (x, y) = self.get_size(id)?;
+        Some((*x, *y))
     }
 }

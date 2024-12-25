@@ -2,24 +2,24 @@ use std::collections::{BTreeSet, HashMap};
 
 use broad_phase::{AARect, Entity, EntityId, SpatialBloom};
 
-use crate::sandbox::{Location, ObjectId, World};
+use crate::sandbox::{ObjectId, Prev};
 
 use super::Avalibility;
 
-pub fn collision(
+pub fn collision<T: Prev>(
     mut todo: BTreeSet<ObjectId>,
     aval: &mut HashMap<EntityId, Avalibility>,
     map: &mut SpatialBloom,
-    world: &World,
+    prev: &T,
 ) {
     loop {
         let Some(unit_id) = todo.pop_first() else {
             return;
         };
-        let Some(Location::World { x, y }) = world.get_location(&unit_id) else {
+        let Some(( x, y )) = prev.get_location(&unit_id) else {
             continue;
         };
-        let Some(size) = world.get_size(&unit_id) else {
+        let Some(size) = prev.get_size(&unit_id) else {
             continue;
         };
         let q = map.qurry(x.clone(), y.clone(), x + size.0, y + size.1);
