@@ -71,7 +71,7 @@ pub fn process_movement(max_step: f32, time_step: f32, world:&World) ->
         .collect();
 
         let (avals, map) = setup_avals_map(collisions, rearendings);
-        [froms, collisions, rearendings] = if step_number == 0 {
+        [froms, collisions, rearendings] = if step_number == 1 {
             moveit(desired, avals, map, world)
         } else {
             let prev = Previous{ sizes: world.raw_sizes(), locations: &last_froms };

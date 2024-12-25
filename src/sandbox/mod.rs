@@ -12,7 +12,7 @@ pub use item::Item;
 mod location;
 pub use location::Location;
 mod movement;
-pub use movement::{process_movement, Prev, WorldWraper};
+pub use movement::{process_movement, Prev};
 mod r#return;
 pub use r#return::Return;
 mod sandbox;

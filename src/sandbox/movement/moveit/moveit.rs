@@ -1,6 +1,7 @@
 use std::collections::{BTreeSet, HashMap};
 
 use broad_phase::{AARect, Entity, EntityId, SpatialBloom};
+use qol::logy;
 
 use crate::sandbox::ObjectId;
 
@@ -39,7 +40,7 @@ pub fn moveit<T: Prev>(
                     let Avalibility::From(o) = cell else { continue };
                     let o2 = o.clone();
                     if let Avalibility::From(source_object) =
-                        std::mem::replace(cell, Avalibility::Collision(o2))
+                        std::mem::replace(cell, Avalibility::Collision(o2.clone()))
                     {
                         collision(
                             BTreeSet::from([source_object.clone()]),
@@ -48,6 +49,14 @@ pub fn moveit<T: Prev>(
                             prev,
                         );
                     };
+                    if let Some(( x, y )) = prev.get_location(&o2) {
+                        logy!("trace-moveit", "putting Rearended in at the original location");
+                        let rearend_cell_id =
+                            map.insert(Entity::AARect(AARect::new(x, y, size.0, size.1)));
+                        avals.insert(rearend_cell_id, Avalibility::RearEnded(o2));
+                    }
+        
+
                     let new_cell_id = map.insert(Entity::AARect(AARect::new(
                         destination.0,
                         destination.1,
@@ -66,24 +75,28 @@ pub fn moveit<T: Prev>(
                 None => (),
             }
         }
-        if let Some(( x, y )) = prev.get_location(&unit_id) {
-            let dest_aval;
-            if blocked {
-                dest_aval = Avalibility::Collision(unit_id.clone());
-                let collision_cell_id =
+
+        let dest_aval;
+        if blocked {
+            println!("here");
+            logy!("trace-moveit", "the unit colided with something");
+            dest_aval = Avalibility::Collision(unit_id.clone());
+            if let Some(( x, y )) = prev.get_location(&unit_id) {
+                logy!("trace-moveit", "putting Rearended in at the original location");
+                let rearend_cell_id =
                     map.insert(Entity::AARect(AARect::new(x, y, size.0, size.1)));
-                avals.insert(collision_cell_id, Avalibility::Collision(unit_id));
-            } else {
-                dest_aval = Avalibility::From(unit_id);
+                avals.insert(rearend_cell_id, Avalibility::RearEnded(unit_id));
             }
-            let dest_cell_id = map.insert(Entity::AARect(AARect::new(
-                destination.0,
-                destination.1,
-                size.0,
-                size.1,
-            )));
-            avals.insert(dest_cell_id, dest_aval);
+        } else {
+            dest_aval = Avalibility::From(unit_id);
         }
+        let dest_cell_id = map.insert(Entity::AARect(AARect::new(
+            destination.0,
+            destination.1,
+            size.0,
+            size.1,
+        )));
+        avals.insert(dest_cell_id, dest_aval);
     }
     let mut from= HashMap::new();
     let mut collision= HashMap::new();
