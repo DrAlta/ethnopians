@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use broad_phase::{AARect, Entity};
+use qol::logy;
 
 use crate::{sandbox::{Command, Location, ObjectId, Return, World}, Vec2};
 
@@ -14,6 +15,13 @@ pub fn process_movement(max_step: f32, time_step: f32, world:&World) ->
     let number_of_substeps = world.movement_iter().fold(
         1_f32,|x, (_,(_,speed))|{
             let step_dist = speed * time_step;
+            logy!(
+                "debug-process-movement", 
+                "step_dist / max_step = {} / {} = {}", 
+                step_dist,
+                max_step,
+                step_dist / max_step
+            );
             x.max((step_dist / max_step).ceil())
         }
     );
@@ -24,7 +32,9 @@ pub fn process_movement(max_step: f32, time_step: f32, world:&World) ->
     let mut froms = HashMap::<ObjectId, Entity>::new();
     #[allow(unused_mut)]
     let mut history = Vec::new();
-    for step_number in number_of_substeps as usize..(number_of_substeps as usize + 1){
+    let mut last_froms = HashMap::<ObjectId, Entity>::new();
+    for step_number in 1..(number_of_substeps as usize + 1){
+        logy!("debug", "processing step {step_number}");
         let desired = world.movement_iter().filter_map(
             |
                 (
@@ -36,34 +46,55 @@ pub fn process_movement(max_step: f32, time_step: f32, world:&World) ->
                 ) 
             | {
                 if collisions.contains_key(unit_id) || rearendings.contains_key(unit_id) {
+                logy!("debug", "this is an early out if this unit already has a collision which has been carried over since the last substep");
                     return None;
                 }
                 let Some(Location::World { x, y }) = world.get_location(unit_id) else {
+                    logy!("debug", "the unit doesn't have a location in the world");
                     return None;
                 };
                 let step_dist = speed * time_substep * step_number as f32;
                 let target_vec= Vec2{x: *tx, y: *ty};
                 let origin_vec = Vec2{x:*x, y:*y};
-                if (target_vec - origin_vec).length_squared() < speed * time_substep {
+                if (target_vec - origin_vec).length_squared() < step_dist * time_substep {
+                    logy!("debug", " the unit is moving more that the distance to the target so returning the target");
                     Some((unit_id.clone(), (target_vec.x, target_vec.y)))
                 } else {
+                    logy!("debug", "the unit is moving less that the distance to the target so returning the origin + (direction_of_motion * distance_traveled)");
                     let delta = (target_vec - origin_vec).normalize() * step_dist;
-                    println!("{step_number}delta:{delta}");
                     let step = Vec2{x:*x, y:*y} + delta;
+                    println!("origin + delta = [{x}:{y}] + {delta} = {step}");
                     Some((unit_id.clone(), (step.x, step.y)))
                 }
             }
         )
         .collect();
+
         let (avals, map) = setup_avals_map(collisions, rearendings);
     
-        let x = moveit(desired, avals, map, world);
-        #[cfg(feature = "move_history")]
-        println!("saving histoy");
-        #[cfg(feature = "move_history")]
-        history.push(x.clone());
+        [froms, collisions, rearendings] = moveit(desired, avals, map, world);
+        for unit_id in collisions.keys() {
+            if let Some((_, entity)) = last_froms.iter().find(|&(k, _)|{
+                k == unit_id
+            }) {
+                rearendings.insert(unit_id.clone(), entity.clone());
+            } else if let (
+                Some(Location::World { x, y }),
+                Some((w,h))
+            ) = (
+                world.get_location(unit_id),
+                world.get_size(unit_id)
+            ) {
+                let readended_entity = Entity::AARect(AARect::new(*x, *y, *w, *h));
+                rearendings.insert(unit_id.clone(), readended_entity);
+            }
+        }
 
-        [froms, collisions, rearendings] = x;
+
+        last_froms = froms.clone();
+        #[cfg(feature = "move_history")]
+        history.push([froms.clone(), collisions.clone(), rearendings.clone()]);
+
 
         
     }
@@ -93,4 +124,3 @@ pub fn process_movement(max_step: f32, time_step: f32, world:&World) ->
     (Return::Commands(commands), history)
 
 }
-

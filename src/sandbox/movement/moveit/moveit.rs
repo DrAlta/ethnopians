@@ -1,8 +1,9 @@
 use std::collections::{BTreeSet, HashMap};
 
 use broad_phase::{AARect, Entity, EntityId, SpatialBloom};
+use qol::logy;
 
-use crate::sandbox::{Location, ObjectId, World};
+use crate::sandbox::{ObjectId, World};
 
 use super::{Avalibility, collision};
 
@@ -66,9 +67,31 @@ pub fn moveit(
                 None => (),
             }
         }
+        //new
+        let dest_aval;
+        if blocked {
+            logy!("debug", "unit was blocked");
+            dest_aval = Avalibility::Collision(unit_id.clone());
+//            let collision_cell_id =
+//                map.insert(Entity::AARect(AARect::new(*x, *y, size.0, size.1)));
+//            avals.insert(collision_cell_id, Avalibility::Collision(unit_id));
+        } else {
+            dest_aval = Avalibility::From(unit_id);
+        }
+        let dest_cell_id = map.insert(Entity::AARect(AARect::new(
+            destination.0,
+            destination.1,
+            size.0,
+            size.1,
+        )));
+        avals.insert(dest_cell_id, dest_aval);
+
+        /* old
         if let Some(Location::World { x, y }) = world.get_location(&unit_id) {
+            logy!("debug", "got unit's location in the world");
             let dest_aval;
             if blocked {
+                logy!("debug", "unit was blocked");
                 dest_aval = Avalibility::Collision(unit_id.clone());
                 let collision_cell_id =
                     map.insert(Entity::AARect(AARect::new(*x, *y, size.0, size.1)));
@@ -84,6 +107,7 @@ pub fn moveit(
             )));
             avals.insert(dest_cell_id, dest_aval);
         }
+        */
     }
     let mut from= HashMap::new();
     let mut collision= HashMap::new();
