@@ -91,6 +91,9 @@ impl World {
     pub fn get_movement(&self, id: &ObjectId) -> Option<&((f32, f32), f32)> {
         self.movement.get(id)
     }
+    pub fn insert_movement(&mut self, id: ObjectId, target: (f32, f32), speed: f32) -> Option<((f32, f32), f32)> {
+        self.movement.insert(id, (target, speed))
+    }
     pub fn get_size(&self, id: &ObjectId) -> Option<&(f32, f32)> {
         self.sizes.get(id)
     }
