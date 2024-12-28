@@ -60,15 +60,10 @@ pub fn process_movement(max_step: f32, time_step: f32, world:&World) ->
                 let delta = (target_vec - origin_vec).normalize() * step_dist;
                 if (target_vec - origin_vec).length_squared() < (step_dist * step_dist) + f32::EPSILON {
                     logy!("debug-process-movement", " the unit is moving more that the distance to the target so returning the target");
-                    print!("*");
                     Some((unit_id.clone(), (target_vec.x, target_vec.y)))
                 } else {
                     logy!("debug-process-movement", "the unit is moving less that the distance to the target so returning the origin + (direction_of_motion * distance_traveled)");
                     let step = Vec2{x:*x, y:*y} + delta;
-                    println!("{}={}|origin + delta = [{x}:{y}] + {delta} = {step}",
-                        (target_vec - origin_vec).length_squared(), 
-                        (step_dist * step_dist)
-                    );
                     Some((unit_id.clone(), (step.x, step.y)))
                 }
             }
