@@ -2,6 +2,13 @@ use std::collections::HashMap;
 
 use super::{Node, ReturnPointer, StackItem, Status};
 
+mod tick_action;
+pub use tick_action::tick_action;
+mod tick_selector;
+pub use tick_selector::tick_selector;
+mod tick_sequence;
+pub use tick_sequence::tick_sequence;
+
 pub fn load(
     token: ReturnPointer, 
     _bt: & HashMap<ReturnPointer, Node>
@@ -65,7 +72,7 @@ fn test() {
 
     let (mut pc, mut stack, mut rs) = load(selector, &bt);
 
-    for _ in 0..3{
+    for _ in 0..9{
         println!("----\nStack:{stack:?}\nreturn_stack:{rs:?}");
         match step(&mut pc, &mut stack, &mut rs, &bt) {
             Ok(ok) => {
