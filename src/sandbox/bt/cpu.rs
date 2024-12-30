@@ -66,7 +66,7 @@ fn test() {
     let (mut pc, mut stack, mut rs) = load(selector, &bt);
 
     for _ in 0..3{
-        println!("----\n{rs:?}\n----");
+        println!("----\nStack:{stack:?}\nreturn_stack:{rs:?}");
         match step(&mut pc, &mut stack, &mut rs, &bt) {
             Ok(ok) => {
                 println!("{ok:?}");

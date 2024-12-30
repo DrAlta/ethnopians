@@ -1,3 +1,5 @@
+use qol::logy;
+
 use crate::sandbox::bt::{ActionId, ReturnPointer, StackItem, Status};
 
 pub enum Node {
@@ -51,15 +53,17 @@ impl Node {
             return Err("Nothing on stack when checking result of child".into())
         };
 
-        let StackItem::Init = tos else {
+        if StackItem::Init == tos {
             stack.push(StackItem::Sequence(0));
             let Some(child_token) = children.first() else {
                 return Err("failed to get first child".into())
             };
+            logy!("trace-tick-sequence", "Initalizing Sequence");
             return_stack.push(child_token.clone());
             *pc = Some(child_token.clone());
             return Ok(Status::None)
         };
+        logy!("trace-tick-sequence", "Doing main body of Sequence tick");
 
 
         let Some(StackItem::Sequence(idx)) = stack.pop() else {
@@ -123,15 +127,17 @@ impl Node {
             return Err("Nothing on stack when checking result of child".into())
         };
 
-        let StackItem::Init = tos else {
+        if StackItem::Init == tos {
             stack.push(StackItem::Selector(0));
             let Some(child_token) = children.first() else {
                 return Err("failed to get first child".into())
             };
+            logy!("trace-tick-selector", "Initalizing Selector");
             return_stack.push(child_token.clone());
             *pc = Some(child_token.clone());
             return Ok(Status::None)
         };
+        logy!("trace-tick-selector", "Doing main body of Selector tick");
 
 
         let Some(StackItem::Selector(idx)) = stack.pop() else {
