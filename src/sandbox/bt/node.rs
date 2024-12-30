@@ -1,175 +1,149 @@
-enum Node {
+use std::collections::HashMap;
+
+use crate::sandbox::bt::{ActionId, ReturnPointer, StackItem, Status, World};
+
+pub enum Node {
     Sequence(Vec<ReturnPointer>),
     Selector(Vec<ReturnPointer>),
-    Action(fn(&mut World) -> Status),
+    Action(ActionId),
 }
 impl Node {
-    fn tick_selector(
-        children: &Vec<ReturnPointer>, 
-        stack: &mut Vec::<NodeState>, 
+    fn tick_action(
+        action_id: &ActionId, 
+        stack: &mut Vec::<StackItem>, 
         return_stack: &mut Vec::<ReturnPointer>, 
-        bt: &HashMap::<ReturnPointer, Node>, 
-        world: &mut World,
-    ) -> Status {
-        let Some(NodeState::Selector(idx)) = stack.pop() else {
-            return Status::Failure
+        pc: &mut Option<ReturnPointer>,
+        _world: &mut World) -> Result<Status, String> {
+        let Some(tos) = stack.pop() else {
+            return Err("Nothing on stack when checking result of child".into())
         };
-        
-        for idx2 in idx..children.len() {
-//            let pre: &str = if let Some(thing) = return_stack.last() { thing } else {&""};
-            let Some(child) = bt.get(children.get(idx2).unwrap()) else {
-                return Status::Failure
-            };
-
-            return_stack.push(idx2);//format!("{pre}:{idx}"));
-            child.init(stack);
-            match child.tick(stack, return_stack, bt, world) {
-                Status::Success => {
-                    return_stack.pop();
-                    return Status::Success
-                },
-                Status::Failure => {
-                    return_stack.pop();
-                    continue
-                },
-                Status::Running(x) => {
-                    //return_stack.pop();
-                    stack.push(NodeState::Selector(idx2));
-                    return Status::Running(x)
-                },
+        match tos {
+            StackItem::Success => {
+                stack.push(StackItem::Success);
+                // remove ourselve from the return stack
+                return_stack.pop();
+                if let Some(parent_token) = return_stack.last() {
+                    // return to calling fuction
+                    *pc = Some(parent_token.clone());
+                } else {
+                    // the program finished
+                    *pc = None;
+                };
+                return Ok(Status::Success)
+            },
+            StackItem::Init => {
+                stack.push(StackItem::Success);
+                return Ok(Status::Running(action_id.clone()))
+            },
+            _ => {
+                return Err("invalid Top of stack".into())
             }
         }
-        Status::Failure
     }
+
     fn tick_sequence(
         children: &Vec<ReturnPointer>, 
-        stack: &mut Vec::<NodeState>, 
+        stack: &mut Vec::<StackItem>, 
         return_stack: &mut Vec::<ReturnPointer>, 
-        pc: &mut ReturnPointer,
-        bt: HashMap<ReturnPointer, Node>,
-        world: &mut World) -> Status {
-        let Some(NodeState::Sequence(idx)) = stack.pop() else {
-            return Status::Failure
-        };
-        
-        let Some(child) = children.get(idx) else {
-            return Status::Failure
-        };
-        return_stack.push(pc);
-        child.init(stack, return_stack);
-        //set the program counter so the child is executed next
-        *rp = child;
+        pc: &mut Option<ReturnPointer>,
+        bt: &HashMap<ReturnPointer, Node>,
+        _world: &mut World) -> Result<Status, String> {
+        let Some(tos) = stack.pop() else {
+            return Err("Nothing on stack when checking result of child".into())
 
-            match child.tick(stack, return_stack, bt, world) {
-                Status::Success => {
-                    return_stack.pop();
-                    continue
-                },
-                Status::Failure => {
-                    return_stack.pop();
-                    return Status::Failure
-                },
-                Status::Running(x) => {
-                    //return_stack.pop();
-                    stack.push(NodeState::Sequence(idx2));
-                    return Status::Running(x)
-                },
+        };
+        let Some(StackItem::Sequence(idx)) = stack.pop() else {
+            return Err("Sequence state not found on stack".into())
+        };
+        match (idx >= children.len(), tos) {
+            (_, StackItem::Failure) => {
+                stack.push(StackItem::Failure);
+                return_stack.pop();
+                if let Some(parent_token) = return_stack.last() {
+                    // return to calling fuction
+                    *pc = Some(parent_token.clone());
+                } else {
+                    // the program finished
+                    *pc = None;
+                };
+                return Ok(Status::Failure)
+            },
+            /*
+            (_, StackItem::Running(x)) => {
+                //pc is pointing at us so don't need changed
+                //but our state on the stack
+                stack.push(StackItem::Sequence(idx));
+                stack.push(StackItem::Init);
+                // pray: signal to the level above that we got running
+                return Ok(Status::Running(x))
+            },
+            */
+            (true, StackItem::Success | StackItem::Init) => {
+                stack.push(StackItem::Success);
+                // remove ourselve from the return stack
+                return_stack.pop();
+                if let Some(parent_token) = return_stack.last() {
+                    // return to calling fuction
+                    *pc = Some(parent_token.clone());
+                } else {
+                    // the program finished
+                    *pc = None;
+                };
+                return Ok(Status::Success)
+            },
+            (false, StackItem::Success | StackItem::Init) => {
+                let child_token = children.get(idx).expect("we already check they it was within range");
+                let Some(child) = bt.get(child_token) else {
+                    return Err("could lookup child in TreeDB".into())
+                };
+                if let Err(err) = child.init(stack) {
+                    return Err(format!("failed ot init child {child_token}:{err}"))
+                };
+                return_stack.push(child_token.clone());
+                *pc = Some(child_token.clone());
+                return Ok(Status::None)
+            },
+            (_,_) => {
+                return Err("TOS wasn't a Success or a Failure".into())
             }
         }
-        Status::Success
     }
-    pub fn resume(
-        &self, 
-        depth: usize, 
-        stack: &mut Vec::<NodeState>,  
-        return_stack: &mut Vec::<ReturnPointer>, 
-        bt: &HashMap::<ReturnPointer, Node>,
-        world: &mut World,
-    ) -> Option<Status> {
-        println!("resume depth:{depth} rs:{return_stack:?}");
-        let child_idx = depth;
-        let child;
+    fn init(
+        &self,
+        stack: &mut Vec::<StackItem>,
+    ) -> Result<(), String>{
         match self {
-            Node::Selector(children) => {
-                println!(
-                    "Geting Selector's {}th child among {}",
-                    if let Some(x) = return_stack.get(child_idx) {x} else{println!("depth to far");return None},
-                    return_stack.len()
-                );
-                child = bt.get(children.get(return_stack[child_idx]).unwrap())?;
-                println!("do you see this?");
+            Node::Sequence(_vec) => {
+                stack.push(StackItem::Sequence(0));
             },
-            Node::Sequence(children) => {
-                println!(
-                    "Geting Sequence's {}th child among {}",
-                    return_stack.get(child_idx)?,
-                    return_stack.len()
-                );
-                child = bt.get(
-                    children.get(
-                        return_stack[child_idx]
-                    ).unwrap()
-                )?;
+            Node::Selector(_vec) => {
+                stack.push(StackItem::Selector(0));
             },
-            Node::Action(_func) => {
-            println!("got action");
-            return None},
+            Node::Action(_action_id) => {
+                stack.push(StackItem::Init);
+            },
         }
-        println!("rs exit:{return_stack:?}");
-        if depth < return_stack.len() - 1 {
-            child.resume(depth + 1, stack, return_stack, bt, world)
-        } else {
-            Some(child.tick(stack, return_stack, bt, world))
-        }
+        Ok(())
     }
+}
 
-    pub fn tick(
-        &self, 
-        stack: &mut Vec::<NodeState>, 
-        return_stack: &mut Vec::<ReturnPointer>, 
-        bt: &HashMap::<ReturnPointer, Node>,
-        world: &mut World
-    ) -> Status {
-        println!("tick rs:{return_stack:?}");
-        match self {
-            Node::Selector(children) => {
-                Self::tick_selector(children, stack, return_stack, bt, world)
-            },
-            Node::Sequence(children) => {
-                Self::tick_sequence(children, stack, return_stack, bt, world)
-            },
-            Node::Action(func) => func(world),
-        }
-    }
-    pub fn init(&self, stack: &mut Vec::<NodeState>,) {
-        match self {
-            Node::Selector(_children) => {
-                stack.push(NodeState::Selector(0))
-            },
-            Node::Sequence(_children) => {
-                stack.push(NodeState::Sequence(0))
-            },
-            _ => (),
-        }
-    }
-    pub fn run(
-        &self, 
-        bt: &HashMap::<ReturnPointer, Node>,
-        world: &mut (bool, bool),
-    ) -> (
-        Status,
-        Vec::<NodeState>, 
-        Vec::<ReturnPointer>,
-    ){
-        let mut stack = Vec::new();
-        let mut rs = Vec::new();
-
-        self.init(&mut stack);
-        let x = self.tick(&mut stack, &mut rs, bt, world);
-
-        (x, stack, rs)
-
-    }
+pub fn load(
+    _token: ReturnPointer, 
+    _bt: & HashMap<ReturnPointer, Node>
+) -> ( 
+    Option<ReturnPointer>,
+    Vec::<StackItem>, 
+    Vec::<ReturnPointer>, 
+) {
+   todo!()
+}
+pub fn step(
+    _pc: &mut Option<ReturnPointer>,
+    _stack: &mut Vec::<StackItem>, 
+    _return_stack: &mut Vec::<ReturnPointer>, 
+    _bt: & HashMap<ReturnPointer, Node>
+) -> Result<Status, String> {
+    todo!()
 }
 
 #[test]
@@ -178,75 +152,39 @@ fn test() {
     let action1 = 0;
     bt.insert(
         action1,
-        Node::Action(|world| {
-            println!("Action 1");
-            if world.0 {
-                world.0 = false;
-                Status::Running(69)
-            } else {
-                Status::Success
-            }
-        })
+        Node::Action(1_usize.into())
     );
 
     let action2 = 1 ;
     bt.insert(
         action2, 
-        Node::Action(|_| {
-            println!("Action 2");
-            Status::Failure
-        })
+        Node::Action(2_usize.into())
     );
     let action3 =3;
     bt.insert(
         action3,
-        Node::Action(|world| {
-            println!("Action 3");
-            if world.1 {
-                world.1 = false;
-                Status::Running(42)
-            } else {
-                return Status::Success
-            }
-        })
+        Node::Action(3_usize.into())
     );
 
-    let sequence = Node::Sequence(vec![action1, action2]);
-    
-    let selector = Node::Selector(vec![sequence, action3]);
-    
-    let mut world = (true, true);
-    let mut depth = 0;
-    let (a, mut stack, mut rs) = selector.run(& bt, &mut world);
-    
-    match a {
-        Status::Success => println!("Sequence succeeded"),
-        Status::Failure => println!("Sequence failed"),
-        Status::Running(x) => {
-            println!("Sequence running {x}");
-        },
-    };
+    let sequence = 4;
+    bt.insert(sequence, Node::Sequence(vec![action1, action2]));
+
+    let selector = 5;
+    bt.insert(selector, Node::Selector(vec![sequence, action3]));
+
+    let (mut pc, mut stack, mut rs) = load(selector, &bt);
+
     for _ in 0..3{
-        println!("----\n{rs:?}\n----{depth}");
-        match selector.resume(depth, &mut stack, &mut rs, & bt, &mut world) {
-            Some(Status::Success) => {
-                depth = 0;
-                println!("Sequence succeeded")
+        println!("----\n{rs:?}\n----");
+        match step(&mut pc, &mut stack, &mut rs, &bt) {
+            Ok(ok) => {
+                println!("{ok:?}");
             },
-            Some(Status::Failure) => {
-                depth = 0;
-                println!("Sequence failed")
-            },
-            Some(Status::Running(x)) => {
-                depth = rs.len() - 1;
-                println!("Sequence running {x}:{rs:?}");
-            },
-            _ => {
-                println!("oops");
-                depth = 0;
-            },
+            Err(err) => {
+                println!("Err:{err:?}");
+                break;
+            }
         };
-        
     }
     panic!("success");
 }
