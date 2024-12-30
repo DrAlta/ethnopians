@@ -61,6 +61,7 @@ pub fn tick_selector(
         // if we haven't reached the end and received a Failure then try the next child
         (false, StackItem::Failure) => {
             let child_token = children.get(idx).expect("we already check they it was within range");
+            stack.push(StackItem::Selector(idx + 1));
             stack.push(StackItem::Init);
             return_stack.push(child_token.clone());
             *pc = Some(child_token.clone());

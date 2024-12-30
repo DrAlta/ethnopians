@@ -50,14 +50,16 @@ pub fn tick_sequence(
             if let Some(parent_token) = return_stack.last() {
                 // return to calling fuction
                 *pc = Some(parent_token.clone());
+                return Ok(Status::None)
             } else {
                 // the program finished
                 *pc = None;
+                return Ok(Status::Success)
             };
-            return Ok(Status::Success)
         },
         (false, StackItem::Success) => {
             let child_token = children.get(idx).expect("we already check they it was within range");
+            stack.push(StackItem::Sequence(idx + 1));
             stack.push(StackItem::Init);
             return_stack.push(child_token.clone());
             *pc = Some(child_token.clone());
