@@ -33,7 +33,7 @@ pub fn step(
     let Some(thread) = bt.get(token) else {
         return Err("failed to get thread {token}".into())
     };
-    thread.tick(stack, return_stack, pc, bt)
+    thread.tick(stack, return_stack, pc)
 }
 
 

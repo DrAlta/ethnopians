@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::sandbox::bt::{ActionId, ReturnPointer, StackItem, Status};
 
 pub enum Node {
@@ -42,17 +40,28 @@ impl Node {
         }
     }
 
+
     fn tick_sequence(
         children: &Vec<ReturnPointer>, 
         stack: &mut Vec::<StackItem>, 
         return_stack: &mut Vec::<ReturnPointer>, 
         pc: &mut Option<ReturnPointer>,
-        bt: &HashMap<ReturnPointer, Node>,
     ) -> Result<Status, String> {
         let Some(tos) = stack.pop() else {
             return Err("Nothing on stack when checking result of child".into())
-
         };
+
+        let StackItem::Init = tos else {
+            stack.push(StackItem::Sequence(0));
+            let Some(child_token) = children.first() else {
+                return Err("failed to get first child".into())
+            };
+            return_stack.push(child_token.clone());
+            *pc = Some(child_token.clone());
+            return Ok(Status::None)
+        };
+
+
         let Some(StackItem::Sequence(idx)) = stack.pop() else {
             return Err("Sequence state not found on stack".into())
         };
@@ -79,7 +88,7 @@ impl Node {
                 return Ok(Status::Running(x))
             },
             */
-            (true, StackItem::Success | StackItem::Init) => {
+            (true, StackItem::Success) => {
                 stack.push(StackItem::Success);
                 // remove ourselve from the return stack
                 return_stack.pop();
@@ -92,14 +101,9 @@ impl Node {
                 };
                 return Ok(Status::Success)
             },
-            (false, StackItem::Success | StackItem::Init) => {
+            (false, StackItem::Success) => {
                 let child_token = children.get(idx).expect("we already check they it was within range");
-                let Some(child) = bt.get(child_token) else {
-                    return Err("could lookup child in TreeDB".into())
-                };
-                if let Err(err) = child.init(stack) {
-                    return Err(format!("failed ot init child {child_token}:{err}"))
-                };
+                stack.push(StackItem::Init);
                 return_stack.push(child_token.clone());
                 *pc = Some(child_token.clone());
                 return Ok(Status::None)
@@ -109,33 +113,80 @@ impl Node {
             }
         }
     }
-    fn init(
-        &self,
-        stack: &mut Vec::<StackItem>,
-    ) -> Result<(), String> {
-        match self {
-            Node::Sequence(_vec) => {
-                stack.push(StackItem::Sequence(0));
+    fn tick_selector(
+        children: &Vec<ReturnPointer>, 
+        stack: &mut Vec::<StackItem>, 
+        return_stack: &mut Vec::<ReturnPointer>, 
+        pc: &mut Option<ReturnPointer>,
+    ) -> Result<Status, String> {
+        let Some(tos) = stack.pop() else {
+            return Err("Nothing on stack when checking result of child".into())
+        };
+
+        let StackItem::Init = tos else {
+            stack.push(StackItem::Selector(0));
+            let Some(child_token) = children.first() else {
+                return Err("failed to get first child".into())
+            };
+            return_stack.push(child_token.clone());
+            *pc = Some(child_token.clone());
+            return Ok(Status::None)
+        };
+
+
+        let Some(StackItem::Selector(idx)) = stack.pop() else {
+            return Err("Selector state not found on stack".into())
+        };
+        match (idx >= children.len(), tos) {
+            // if we had a success then we succeed
+            (_, StackItem::Success) => {
+                stack.push(StackItem::Success);
+                // remove ourselve from the return stack
+                return_stack.pop();
+                if let Some(parent_token) = return_stack.last() {
+                    // return to calling fuction
+                    *pc = Some(parent_token.clone());
+                } else {
+                    // the program finished
+                    *pc = None;
+                };
+                return Ok(Status::Success)
             },
-            Node::Selector(_vec) => {
-                stack.push(StackItem::Selector(0));
+            (true, StackItem::Failure) => {
+            // if we reached the end without a Success then we fail
+                stack.push(StackItem::Failure);
+                return_stack.pop();
+                if let Some(parent_token) = return_stack.last() {
+                    // return to calling fuction
+                    *pc = Some(parent_token.clone());
+                } else {
+                    // the program finished
+                    *pc = None;
+                };
+                return Ok(Status::Failure)
             },
-            Node::Action(_action_id) => {
+            // if we haven't reached the end and received a Failure then try the next child
+            (false, StackItem::Failure) => {
+                let child_token = children.get(idx).expect("we already check they it was within range");
                 stack.push(StackItem::Init);
+                return_stack.push(child_token.clone());
+                *pc = Some(child_token.clone());
+                return Ok(Status::None)
             },
+            (_,_) => {
+                return Err("TOS wasn't a Success or a Failure".into())
+            }
         }
-        Ok(())
     }
     pub fn tick(
         &self,
         stack: &mut Vec::<StackItem>, 
         return_stack: &mut Vec::<ReturnPointer>, 
         pc: &mut Option<ReturnPointer>,
-        bt: &HashMap<ReturnPointer, Node>,
     ) -> Result<Status, String> {
         match self {
-            Node::Sequence(children) => Self::tick_sequence(children, stack, return_stack, pc, bt),
-            Node::Selector(_children) => todo!(),
+            Node::Sequence(children) => Self::tick_sequence(children, stack, return_stack, pc),
+            Node::Selector(children) => Self::tick_selector(children, stack, return_stack, pc),
             Node::Action(action_id) => Self::tick_action(action_id, stack, return_stack, pc),
         }
     }
