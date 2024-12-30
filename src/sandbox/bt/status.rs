@@ -1,6 +1,6 @@
 use super::ActionId;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Status {
     Success,
     Failure,

@@ -13,7 +13,8 @@ pub fn tick_sequence(
     };
 
     if StackItem::Init == tos {
-        stack.push(StackItem::Sequence(0));
+        /* this runs the first child
+        stack.push(StackItem::Sequence(1));
         stack.push(StackItem::Init);
         let Some(child_token) = children.first() else {
             return Err("failed to get first child".into())
@@ -21,6 +22,11 @@ pub fn tick_sequence(
         logy!("trace-tick-sequence", "Initalizing Sequence");
         return_stack.push(child_token.clone());
         *pc = Some(child_token.clone());
+        return Ok(Status::None)
+        */
+        // will setup the process so that the next step We'll process the first child
+        stack.push(StackItem::Sequence(0));
+        stack.push(StackItem::Init);
         return Ok(Status::None)
     };
     logy!("trace-tick-sequence", "Doing main body of Sequence tick");
@@ -69,4 +75,110 @@ pub fn tick_sequence(
             return Err("TOS wasn't a Success or a Failure".into())
         }
     }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    pub fn sequence_init_test() {
+        let mut stack = vec![StackItem::Init];
+        let mut rs = vec![1];
+        let mut pc = Some(1);
+
+        let children = vec![42];
+
+        assert_eq!(
+            tick_sequence(&children, &mut stack, &mut rs, &mut pc),
+            Ok(Status::None)
+        );
+        assert_eq!(
+            stack,
+            vec![StackItem::Sequence(0), StackItem::Init]
+        );
+        assert_eq!(
+            rs,
+            vec![1]
+        );
+        assert_eq!(
+            pc,
+            Some(1)
+        );
+    }
+    #[test]
+    pub fn sequence_step_test() {
+        let mut stack = vec![StackItem::Sequence(0), StackItem::Success];
+        let mut rs = vec![1];
+        let mut pc = Some(1);
+
+        let children = vec![42, 69];
+
+        assert_eq!(
+            tick_sequence(&children, &mut stack, &mut rs, &mut pc),
+            Ok(Status::None)
+        );
+        assert_eq!(
+            stack,
+            vec![StackItem::Sequence(1), StackItem::Init]
+        );
+        assert_eq!(
+            rs,
+            vec![1, 42]
+        );
+        assert_eq!(
+            pc,
+            Some(42)
+        );
+    }
+    #[test]
+    pub fn sequence_success_test() {
+        let mut stack = vec![StackItem::Sequence(2), StackItem::Success];
+        let mut rs = vec![1];
+        let mut pc = Some(1);
+
+        let children = vec![42];
+
+        assert_eq!(
+            tick_sequence(&children, &mut stack, &mut rs, &mut pc),
+            Ok(Status::Success)
+        );
+        assert_eq!(
+            stack,
+            vec![StackItem::Success]
+        );
+        assert_eq!(
+            rs,
+            vec![]
+        );
+        assert_eq!(
+            pc,
+            None
+        );
+    }
+    #[test]
+    pub fn sequence_fail_test() {
+        let mut stack = vec![StackItem::Sequence(0), StackItem::Failure];
+        let mut rs = vec![1];
+        let mut pc = Some(1);
+
+        let children = vec![42];
+
+        assert_eq!(
+            tick_sequence(&children, &mut stack, &mut rs, &mut pc),
+            Ok(Status::Failure)
+        );
+        assert_eq!(
+            stack,
+            vec![StackItem::Failure]
+        );
+        assert_eq!(
+            rs,
+            vec![]
+        );
+        assert_eq!(
+            pc,
+            None
+        );
+    }
+
 }

@@ -72,7 +72,7 @@ fn test() {
 
     let (mut pc, mut stack, mut rs) = load(selector, &bt);
 
-    for _ in 0..9{
+    for _ in 0..13{
         println!("----\nStack:{stack:?}\nreturn_stack:{rs:?}");
         match step(&mut pc, &mut stack, &mut rs, &bt) {
             Ok(ok) => {
