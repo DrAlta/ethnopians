@@ -1,19 +1,20 @@
 use std::collections::HashMap;
 
-use crate::sandbox::bt::{ActionId, ReturnPointer, StackItem, Status, World};
+use crate::sandbox::bt::{ActionId, ReturnPointer, StackItem, Status};
 
 pub enum Node {
     Sequence(Vec<ReturnPointer>),
     Selector(Vec<ReturnPointer>),
     Action(ActionId),
 }
+
 impl Node {
     fn tick_action(
         action_id: &ActionId, 
         stack: &mut Vec::<StackItem>, 
         return_stack: &mut Vec::<ReturnPointer>, 
         pc: &mut Option<ReturnPointer>,
-        _world: &mut World) -> Result<Status, String> {
+    ) -> Result<Status, String> {
         let Some(tos) = stack.pop() else {
             return Err("Nothing on stack when checking result of child".into())
         };
@@ -47,7 +48,7 @@ impl Node {
         return_stack: &mut Vec::<ReturnPointer>, 
         pc: &mut Option<ReturnPointer>,
         bt: &HashMap<ReturnPointer, Node>,
-        _world: &mut World) -> Result<Status, String> {
+    ) -> Result<Status, String> {
         let Some(tos) = stack.pop() else {
             return Err("Nothing on stack when checking result of child".into())
 
@@ -111,7 +112,7 @@ impl Node {
     fn init(
         &self,
         stack: &mut Vec::<StackItem>,
-    ) -> Result<(), String>{
+    ) -> Result<(), String> {
         match self {
             Node::Sequence(_vec) => {
                 stack.push(StackItem::Sequence(0));
@@ -125,67 +126,17 @@ impl Node {
         }
         Ok(())
     }
-}
-
-pub fn load(
-    _token: ReturnPointer, 
-    _bt: & HashMap<ReturnPointer, Node>
-) -> ( 
-    Option<ReturnPointer>,
-    Vec::<StackItem>, 
-    Vec::<ReturnPointer>, 
-) {
-   todo!()
-}
-pub fn step(
-    _pc: &mut Option<ReturnPointer>,
-    _stack: &mut Vec::<StackItem>, 
-    _return_stack: &mut Vec::<ReturnPointer>, 
-    _bt: & HashMap<ReturnPointer, Node>
-) -> Result<Status, String> {
-    todo!()
-}
-
-#[test]
-fn test() {
-    let mut bt = HashMap::<ReturnPointer, Node>::new();
-    let action1 = 0;
-    bt.insert(
-        action1,
-        Node::Action(1_usize.into())
-    );
-
-    let action2 = 1 ;
-    bt.insert(
-        action2, 
-        Node::Action(2_usize.into())
-    );
-    let action3 =3;
-    bt.insert(
-        action3,
-        Node::Action(3_usize.into())
-    );
-
-    let sequence = 4;
-    bt.insert(sequence, Node::Sequence(vec![action1, action2]));
-
-    let selector = 5;
-    bt.insert(selector, Node::Selector(vec![sequence, action3]));
-
-    let (mut pc, mut stack, mut rs) = load(selector, &bt);
-
-    for _ in 0..3{
-        println!("----\n{rs:?}\n----");
-        match step(&mut pc, &mut stack, &mut rs, &bt) {
-            Ok(ok) => {
-                println!("{ok:?}");
-            },
-            Err(err) => {
-                println!("Err:{err:?}");
-                break;
-            }
-        };
+    pub fn tick(
+        &self,
+        stack: &mut Vec::<StackItem>, 
+        return_stack: &mut Vec::<ReturnPointer>, 
+        pc: &mut Option<ReturnPointer>,
+        bt: &HashMap<ReturnPointer, Node>,
+    ) -> Result<Status, String> {
+        match self {
+            Node::Sequence(children) => Self::tick_sequence(children, stack, return_stack, pc, bt),
+            Node::Selector(_children) => todo!(),
+            Node::Action(action_id) => Self::tick_action(action_id, stack, return_stack, pc),
+        }
     }
-    panic!("success");
 }
-

@@ -2,30 +2,16 @@
 
 mod blackboard;
 pub use blackboard::{Blackboard, Variable};
+pub mod cpu;
 mod node;
 pub use node::Node;
+mod stack_item;
+pub use stack_item::StackItem;
+mod status;
+pub use status::Status;
+
 
 type ActionId = usize;
 type ReturnPointer = usize;
-
-#[derive(Debug)]
-enum Status {
-    Success,
-    Failure,
-    Running(ActionId),
-    None,
-}
-
-enum StackItem {
-    //node states
-    Sequence(usize),
-    Selector(usize),
-    // return statues
-    Success,
-    Failure,
-    Init,
-}
-
-
 type World = (bool, bool);
 
