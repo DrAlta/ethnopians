@@ -1,10 +1,10 @@
-use crate::sandbox::bt::{ActionId, ReturnPointer, StackItem, Status};
+use crate::sandbox::bt::{ActionId, ExecutionToken, StackItem, Status};
 
 pub fn tick_action(
     action_id: &ActionId, 
     stack: &mut Vec::<StackItem>, 
-    return_stack: &mut Vec::<ReturnPointer>, 
-    pc: &mut Option<ReturnPointer>,
+    return_stack: &mut Vec::<ExecutionToken>, 
+    pc: &mut Option<ExecutionToken>,
 ) -> Result<Status, String> {
     let Some(tos) = stack.pop() else {
         return Err("Nothing on stack when checking result of child".into())
@@ -12,11 +12,9 @@ pub fn tick_action(
     match tos {
         StackItem::Success => {
             stack.push(StackItem::Success);
-            // remove ourselve from the return stack
-            return_stack.pop();
-            if let Some(parent_token) = return_stack.last() {
+            if let Some(parent_token) = return_stack.pop() {
                 // return to calling fuction
-                *pc = Some(parent_token.clone());
+                *pc = Some(parent_token);
                 return Ok(Status::None)
             } else {
                 // the program finished

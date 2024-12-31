@@ -1,6 +1,6 @@
 #[derive(Debug, PartialEq)]
 pub enum StackItem {
-    //node states
+    //Behaior Tree states
     Sequence(usize),
     Selector(usize),
     // return statues
