@@ -22,8 +22,21 @@ pub fn tick_action(
                 return Ok(Status::Success)
             };
         },
+        StackItem::Failure => {
+            stack.push(StackItem::Failure);
+            if let Some(parent_token) = return_stack.pop() {
+                // return to calling fuction
+                *pc = Some(parent_token);
+                return Ok(Status::None)
+            } else {
+                // the program finished
+                *pc = None;
+                return Ok(Status::Failure)
+            };
+        },
         StackItem::Init => {
-            stack.push(StackItem::Success);
+            let x = if action_id % 2 == 1 { StackItem::Success } else {StackItem::Failure};
+            stack.push(x);
             return Ok(Status::Running(action_id.clone()))
         },
         _ => {

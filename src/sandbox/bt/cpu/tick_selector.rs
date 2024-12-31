@@ -40,9 +40,9 @@ pub fn tick_selector(
         // if we had a success then we succeed
         (_, StackItem::Success) => {
             stack.push(StackItem::Success);
-            if let Some(parent_token) = return_stack.last() {
+            if let Some(parent_token) = return_stack.pop() {
                 // return to calling fuction
-                *pc = Some(parent_token.clone());
+                *pc = Some(parent_token);
                 return Ok(Status::None)
             } else {
                 // the program finished
@@ -53,15 +53,15 @@ pub fn tick_selector(
         (true, StackItem::Failure) => {
         // if we reached the end without a Success then we fail
             stack.push(StackItem::Failure);
-            return_stack.pop();
-            if let Some(parent_token) = return_stack.last() {
+            if let Some(parent_token) = return_stack.pop() {
                 // return to calling fuction
-                *pc = Some(parent_token.clone());
+                *pc = Some(parent_token);
+                return Ok(Status::None)
             } else {
                 // the program finished
                 *pc = None;
+                return Ok(Status::Failure)
             };
-            return Ok(Status::Failure)
         },
         // if we haven't reached the end and received a Failure then try the next child
         (false, StackItem::Failure) => {

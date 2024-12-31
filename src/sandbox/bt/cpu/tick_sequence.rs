@@ -38,10 +38,9 @@ pub fn tick_sequence(
     match (idx >= children.len(), tos) {
         (_, StackItem::Failure) => {
             stack.push(StackItem::Failure);
-            return_stack.pop();
-            if let Some(parent_token) = return_stack.last() {
+            if let Some(parent_token) = return_stack.pop() {
                 // return to calling fuction
-                *pc = Some(parent_token.clone());
+                *pc = Some(parent_token);
                 return Ok(Status::None)
             } else {
                 // the program finished
@@ -51,9 +50,9 @@ pub fn tick_sequence(
         },
         (true, StackItem::Success) => {
             stack.push(StackItem::Success);
-            if let Some(parent_token) = return_stack.last() {
+            if let Some(parent_token) = return_stack.pop() {
                 // return to calling fuction
-                *pc = Some(parent_token.clone());
+                *pc = Some(parent_token);
                 return Ok(Status::None)
             } else {
                 // the program finished
