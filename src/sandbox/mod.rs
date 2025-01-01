@@ -8,6 +8,7 @@ pub mod bt;
 pub mod collision;
 mod command;
 pub use command::Command;
+pub mod forth;
 mod item;
 pub use item::Item;
 mod location;

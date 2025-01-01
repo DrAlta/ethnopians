@@ -14,6 +14,7 @@ pub mod combat;
 pub mod formation;
 pub mod mate;
 pub mod preferances;
+pub mod kill_share;
 pub mod sandbox;
 pub mod social_sim;
 mod trauma;
