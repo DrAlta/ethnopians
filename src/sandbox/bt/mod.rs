@@ -3,15 +3,21 @@
 mod blackboard;
 pub use blackboard::{Blackboard, Variable};
 pub mod cpu;
+mod instruction;
+pub use instruction::Instruction;
+pub mod parser;
 mod stack_item;
 pub use stack_item::StackItem;
 mod status;
 pub use status::Status;
-mod thread;
-pub use thread::Thread;
 
+#[derive(Debug,Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub enum InpulseId {
+    Act1,
+    Act2,
+    Act3,
 
-type ActionId = usize;
-type ExecutionToken = usize;
+}
+type ExecutionToken = String;
 type World = (bool, bool);
 

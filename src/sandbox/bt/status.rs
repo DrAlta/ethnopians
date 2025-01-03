@@ -1,9 +1,9 @@
-use super::ActionId;
+use super::InpulseId;
 
 #[derive(Debug, PartialEq)]
 pub enum Status {
     Success,
     Failure,
-    Running(ActionId),
+    Running(InpulseId),
     None,
 }

@@ -21,6 +21,7 @@ qol = { version = "0.1.14", git = "https://github.com/DrAlta/rust_quality_of_lif
 macroquad = { version = "0.4.13", optional = true }
 base64 = "0.22.1"
 tales-of-tails = { version = "0.1.4", path = "../tales-of-tails"}
+nom = "7.1.3"
 
 
 [features]

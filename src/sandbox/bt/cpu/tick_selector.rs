@@ -20,7 +20,7 @@ pub fn tick_selector(
             return Err("failed to get first child".into())
         };
         logy!("trace-tick-selector", "Initalizing Selector");
-        return_stack.push(pc.unwrap().clone());
+        return_stack.push(pc.clone().unwrap());
         *pc = Some(child_token.clone());
         return Ok(Status::None)
 
@@ -68,7 +68,7 @@ pub fn tick_selector(
             let child_token = children.get(idx).expect("we already check they it was within range");
             stack.push(StackItem::Selector(idx + 1));
             stack.push(StackItem::Init);
-            return_stack.push(pc.unwrap().clone());
+            return_stack.push(pc.clone().unwrap());
             *pc = Some(child_token.clone());
             return Ok(Status::None)
         },
@@ -85,9 +85,9 @@ mod tests {
     pub fn selector_init_test() {
         let mut stack = vec![StackItem::Init];
         let mut rs = Vec::new();
-        let mut pc = Some(1);
+        let mut pc = Some("1".to_owned());
 
-        let children = vec![42];
+        let children = vec!["42".to_owned()];
 
         assert_eq!(
             tick_selector(&children, &mut stack, &mut rs, &mut pc),
@@ -99,11 +99,11 @@ mod tests {
         );
         assert_eq!(
             rs,
-            vec![1]
+            vec!["1".to_owned()]
         );
         assert_eq!(
             pc,
-            Some(42)
+            Some("42".to_owned())
         );
     }
     /*

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use super::{Thread, ExecutionToken, StackItem, Status};
+use super::{Instruction, ExecutionToken, StackItem, Status};
 
 mod tick_action;
 pub use tick_action::tick_action;
@@ -11,7 +11,7 @@ pub use tick_sequence::tick_sequence;
 
 pub fn load(
     token: ExecutionToken, 
-    _bt: & HashMap<ExecutionToken, Thread>
+    _bt: & HashMap<ExecutionToken, Vec::<Instruction>>
 ) -> ( 
     Option<ExecutionToken>,
     Vec::<StackItem>, 
@@ -31,7 +31,7 @@ pub fn step(
     pc: &mut Option<ExecutionToken>,
     stack: &mut Vec::<StackItem>, 
     return_stack: &mut Vec::<ExecutionToken>, 
-    bt: & HashMap<ExecutionToken, Thread>
+    bt: & HashMap<ExecutionToken, Instruction>
 ) -> Result<Status, String> {
     let Some(token) = pc else {
         return Err("program halted".into())
@@ -42,6 +42,9 @@ pub fn step(
     };
     thread.tick(stack, return_stack, pc)
 }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
 /*
 #[test]
@@ -88,33 +91,35 @@ fn test() {
 }
 */
 
+use crate::sandbox::bt::InpulseId;
+
 #[test]
 fn step_test() {
-    let mut bt = HashMap::<ExecutionToken, Thread>::new();
-    let action1 = 0;
+    let mut bt = HashMap::<ExecutionToken, Instruction>::new();
+    let action1 = "act1".to_owned();
     bt.insert(
-        action1,
-        Thread::Action(1_usize.into())
+        action1.clone(),
+        Instruction::Action(InpulseId::Act1)
     );
 
-    let action2 = 1 ;
+    let action2 = "act2".to_owned();
     bt.insert(
-        action2, 
-        Thread::Action(2_usize.into())
+        action2.clone(), 
+        Instruction::Action(InpulseId::Act2)
     );
-    let action3 =3;
+    let action3 ="act3".to_owned();
     bt.insert(
-        action3,
-        Thread::Action(3_usize.into())
+        action3.clone(),
+        Instruction::Action(InpulseId::Act3)
     );
 
-    let sequence = 4;
-    bt.insert(sequence, Thread::Sequence(vec![action1, action2]));
+    let sequence = "seq".to_owned();
+    bt.insert(sequence.clone(), Instruction::Sequence(vec![action1.clone(), action2.clone()]));
 
-    let selector = 5;
-    bt.insert(selector, Thread::Selector(vec![sequence, action3]));
+    let selector = "sel".to_owned();
+    bt.insert(selector.clone(), Instruction::Selector(vec![sequence.clone(), action3]));
 
-    let (mut pc, mut stack, mut rs) = load(selector, &bt);
+    let (mut pc, mut stack, mut rs) = load(selector.clone(), &bt);
     //step 1 selectpr does its init and sets the cpu up to call its first child, sequence.
     assert_eq!(
         step(&mut pc, &mut stack, &mut rs, &bt),
@@ -126,7 +131,7 @@ fn step_test() {
     );
     assert_eq!(
         &rs,
-        &vec![selector]
+        &vec![selector.clone()]
     );
     //step 2 sequence intalized and set the cpu up to call its first child, action1
     assert_eq!(
@@ -139,12 +144,12 @@ fn step_test() {
     );
     assert_eq!(
         &rs,
-        &vec![selector, sequence]
+        &vec![selector.clone(), sequence.clone()]
     );
     //step 3 action1 puts it's state on the stack,Success, and prays Running(1)
     assert_eq!(
         step(&mut pc, &mut stack, &mut rs, &bt),
-        Ok(Status::Running(1))
+        Ok(Status::Running(InpulseId::Act1))
     );
     assert_eq!(
         &stack,
@@ -152,7 +157,7 @@ fn step_test() {
     );
     assert_eq!(
         &rs,
-        &vec![selector, sequence]
+        &vec![selector.clone(), sequence.clone()]
     );
     assert_eq!(
         &pc,
@@ -169,7 +174,7 @@ fn step_test() {
     );
     assert_eq!(
         &rs,
-        &vec![selector]
+        &vec![selector.clone()]
     );
     //step 5  sequence sets the cpu up to run it's second child, action2
     assert_eq!(
@@ -186,12 +191,12 @@ fn step_test() {
     );
     assert_eq!(
         &rs,
-        &vec![selector, sequence]
+        &vec![selector.clone(), sequence.clone()]
     );
     //step 6 action2 intalizes and prays Running(2)
     assert_eq!(
         step(&mut pc, &mut stack, &mut rs, &bt),
-        Ok(Status::Running(2))
+        Ok(Status::Running(InpulseId::Act2))
     );
     assert_eq!(
         &stack,
@@ -199,7 +204,7 @@ fn step_test() {
     );
     assert_eq!(
         &rs,
-        &vec![selector, sequence]
+        &vec![selector.clone(), sequence]
     );
     //step 7 action2 returns to sequence
     assert_eq!(
@@ -212,7 +217,7 @@ fn step_test() {
     );
     assert_eq!(
         &rs,
-        &vec![selector]
+        &vec![selector.clone()]
     );
     //step 8 sequence sees it's last child has returned failure to returns failure to select
     assert_eq!(
@@ -225,7 +230,7 @@ fn step_test() {
     );
     assert_eq!(
         &rs,
-        &Vec::new()
+        &Vec::<ExecutionToken>::new()
     );
     //step 9 selector sees it's first child has returned failure so puts it's new state and then init on the stack and set up the cpu to run it's second child, action3
     assert_eq!(
@@ -238,12 +243,12 @@ fn step_test() {
     );
     assert_eq!(
         &rs,
-        &vec![selector]
+        &vec![selector.clone()]
     );
     //step 10 action3 sees init and puts Success on tha stack and prays Running(3)
     assert_eq!(
         step(&mut pc, &mut stack, &mut rs, &bt),
-        Ok(Status::Running(3))
+        Ok(Status::Running(InpulseId::Act3))
     );
     assert_eq!(
         &stack,
@@ -264,7 +269,7 @@ fn step_test() {
     );
     assert_eq!(
         &rs,
-        &Vec::new()
+        &Vec::<ExecutionToken>::new()
     );
     //step 12 selection sees its it's child return success then seens its' has no calling function so holts execution and prays Success
     assert_eq!(
@@ -277,7 +282,7 @@ fn step_test() {
     );
     assert_eq!(
         &rs,
-        &Vec::new()
+        &Vec::<ExecutionToken>::new()
     );
     //step 13 the program has is holted
     assert_eq!(
@@ -290,8 +295,9 @@ fn step_test() {
     );
     assert_eq!(
         &rs,
-        &Vec::new()
+        &Vec::<ExecutionToken>::new()
     );
 }
 
 
+}

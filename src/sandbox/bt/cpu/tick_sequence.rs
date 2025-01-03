@@ -20,7 +20,7 @@ pub fn tick_sequence(
             return Err("failed to get first child".into())
         };
         logy!("trace-tick-sequence", "Initalizing Sequence");
-        return_stack.push(pc.unwrap().clone());
+        return_stack.push(pc.clone().unwrap());
         *pc = Some(child_token.clone());
         return Ok(Status::None)
         /* will setup the process so that the next execution step We'll process the first child
@@ -64,7 +64,7 @@ pub fn tick_sequence(
             let child_token = children.get(idx).expect("we already check they it was within range");
             stack.push(StackItem::Sequence(idx + 1));
             stack.push(StackItem::Init);
-            return_stack.push(pc.unwrap().clone());
+            return_stack.push(pc.clone().unwrap());
             *pc = Some(child_token.clone());
             return Ok(Status::None)
         },
@@ -81,9 +81,9 @@ mod tests {
     pub fn sequence_init_test() {
         let mut stack = vec![StackItem::Init];
         let mut rs = Vec::new();
-        let mut pc = Some(1);
+        let mut pc = Some("1".to_owned());
 
-        let children = vec![42];
+        let children = vec!["42".to_owned()];
 
         assert_eq!(
             tick_sequence(&children, &mut stack, &mut rs, &mut pc),
@@ -95,20 +95,20 @@ mod tests {
         );
         assert_eq!(
             rs,
-            vec![1]
+            vec!["1".to_owned()]
         );
         assert_eq!(
             pc,
-            Some(42)
+            Some("42".to_owned())
         );
     }
     #[test]
     pub fn sequence_step_test() {
         let mut stack = vec![StackItem::Sequence(0), StackItem::Success];
         let mut rs = Vec::new();
-        let mut pc = Some(1);
+        let mut pc = Some("1".to_owned());
 
-        let children = vec![42, 69];
+        let children = vec!["42".to_owned(), "69".to_owned()];
 
         assert_eq!(
             tick_sequence(&children, &mut stack, &mut rs, &mut pc),
@@ -120,20 +120,20 @@ mod tests {
         );
         assert_eq!(
             rs,
-            vec![1]
+            vec!["1".to_owned()]
         );
         assert_eq!(
             pc,
-            Some(42)
+            Some("42".to_owned())
         );
     }
     #[test]
     pub fn sequence_success_test() {
         let mut stack = vec![StackItem::Sequence(2), StackItem::Success];
         let mut rs = Vec::new();
-        let mut pc = Some(1);
+        let mut pc = Some("1".to_owned());
 
-        let children = vec![42];
+        let children = vec!["42".to_owned()];
 
         assert_eq!(
             tick_sequence(&children, &mut stack, &mut rs, &mut pc),
@@ -145,7 +145,7 @@ mod tests {
         );
         assert_eq!(
             rs,
-            vec![]
+            Vec::<ExecutionToken>::new()
         );
         assert_eq!(
             pc,
@@ -156,9 +156,9 @@ mod tests {
     pub fn sequence_fail_test() {
         let mut stack = vec![StackItem::Sequence(0), StackItem::Failure];
         let mut rs = Vec::new();
-        let mut pc = Some(1);
+        let mut pc = Some("1".to_owned());
 
-        let children = vec![42];
+        let children = vec!["42".to_owned()];
 
         assert_eq!(
             tick_sequence(&children, &mut stack, &mut rs, &mut pc),
@@ -170,7 +170,7 @@ mod tests {
         );
         assert_eq!(
             rs,
-            vec![]
+            Vec::<ExecutionToken>::new()
         );
         assert_eq!(
             pc,

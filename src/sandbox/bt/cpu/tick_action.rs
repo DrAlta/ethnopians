@@ -1,7 +1,7 @@
-use crate::sandbox::bt::{ActionId, ExecutionToken, StackItem, Status};
+use crate::sandbox::bt::{InpulseId, ExecutionToken, StackItem, Status};
 
 pub fn tick_action(
-    action_id: &ActionId, 
+    action_id: &InpulseId, 
     stack: &mut Vec::<StackItem>, 
     return_stack: &mut Vec::<ExecutionToken>, 
     pc: &mut Option<ExecutionToken>,
@@ -35,7 +35,7 @@ pub fn tick_action(
             };
         },
         StackItem::Init => {
-            let x = if action_id % 2 == 1 { StackItem::Success } else {StackItem::Failure};
+            let x = if action_id == &InpulseId::Act2 {StackItem::Failure} else { StackItem::Success };
             stack.push(x);
             return Ok(Status::Running(action_id.clone()))
         },
