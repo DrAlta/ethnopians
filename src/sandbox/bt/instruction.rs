@@ -6,6 +6,7 @@ use crate::sandbox::{
     ItemClass,
 };
 
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Instruction {
     Action(InpulseId),
     InventoryGE(ItemClass, u8),
@@ -25,6 +26,24 @@ impl Instruction {
             Instruction::InventoryGE(_, _) => todo!(),
             Instruction::Selector(children) => tick_selector(children, stack, return_stack, pc),
             Instruction::Sequence(children) => tick_sequence(children, stack, return_stack, pc),
+        }
+    }
+    pub fn correct(&mut self, prefix: &str) {
+        match self {
+            Instruction::Action(_inpulse_id) => (),
+            Instruction::InventoryGE(_, _) => (),
+            Instruction::Selector(vec) => {
+                vec.into_iter().for_each(|x|{
+                    let y = format!("{prefix}{x}");
+                    *x = y
+                });
+            },
+            Instruction::Sequence(vec) => {
+                vec.into_iter().for_each(|x|{
+                    let y = format!("{prefix}{x}");
+                    *x = y
+                });
+            },
         }
     }
 }

@@ -1,6 +1,8 @@
 #![allow(dead_code)]
 
 mod blackboard;
+use std::collections::HashMap;
+
 pub use blackboard::{Blackboard, Variable};
 pub mod cpu;
 mod instruction;
@@ -20,3 +22,4 @@ pub enum InpulseId {
 type ExecutionToken = String;
 type World = (bool, bool);
 type Thread = Instruction;
+type TreePool = HashMap<ExecutionToken, Thread>;
