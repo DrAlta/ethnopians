@@ -6,14 +6,14 @@ use crate::sandbox::bt::{parser::{parse_space, parse_tree}, Instruction};
 
 use super::Thingie;
 
-pub fn parse_selector<'a, 'b>(
+pub fn parse_sequence<'a, 'b>(
     input: &'a str,
     //    bt: &'b HashMap<ExecutionToken, Vec::<Instruction>>,
 ) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
     let mut hash = HashMap::new();
     let (tail, (_, _, head, _, _)) = //map_res(
         tuple((
-            tag("sel{"),
+            tag("seq{"),
             parse_space,
             separated_list1(
                 tuple((
@@ -54,7 +54,7 @@ pub fn parse_selector<'a, 'b>(
     Ok((
         tail,
         Thingie::Tree(
-            Instruction::Selector(vec),
+            Instruction::Sequence(vec),
             hash
         )
     ))
@@ -68,13 +68,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn selector_acts_test(){
-        let (_, Thingie::Tree(i, db)) = parse_selector("sel{act1, act2, act3}").unwrap() else {
+    fn sequence_acts_test(){
+        let (_, Thingie::Tree(i, db)) = parse_sequence("seq{act1, act2, act3}").unwrap() else {
             panic!()
         };
         assert_eq!(
             i,
-            Instruction::Selector(vec!["_2".to_owned(), "_3".to_owned(), "_4".to_owned()]),
+            Instruction::Sequence(vec!["_2".to_owned(), "_3".to_owned(), "_4".to_owned()]),
         );
         assert_eq!(
             db,
