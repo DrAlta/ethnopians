@@ -24,7 +24,7 @@
 //! 
 
 pub const MAX_ENERGY: i16 = 100;
-pub mod ai;
+//pub mod ai;
 pub mod interaction;
 
 mod acts;

@@ -1,8 +1,13 @@
-use std::collections::HashMap;
+use nom::{bytes::complete::tag, character::complete::{char, one_of}, combinator::{opt, recognize}, error::ErrorKind, multi::{many1, separated_list1}, sequence::tuple, IResult};
 
-use nom::{bytes::complete::tag, character::complete::{char, one_of}, combinator::{opt, recognize}, error::ErrorKind, multi::{many1, separated_list1}, sequence::{delimited, tuple}, IResult};
-
-use super::{ExecutionToken, InpulseId, Instruction};
+use super::{ExecutionToken, Instruction};
+pub fn parse_token<'a>(
+    input: &'a str,
+) -> IResult<&'a str, ExecutionToken, (&'a str, ErrorKind)>{
+    let (tail, head) = recognize(many1(one_of("abcdefghijklmnopqrstuzwxyx_1234567890")))(input)?;
+    Ok((tail, head.to_owned()))
+}
+/*
 pub fn parse_token<'a, 'b>(
     input: &'a str, 
     bt: &'b HashMap<ExecutionToken, Vec::<Instruction>>,
@@ -15,23 +20,31 @@ pub fn parse_token<'a, 'b>(
     }
 }
 
-pub fn parse_space<'a>(input: &'a str) -> IResult<&'a str, (), (&'a str, ErrorKind)> {
-    let (tail, _) = opt(many1(char(' ')))(input)?;
-    Ok((tail, ()))
-}
-
 pub fn gen_parse_token<'a,'b>(bt: &'a HashMap<ExecutionToken, Vec::<Instruction>>)
     -> impl FnMut(&'b str) -> IResult<&'b str, ExecutionToken, (&'b str, ErrorKind)> + 'a
 {
     |input| {parse_token(input, bt)}
 }
+*/
+pub fn parse_space<'a>(input: &'a str) -> IResult<&'a str, (), (&'a str, ErrorKind)> {
+    let (tail, _) = opt(many1(char(' ')))(input)?;
+    Ok((tail, ()))
+}
 
-pub fn parse_selector<'a, 'b>(
+
+pub fn parse_selector<'a>(
     input: &'a str, 
-    bt: &'b HashMap<ExecutionToken, Vec::<Instruction>>,
-) -> IResult<&'a str, Instruction, (&'a str, ErrorKind)>{
-    let (tail, head) = tuple((
-        tag("sel"),
+//    bt: &'b HashMap<ExecutionToken, Vec::<Instruction>>,
+) -> IResult<
+    &'a str, 
+    Instruction, 
+    (
+        &'a str, 
+        ErrorKind,
+    )
+> {
+    let (tail, (_, _, head, _, _)) = tuple((
+        tag("sel{"),
         parse_space,
         separated_list1(
             tuple((
@@ -39,15 +52,16 @@ pub fn parse_selector<'a, 'b>(
                 char(','),
                 parse_space,
             )),
-            gen_parse_token(bt)
+            parse_token
         ), 
+        parse_space,
+        tag("}")
     ))(input)?;
-    match TryInto::<Instruction>::try_into(head) {
-        Ok(thing) => {
-            Ok((tail, thing))
-        },
-        Err(_) => {
-            Err(nom::Err::Error((head, ErrorKind::Tag)))
-        }
-    }
+    Ok((
+        tail, 
+        Instruction::Selector(
+            head.into_iter()
+            .map(|x| x.to_owned()).collect()
+        )
+    ))
 }

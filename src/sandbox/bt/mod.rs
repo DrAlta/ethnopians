@@ -20,4 +20,5 @@ pub enum InpulseId {
 }
 type ExecutionToken = String;
 type World = (bool, bool);
+type Thread = Instruction;
 
