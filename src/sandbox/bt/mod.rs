@@ -11,14 +11,12 @@ pub use stack_item::StackItem;
 mod status;
 pub use status::Status;
 
-#[derive(Debug,Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum InpulseId {
     Act1,
     Act2,
     Act3,
-
 }
 type ExecutionToken = String;
 type World = (bool, bool);
 type Thread = Instruction;
-

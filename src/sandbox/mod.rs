@@ -4,7 +4,7 @@
 //! type Number = f64;
 //! fn predict_selling_price(time:Number) -> Number{todo!()};
 //! fn predict_cost(time:Number) -> Number{todo!()};
-//! 
+//!
 //! fn foo(number_want_to_buy: u16, mean_time_between_sells: Number, start_time:Number) -> u16 {
 //!     let current_ratio = predict_selling_price(start_time) / predict_cost(start_time);
 //!     let mut number_to_actualy_buy = 1;
@@ -15,13 +15,13 @@
 //!             number_to_actualy_buy += 1;
 //!         }
 //!         time += mean_time_between_sells;
-//!     } 
+//!     }
 //!     number_to_actualy_buy
 //!     
 //! }
-//! 
-//! 
-//! 
+//!
+//!
+//!
 
 pub const MAX_ENERGY: i16 = 100;
 //pub mod ai;

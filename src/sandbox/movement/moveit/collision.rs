@@ -16,7 +16,7 @@ pub fn collision<T: Prev>(
         let Some(unit_id) = todo.pop_first() else {
             return;
         };
-        let Some(( x, y )) = prev.get_location(&unit_id) else {
+        let Some((x, y)) = prev.get_location(&unit_id) else {
             continue;
         };
         let Some(size) = prev.get_size(&unit_id) else {

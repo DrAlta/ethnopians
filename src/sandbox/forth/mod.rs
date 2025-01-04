@@ -1,26 +1,26 @@
 //! todo:
 //! you have `chit`s that can hold a `Value` you can't put a chit on the stack only referances to the chit
-//! 
+//!
 //! can tables have chits, can thet hold any value of only refs to chits
-//! 
+//!
 //! the question is do we want to be able to make another Table point to the same chit a
-//! 
+//!
 //! let a = Chit(1)
 //! let b = Table{"a": &a};
-//! 
+//!
 //! let x = b.a @;
 //! let c = Table{"c": x};
 //! b.a 3 !
 //! what is c.c @ return?
-//! 
+//!
 //! I think we need points and Tables to have pointers. then have methos to acces both the ref and the thing reffef
-//!  the '.<ident>' returns a 
+//!  the '.<ident>' returns a
 //! [{a:&1}] | .a
 //! [{a:&1}, &1] | @
 //! [{a:&1}, 1]
 //!
+use std::cmp::Ordering::{Equal, Greater, Less};
 use std::{cell::RefCell, collections::BTreeMap, rc::Rc};
-use std::cmp::Ordering::{Greater, Less, Equal};
 
 #[derive(Debug, Eq)]
 pub enum Value {
@@ -30,7 +30,7 @@ pub enum Value {
     Str(String),
     Table(BTreeMap<Value, Rc<RefCell<Value>>>),
 }
-impl PartialOrd for Value{
+impl PartialOrd for Value {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other))
     }
@@ -65,36 +65,31 @@ impl Ord for Value {
             (Value::Table(_btree_map), Value::Str(_)) => Less,
             (Value::Table(a), Value::Table(b)) => {
                 if a == b {
-                    return Equal
+                    return Equal;
                 };
-                let mut l= a.iter();
-                let mut r= b.iter();
+                let mut l = a.iter();
+                let mut r = b.iter();
                 loop {
                     match (l.next(), r.next()) {
                         (None, None) => return Equal,
                         (None, Some(_)) => return Less,
                         (Some(_), None) => return Greater,
-                        (
-                            Some((x, xv)), 
-                            Some((y, yv))
-                        ) => {
-                            match x.cmp(y) {
+                        (Some((x, xv)), Some((y, yv))) => match x.cmp(y) {
+                            Less => return Less,
+                            Equal => match xv.cmp(yv) {
                                 Less => return Less,
-                                Equal => match xv.cmp(yv) {
-                                    Less => return Less,
-                                    Equal => (),
-                                    Greater => return Greater,
-                                },
+                                Equal => (),
                                 Greater => return Greater,
-                            }
+                            },
+                            Greater => return Greater,
                         },
                     }
                 }
-            },
+            }
         }
     }
 }
-impl PartialEq for Value{
+impl PartialEq for Value {
     fn eq(&self, other: &Self) -> bool {
         self.cmp(other) == Equal
         /*
@@ -126,9 +121,9 @@ impl std::hash::Hash for Value {
             Value::Bool(x) => x.hash(state),
             Value::Int(x) => x.hash(state),
             Value::Ref(ref_cell) => {
-                let x= ref_cell.as_ref();
+                let x = ref_cell.as_ref();
                 x.borrow().hash(state)
-            },
+            }
             Value::Str(x) => x.hash(state),
             Value::Table(btree_map) => {
                 for key in btree_map.keys() {

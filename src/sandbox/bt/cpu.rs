@@ -12,44 +12,36 @@ mod tick_sequence;
 pub use tick_sequence::tick_sequence;
 
 type ProgramCounter = Option<ExecutionToken>;
-type Stack = Vec::<StackItem>;
-type ReturnStack = Vec::<ExecutionToken>;
+type Stack = Vec<StackItem>;
+type ReturnStack = Vec<ExecutionToken>;
 
 pub fn load(
-    token: ExecutionToken, 
-    _bt: &HashMap<ExecutionToken, Thread>
-) -> ( 
-    ProgramCounter,
-    Stack, 
-    ReturnStack, 
-) {
+    token: ExecutionToken,
+    _bt: &HashMap<ExecutionToken, Thread>,
+) -> (ProgramCounter, Stack, ReturnStack) {
     let pc = Some(token.clone());
     let stack = vec![StackItem::Init];
     let return_stack = Vec::new();
 
-    (
-        pc,
-        stack,
-        return_stack,
-    )
+    (pc, stack, return_stack)
 }
 pub fn step(
     pc: &mut Option<ExecutionToken>,
-    stack: &mut Vec::<StackItem>, 
-    return_stack: &mut Vec::<ExecutionToken>, 
-    bt: & HashMap<ExecutionToken, Thread>
+    stack: &mut Vec<StackItem>,
+    return_stack: &mut Vec<ExecutionToken>,
+    bt: &HashMap<ExecutionToken, Thread>,
 ) -> Result<Status, String> {
     let Some(token) = pc else {
-        return Err("program halted".into())
+        return Err("program halted".into());
     };
 
     let Some(thread) = bt.get(token) else {
-        return Err("failed to get thread {token}".into())
+        return Err("failed to get thread {token}".into());
     };
     thread.tick(stack, return_stack, pc)
 }
 /* {
-    use super::*;
+
 
 #[test]
 fn test() {
@@ -62,7 +54,7 @@ fn test() {
 
     let action2 = 1 ;
     bt.insert(
-        action2, 
+        action2,
         Thread::Action(2_usize.into())
     );
     let action3 =3;

@@ -4,13 +4,13 @@ use crate::sandbox::{Item, Location, ObjectId, Prev};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct World {
-    pub (super) locations: HashMap<ObjectId, Location>,
-    pub (super) energy: HashMap<ObjectId, i16>,
-    pub (super) hp: HashMap<ObjectId, i16>,
-    pub (super) sizes: HashMap<ObjectId, (f32, f32)>,
-    pub (super) r#type: HashMap<ObjectId, Item>,
-    pub (super) highest_id: ObjectId,
-    pub (super) movement: HashMap<ObjectId, ((f32,f32), f32)>,
+    pub(super) locations: HashMap<ObjectId, Location>,
+    pub(super) energy: HashMap<ObjectId, i16>,
+    pub(super) hp: HashMap<ObjectId, i16>,
+    pub(super) sizes: HashMap<ObjectId, (f32, f32)>,
+    pub(super) r#type: HashMap<ObjectId, Item>,
+    pub(super) highest_id: ObjectId,
+    pub(super) movement: HashMap<ObjectId, ((f32, f32), f32)>,
 }
 
 impl
@@ -20,7 +20,7 @@ impl
         HashMap<ObjectId, i16>,
         HashMap<ObjectId, (f32, f32)>,
         HashMap<ObjectId, Item>,
-        HashMap<ObjectId, ((f32,f32), f32)>,
+        HashMap<ObjectId, ((f32, f32), f32)>,
     )> for World
 {
     fn from(
@@ -30,7 +30,7 @@ impl
             HashMap<ObjectId, i16>,
             HashMap<ObjectId, (f32, f32)>,
             HashMap<ObjectId, Item>,
-            HashMap<ObjectId, ((f32,f32), f32)>,
+            HashMap<ObjectId, ((f32, f32), f32)>,
         ),
     ) -> Self {
         Self::new(locations, energy, hp, sizes, r#type, movement)
@@ -44,8 +44,8 @@ impl World {
         hp: HashMap<ObjectId, i16>,
         sizes: HashMap<ObjectId, (f32, f32)>,
         r#type: HashMap<ObjectId, Item>,
-        movement: HashMap<ObjectId, ((f32,f32), f32)>,    
-    )->Self {
+        movement: HashMap<ObjectId, ((f32, f32), f32)>,
+    ) -> Self {
         let mut highest_id = 0;
         if let Some(value) = locations.keys().max() {
             highest_id = value.clone();
@@ -91,7 +91,12 @@ impl World {
     pub fn get_movement(&self, id: &ObjectId) -> Option<&((f32, f32), f32)> {
         self.movement.get(id)
     }
-    pub fn insert_movement(&mut self, id: ObjectId, target: (f32, f32), speed: f32) -> Option<((f32, f32), f32)> {
+    pub fn insert_movement(
+        &mut self,
+        id: ObjectId,
+        target: (f32, f32),
+        speed: f32,
+    ) -> Option<((f32, f32), f32)> {
         self.movement.insert(id, (target, speed))
     }
     pub fn get_size(&self, id: &ObjectId) -> Option<&(f32, f32)> {
@@ -120,7 +125,6 @@ impl World {
     pub fn raw_sizes(&self) -> &HashMap<ObjectId, (f32, f32)> {
         &self.sizes
     }
-
 }
 
 impl World {

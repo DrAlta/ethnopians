@@ -1,5 +1,10 @@
-use crate::sandbox::{ItemClass, bt::{InpulseId, cpu::{tick_action, tick_selector, tick_sequence}, ExecutionToken, StackItem, Status}};
-
+use crate::sandbox::{
+    bt::{
+        cpu::{tick_action, tick_selector, tick_sequence},
+        ExecutionToken, InpulseId, StackItem, Status,
+    },
+    ItemClass,
+};
 
 pub enum Instruction {
     Action(InpulseId),
@@ -11,8 +16,8 @@ pub enum Instruction {
 impl Instruction {
     pub fn tick(
         &self,
-        stack: &mut Vec::<StackItem>, 
-        return_stack: &mut Vec::<ExecutionToken>, 
+        stack: &mut Vec<StackItem>,
+        return_stack: &mut Vec<ExecutionToken>,
         pc: &mut Option<ExecutionToken>,
     ) -> Result<Status, String> {
         match self {

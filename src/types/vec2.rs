@@ -20,7 +20,7 @@ impl Vec2 {
         (self.x * rhs.x) + (self.y * rhs.y)
     }
     pub fn length_squared(self) -> f32 {
-        (self.x * self.x) + (self.y * self.y) 
+        (self.x * self.x) + (self.y * self.y)
     }
     pub fn length(self) -> f32 {
         self.length_squared().sqrt()
