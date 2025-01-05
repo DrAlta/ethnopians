@@ -3,9 +3,9 @@ use nom::{
 };
 
 
-use crate::sandbox::bt::parser::{parse_action, parse_selector};
+use crate::sandbox::bt::parser::parse_selector;
 
-use super::Thingie;
+use super::{parse_sequence, parse_token, Thingie};
 
 
 pub fn parse_tree<'a>(
@@ -20,7 +20,8 @@ pub fn parse_tree<'a>(
     //let x = 
     alt((
         parse_selector,
-        parse_action,
+        parse_sequence,
+        parse_token,
     ))(input)
 }
 
@@ -29,23 +30,36 @@ pub fn parse_tree<'a>(
 mod tests {
     use std::collections::HashMap;
 
-    use crate::sandbox::bt::{InpulseId, Instruction};
+    use crate::sandbox::bt::Instruction;
 
     use super::*;
 
     #[test]
     fn parse_tree_action_test(){
-        let (_, Thingie::Tree(i, db)) = parse_action("act1").unwrap() else {
+        let (_, Thingie::Token(token)) = parse_tree("act1").unwrap() else {
+            panic!()
+        };
+        assert_eq!(
+            token,
+            "act1".to_owned()
+        );
+    }
+    #[test]
+    fn parse_tree_sel_test(){
+        let (_, Thingie::Tree(i, db)) = parse_tree("sel{seq{act1, act1}, seq{act2, act2}, act3}").unwrap() else {
             panic!()
         };
         assert_eq!(
             i,
-            Instruction::Action(InpulseId::Act1),
+            Instruction::Selector(vec!["_2".to_owned(), "_3".to_owned(), "act3".to_owned()]),
         );
         assert_eq!(
             db,
-            HashMap::new()
+            HashMap::from([
+                ("_2".to_owned(), Instruction::Sequence(vec!["act1".to_owned(), "act1".to_owned()])),
+                ("_3".to_owned(), Instruction::Sequence(vec!["act2".to_owned(), "act2".to_owned()])),
+            ])
         );
     }
-    
+
 }

@@ -24,6 +24,7 @@ pub use parse_tree::parse_tree;
 
 type TreesUsed = TreePool;
 
+#[derive(Debug, PartialEq, Eq)]
 pub enum Thingie {
     Token(String),
     Tree(Thread, TreesUsed)

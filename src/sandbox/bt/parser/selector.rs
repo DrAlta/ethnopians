@@ -63,10 +63,25 @@ pub fn parse_selector<'a, 'b>(
 
 #[cfg(test)]
 mod tests {
-    use crate::sandbox::bt::InpulseId;
-
     use super::*;
 
+    #[test]
+    fn selector_nest_test(){
+        let (_, Thingie::Tree(i, db)) = parse_selector("sel{sel{act1, act1}, sel{act2, act2}, act3}").unwrap() else {
+            panic!()
+        };
+        assert_eq!(
+            i,
+            Instruction::Selector(vec!["_2".to_owned(), "_3".to_owned(), "act3".to_owned()]),
+        );
+        assert_eq!(
+            db,
+            HashMap::from([
+                ("_2".to_owned(), Instruction::Selector(vec!["act1".to_owned(), "act1".to_owned()])),
+                ("_3".to_owned(), Instruction::Selector(vec!["act2".to_owned(), "act2".to_owned()])),
+            ])
+        );
+    }
     #[test]
     fn selector_acts_test(){
         let (_, Thingie::Tree(i, db)) = parse_selector("sel{act1, act2, act3}").unwrap() else {
@@ -74,16 +89,11 @@ mod tests {
         };
         assert_eq!(
             i,
-            Instruction::Selector(vec!["_2".to_owned(), "_3".to_owned(), "_4".to_owned()]),
+            Instruction::Selector(vec!["act1".to_owned(), "act2".to_owned(), "act3".to_owned()]),
         );
         assert_eq!(
             db,
-            HashMap::from([
-                ("_2".to_owned(), Instruction::Action(InpulseId::Act1)),
-                ("_3".to_owned(), Instruction::Action(InpulseId::Act2)),
-                ("_4".to_owned(), Instruction::Action(InpulseId::Act3)),
-            ])
+            HashMap::new()
         );
     }
-    
 }
