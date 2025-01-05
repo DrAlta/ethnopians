@@ -4,8 +4,7 @@
 //!     c,
 //! }
 //! (seq{_2,_3,_4}, {_2:a, _3:b, _4:c})
-//! 
-
+//!
 
 use super::{Thread, TreePool};
 
@@ -27,6 +26,5 @@ type TreesUsed = TreePool;
 #[derive(Debug, PartialEq, Eq)]
 pub enum Thingie {
     Token(String),
-    Tree(Thread, TreesUsed)
+    Tree(Thread, TreesUsed),
 }
-

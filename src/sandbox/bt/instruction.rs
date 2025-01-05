@@ -33,17 +33,17 @@ impl Instruction {
             Instruction::Action(_inpulse_id) => (),
             Instruction::InventoryGE(_, _) => (),
             Instruction::Selector(vec) => {
-                vec.into_iter().for_each(|x|{
+                vec.into_iter().for_each(|x| {
                     let y = format!("{prefix}{x}");
                     *x = y
                 });
-            },
+            }
             Instruction::Sequence(vec) => {
-                vec.into_iter().for_each(|x|{
+                vec.into_iter().for_each(|x| {
                     let y = format!("{prefix}{x}");
                     *x = y
                 });
-            },
+            }
         }
     }
 }
