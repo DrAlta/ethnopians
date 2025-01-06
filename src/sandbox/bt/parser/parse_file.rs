@@ -1,8 +1,10 @@
 use std::collections::HashMap;
 
-use nom::{character::complete::{char, one_of}, combinator::{map_res, recognize}, error::ErrorKind, multi::{many1, separated_list1}, sequence::tuple, IResult};
+use nom::{character::complete::char, combinator::map_res, error::ErrorKind, multi::separated_list1, sequence::tuple, IResult};
 
 use crate::sandbox::bt::{ExecutionToken, Instruction, TreePool, parser::{parse_space, parse_tree, Thingie, TreesUsed}};
+
+use super::parse_ident;
 
 
 pub fn parse_file<'a>(
@@ -41,7 +43,7 @@ pub fn parse_named_tree<'a>(
 ) -> IResult<&'a str, (ExecutionToken, TreePool), (&'a str, ErrorKind)> {
     //    let mut hash = HashMap::new();
     let (tail,(thread_name, _ ,_ ,_ , (i, db))) = tuple((
-        recognize(many1(one_of("abcdefghijklmnopqrstuzwxyx_1234567890"))),
+        parse_ident,
         parse_space,
         char('='),
         parse_space,
@@ -69,4 +71,73 @@ pub fn parse_named_tree<'a>(
         )
     ))
     
+}
+
+#[test]
+fn foo(){
+    let source = r#"
+have_2_stone_2 = sel{
+    inventory_have_ge(stone, 2),
+    seq{
+        go_to_stone,
+        take_stone
+    }
+};
+have_2_stone = seq{
+    have_2_stone_2,
+    have_2_stone_2
+};
+have_knife = sel{
+    inventory_have_ge(knife, 1), 
+    seq{
+        have_2_stone,
+        combine(stone, stone)
+    }
+};
+have_stick = sel{
+    inventory_have_ge(stick, 1), 
+    seq{
+        go_to_tree,
+        use(hands, tree)
+    }
+};
+have_axe = sel{
+    inventory_have_ge(axe, 1),
+    seq{
+        have_knife,
+        have_stick,
+        combine(stick, knife)
+    }
+};
+have_2_wood_2 = sel{
+    inventory_have_ge(wood, 2),
+    have_axe,
+    go_to_tree,
+    use(axe, tree)
+};
+have_2_wood =seq{
+    have_2_wood_2,
+    have_2_wood_2
+};
+have_house = sel {
+    is_house_in_range,
+    seq{
+        have_2_wood,
+        combine(wood,wood)
+    }
+};
+sat_hunger = selector{
+    dont_need_to_eat,
+    seq{
+        selector{
+            inventory_have_ge(veg, 1),
+            get_veg
+        },
+        eat(veg)
+    }
+}
+"#;
+    let (tail, db) = parse_file(source).unwrap();
+    println!("{db:?}");
+    assert_eq!(tail, "");
 }

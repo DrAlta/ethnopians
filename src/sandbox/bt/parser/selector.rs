@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
 use nom::{
-    bytes::complete::tag, character::complete::char, error::ErrorKind, multi::separated_list1,
-    sequence::tuple, IResult,
+    branch::alt, bytes::complete::tag, character::complete::char, error::ErrorKind, multi::separated_list1, sequence::tuple, IResult
 };
 
 use crate::sandbox::bt::{
@@ -17,9 +16,14 @@ pub fn parse_selector<'a, 'b>(
     //    bt: &'b HashMap<ExecutionToken, Vec::<Instruction>>,
 ) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
     let mut hash = HashMap::new();
-    let (tail, (_, _, head, _, _)) = //map_res(
+    let (tail, (_, _, _, _, head, _, _)) = //map_res(
         tuple((
-            tag("sel{"),
+            alt((
+                tag("selector"),
+                tag("sel"),
+            )),
+            parse_space,
+            char('{'),
             parse_space,
             separated_list1(
                 tuple((

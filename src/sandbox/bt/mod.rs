@@ -23,3 +23,4 @@ type ExecutionToken = String;
 type World = (bool, bool);
 type Thread = Instruction;
 type TreePool = HashMap<ExecutionToken, Thread>;
+type ItemId = String;

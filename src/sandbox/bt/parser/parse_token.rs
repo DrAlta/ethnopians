@@ -1,11 +1,11 @@
 use nom::{
-    character::complete::one_of, combinator::recognize, error::ErrorKind, multi::many1, IResult,
+    error::ErrorKind, IResult,
 };
 
-use super::Thingie;
+use super::{parse_ident, Thingie};
 
 pub fn parse_token<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
-    let (tail, head) = recognize(many1(one_of("abcdefghijklmnopqrstuzwxyx_1234567890")))(input)?;
+    let (tail, head) = parse_ident(input)?;
     Ok((tail, Thingie::Token(head.to_owned())))
 }
 
