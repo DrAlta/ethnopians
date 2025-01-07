@@ -5,6 +5,8 @@ use std::collections::HashMap;
 
 pub use blackboard::{Blackboard, Variable};
 pub mod cpu;
+mod hermit;
+pub use hermit::get_hermit_behavoir_tree;
 mod instruction;
 pub use instruction::Instruction;
 pub mod parser;
