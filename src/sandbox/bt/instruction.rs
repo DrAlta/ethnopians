@@ -1,7 +1,7 @@
 use crate::sandbox::{
     bt::{
         cpu::{tick_action, tick_selector, tick_sequence},
-        ExecutionToken, InpulseId, StackItem, Status, ItemId
+        ExecutionToken, InpulseId, ItemId, StackItem, Status,
     },
     ItemClass,
 };

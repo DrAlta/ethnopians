@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
 use nom::{
-    branch::alt, bytes::complete::tag, character::complete::char, error::ErrorKind, multi::separated_list1, sequence::tuple, IResult
+    branch::alt, bytes::complete::tag, character::complete::char, error::ErrorKind,
+    multi::separated_list1, sequence::tuple, IResult,
 };
 
 use crate::sandbox::bt::{

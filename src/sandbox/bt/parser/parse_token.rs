@@ -1,6 +1,4 @@
-use nom::{
-    error::ErrorKind, IResult,
-};
+use nom::{error::ErrorKind, IResult};
 
 use super::{parse_ident, Thingie};
 

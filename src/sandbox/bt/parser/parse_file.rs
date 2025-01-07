@@ -1,11 +1,16 @@
 use std::collections::HashMap;
 
-use nom::{character::complete::char, combinator::map_res, error::ErrorKind, multi::separated_list1, sequence::tuple, IResult};
+use nom::{
+    character::complete::char, combinator::map_res, error::ErrorKind, multi::separated_list1,
+    sequence::tuple, IResult,
+};
 
-use crate::sandbox::bt::{ExecutionToken, Instruction, TreePool, parser::{parse_space, parse_tree, Thingie, TreesUsed}};
+use crate::sandbox::bt::{
+    parser::{parse_space, parse_tree, Thingie, TreesUsed},
+    ExecutionToken, Instruction, TreePool,
+};
 
 use super::parse_ident;
-
 
 pub fn parse_file<'a>(
     input: &'a str,
@@ -15,26 +20,16 @@ pub fn parse_file<'a>(
     let (tail, (_, head, _)) = tuple((
         parse_space,
         separated_list1(
-                tuple((
-                    parse_space,
-                    char(';'),
-                    parse_space,
-                )),
-                parse_named_tree
+            tuple((parse_space, char(';'), parse_space)),
+            parse_named_tree,
         ),
         parse_space,
     ))(input)?;
     let mut hash = HashMap::new();
     for (_thread_name, body) in head {
         hash.extend(body.into_iter());
-    };
-    Ok(
-        (
-            tail,
-            hash,
-        )
-    )
- 
+    }
+    Ok((tail, hash))
 }
 /// parse_named_tree() addes the tree to the TreePool
 pub fn parse_named_tree<'a>(
@@ -42,20 +37,17 @@ pub fn parse_named_tree<'a>(
     //    _prefix: &'b str
 ) -> IResult<&'a str, (ExecutionToken, TreePool), (&'a str, ErrorKind)> {
     //    let mut hash = HashMap::new();
-    let (tail,(thread_name, _ ,_ ,_ , (i, db))) = tuple((
+    let (tail, (thread_name, _, _, _, (i, db))) = tuple((
         parse_ident,
         parse_space,
         char('='),
         parse_space,
-        map_res(
-            parse_tree,
-            |x| {
-                let Thingie::Tree(i, used) = x else {
-                    return Err(()).into()
-                };
-                Ok::<(Instruction, TreesUsed), ()>((i, used))
-            }
-        )
+        map_res(parse_tree, |x| {
+            let Thingie::Tree(i, used) = x else {
+                return Err(()).into();
+            };
+            Ok::<(Instruction, TreesUsed), ()>((i, used))
+        }),
     ))(input)?;
     let mut hash = HashMap::new();
     for (k, mut v) in db.into_iter() {
@@ -63,18 +55,11 @@ pub fn parse_named_tree<'a>(
         assert_eq!(hash.insert(format!("{thread_name}{k}"), v), None,);
     }
     hash.insert(thread_name.to_owned(), i);
-    Ok((
-        tail,
-        (
-            thread_name.to_owned(),
-            hash
-        )
-    ))
-    
+    Ok((tail, (thread_name.to_owned(), hash)))
 }
 
 #[test]
-fn foo(){
+fn foo() {
     let source = r#"
 have_2_stone_2 = sel{
     inventory_have_ge(stone, 2),

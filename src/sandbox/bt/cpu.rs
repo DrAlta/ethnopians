@@ -18,23 +18,22 @@ type ReturnStack = Vec<ExecutionToken>;
 pub struct CPU {
     pub pc: ProgramCounter,
     pub stack: Stack,
-    pub return_stack: ReturnStack
+    pub return_stack: ReturnStack,
 }
 
 impl CPU {
-    pub fn load(
-        token: ExecutionToken,
-    ) -> Self {
+    pub fn load(token: ExecutionToken) -> Self {
         let pc = Some(token.clone());
         let stack = vec![StackItem::Init];
         let return_stack = Vec::new();
 
-        Self { pc, stack, return_stack }
+        Self {
+            pc,
+            stack,
+            return_stack,
+        }
     }
-    pub fn step(
-        &mut self,
-        bt: &HashMap<ExecutionToken, Thread>,
-    ) -> Result<Status, String> {
+    pub fn step(&mut self, bt: &HashMap<ExecutionToken, Thread>) -> Result<Status, String> {
         let Some(token) = &self.pc else {
             return Err("program halted".into());
         };
