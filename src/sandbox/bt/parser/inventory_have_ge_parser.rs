@@ -4,22 +4,22 @@ use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
 };
 
-use crate::sandbox::bt::{parser::parse_space, Instruction};
+use crate::sandbox::bt::{parser::space_parser, Instruction};
 
-use super::{parse_ident, parse_u8, Thingie};
+use super::{ident_parser, u8_parser, Thingie};
 
-pub fn parse_inventory_have_ge<'a>(
+pub fn inventory_have_ge_parser<'a>(
     input: &'a str,
 ) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
     let (tail, (_, _, _, _, item, _, number, _, _)) = tuple((
         tag("inventory_have_ge"),
-        parse_space,
+        space_parser,
         char('('),
-        parse_space,
-        parse_ident,
-        tuple((parse_space, char(','), parse_space)),
-        parse_u8,
-        parse_space,
+        space_parser,
+        ident_parser,
+        tuple((space_parser, char(','), space_parser)),
+        u8_parser,
+        space_parser,
         char(')'),
     ))(input)?;
     Ok((
@@ -35,9 +35,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn parse_inventory_have_ge_test() {
+    fn inventory_have_ge_parser_test() {
         let (_, Thingie::Tree(i, _db)) =
-            parse_inventory_have_ge("inventory_have_ge ( stone ,1 )").unwrap()
+            inventory_have_ge_parser("inventory_have_ge ( stone ,1 )").unwrap()
         else {
             panic!()
         };

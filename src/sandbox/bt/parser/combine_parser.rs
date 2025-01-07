@@ -4,20 +4,20 @@ use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
 };
 
-use crate::sandbox::bt::{parser::parse_space, Instruction};
+use crate::sandbox::bt::{parser::space_parser, Instruction};
 
-use super::{parse_ident, Thingie};
+use super::{ident_parser, Thingie};
 
-pub fn parse_combine<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
+pub fn combine_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
     let (tail, (_, _, _, _, item_a, _, item_b, _, _)) = tuple((
         tag("combine"),
-        parse_space,
+        space_parser,
         char('('),
-        parse_space,
-        parse_ident,
-        tuple((parse_space, char(','), parse_space)),
-        parse_ident,
-        parse_space,
+        space_parser,
+        ident_parser,
+        tuple((space_parser, char(','), space_parser)),
+        ident_parser,
+        space_parser,
         char(')'),
     ))(input)?;
     Ok((
@@ -33,8 +33,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn parse_combine_test() {
-        let (_, Thingie::Tree(i, _db)) = parse_combine("combine( stone , stick)").unwrap() else {
+    fn combine_parser_test() {
+        let (_, Thingie::Tree(i, _db)) = combine_parser("combine( stone , stick)").unwrap() else {
             panic!()
         };
         assert_eq!(

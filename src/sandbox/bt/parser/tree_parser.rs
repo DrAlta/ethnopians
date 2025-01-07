@@ -1,27 +1,27 @@
 use nom::{branch::alt, error::ErrorKind, IResult};
 
-use crate::sandbox::bt::parser::parse_selector;
+use crate::sandbox::bt::parser::selector_parser;
 
 use super::{
-    parse_combine, parse_eat, parse_inventory_have_ge, parse_sequence, parse_token, parse_use,
+    combine_parser, eat_parser, inventory_have_ge_parser, sequence_parser, token_parser, use_parser,
     Thingie,
 };
 
-pub fn parse_tree<'a>(
+pub fn tree_parser<'a>(
     input: &'a str,
     //    _prefix: &'b str
 ) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
     //    let mut hash = HashMap::new();
     //let x =
     alt((
-        parse_combine,
-        parse_eat,
-        parse_inventory_have_ge,
-        parse_selector,
-        parse_sequence,
-        parse_use,
-        // parse_token needs to be last so it don't take the prefix of other items
-        parse_token,
+        combine_parser,
+        eat_parser,
+        inventory_have_ge_parser,
+        selector_parser,
+        sequence_parser,
+        use_parser,
+        // token_parser needs to be last so it don't take the prefix of other items
+        token_parser,
     ))(input)
 }
 
@@ -34,7 +34,7 @@ mod tests {
     use super::*;
     #[test]
     fn parse_debug_test() {
-        let (_, Thingie::Tree(_i, _db)) = parse_tree(
+        let (_, Thingie::Tree(_i, _db)) = tree_parser(
             "sel{
         inventory_have_ge(stick, 1), 
         seq{
@@ -49,16 +49,16 @@ mod tests {
         // assert_eq!(token, "act1".to_owned());
     }
     #[test]
-    fn parse_tree_action_test() {
-        let (_, Thingie::Token(token)) = parse_tree("act1").unwrap() else {
+    fn tree_parser_action_test() {
+        let (_, Thingie::Token(token)) = tree_parser("act1").unwrap() else {
             panic!()
         };
         assert_eq!(token, "act1".to_owned());
     }
     #[test]
-    fn parse_tree_sel_test() {
+    fn tree_parser_sel_test() {
         let (_, Thingie::Tree(i, db)) =
-            parse_tree("sel{seq{act1, act1}, seq{act2, act2}, act3}").unwrap()
+            tree_parser("sel{seq{act1, act1}, seq{act2, act2}, act3}").unwrap()
         else {
             panic!()
         };

@@ -7,7 +7,7 @@ use nom::{
     IResult,
 };
 
-pub fn parse_u8(input: &str) -> IResult<&str, u8, (&str, ErrorKind)> {
+pub fn u8_parser(input: &str) -> IResult<&str, u8, (&str, ErrorKind)> {
     map_res(
         recognize(many1(terminated(one_of("0123456789"), many0(char('_'))))),
         |out| u8::from_str_radix(&str::replace(out, "_", ""), 10),

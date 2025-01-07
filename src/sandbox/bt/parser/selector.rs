@@ -6,13 +6,13 @@ use nom::{
 };
 
 use crate::sandbox::bt::{
-    parser::{parse_space, parse_tree},
+    parser::{space_parser, tree_parser},
     Instruction,
 };
 
 use super::Thingie;
 
-pub fn parse_selector<'a, 'b>(
+pub fn selector_parser<'a, 'b>(
     input: &'a str,
     //    bt: &'b HashMap<ExecutionToken, Vec::<Instruction>>,
 ) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
@@ -23,18 +23,18 @@ pub fn parse_selector<'a, 'b>(
                 tag("selector"),
                 tag("sel"),
             )),
-            parse_space,
+            space_parser,
             char('{'),
-            parse_space,
+            space_parser,
             separated_list1(
                 tuple((
-                    parse_space,
+                    space_parser,
                     char(','),
-                    parse_space
+                    space_parser
                 )),
-                parse_tree
+                tree_parser
             ),
-            parse_space,
+            space_parser,
             char('}'),
         ))/*,
 
@@ -69,7 +69,7 @@ mod tests {
     #[test]
     fn selector_nest_test() {
         let (_, Thingie::Tree(i, db)) =
-            parse_selector("sel{sel{act1, act1}, sel{act2, act2}, act3}").unwrap()
+            selector_parser("sel{sel{act1, act1}, sel{act2, act2}, act3}").unwrap()
         else {
             panic!()
         };
@@ -93,7 +93,7 @@ mod tests {
     }
     #[test]
     fn selector_acts_test() {
-        let (_, Thingie::Tree(i, db)) = parse_selector("sel{act1, act2, act3}").unwrap() else {
+        let (_, Thingie::Tree(i, db)) = selector_parser("sel{act1, act2, act3}").unwrap() else {
             panic!()
         };
         assert_eq!(

@@ -1,4 +1,4 @@
-use crate::sandbox::bt::parser::parse_file;
+use crate::sandbox::bt::parser::file_parser;
 
 use super::TreePool;
 
@@ -65,7 +65,7 @@ sat_hunger = selector{
     }
 }
     "#;
-    let (tail, db) = parse_file(source).unwrap();
+    let (tail, db) = file_parser(source).unwrap();
     assert_eq!(tail, "");
     db
 }

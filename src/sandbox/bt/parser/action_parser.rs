@@ -6,7 +6,7 @@ use crate::sandbox::bt::{InpulseId, Instruction};
 
 use super::Thingie;
 
-pub fn parse_action<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
+pub fn action_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
     let (tail, i) = alt((
         map_res(tag("act1"), |_| {
             Ok::<Instruction, ()>(Instruction::Action(InpulseId::Act1))
@@ -28,7 +28,7 @@ mod tests {
 
     #[test]
     fn act1_test() {
-        let (_, Thingie::Tree(i, db)) = parse_action("act1").unwrap() else {
+        let (_, Thingie::Tree(i, db)) = action_parser("act1").unwrap() else {
             panic!()
         };
         assert_eq!(i, Instruction::Action(InpulseId::Act1),);
@@ -36,7 +36,7 @@ mod tests {
     }
     #[test]
     fn act2_test() {
-        let (_, Thingie::Tree(i, db)) = parse_action("act2").unwrap() else {
+        let (_, Thingie::Tree(i, db)) = action_parser("act2").unwrap() else {
             panic!()
         };
         assert_eq!(i, Instruction::Action(InpulseId::Act2),);
@@ -44,7 +44,7 @@ mod tests {
     }
     #[test]
     fn act3_test() {
-        let (_, Thingie::Tree(i, db)) = parse_action("act3").unwrap() else {
+        let (_, Thingie::Tree(i, db)) = action_parser("act3").unwrap() else {
             panic!()
         };
         assert_eq!(i, Instruction::Action(InpulseId::Act3),);

@@ -6,24 +6,23 @@ use nom::{
 };
 
 use crate::sandbox::bt::{
-    parser::{parse_space, parse_tree, Thingie, TreesUsed},
+    parser::{ident_parser, space_parser, tree_parser, Thingie, TreesUsed},
     ExecutionToken, Instruction, TreePool,
 };
 
-use super::parse_ident;
 
-pub fn parse_file<'a>(
+pub fn file_parser<'a>(
     input: &'a str,
     //    _prefix: &'b str
 ) -> IResult<&'a str, TreePool, (&'a str, ErrorKind)> {
     //    let mut hash = HashMap::new();
     let (tail, (_, head, _)) = tuple((
-        parse_space,
+        space_parser,
         separated_list1(
-            tuple((parse_space, char(';'), parse_space)),
-            parse_named_tree,
+            tuple((space_parser, char(';'), space_parser)),
+            named_tree_parser,
         ),
-        parse_space,
+        space_parser,
     ))(input)?;
     let mut hash = HashMap::new();
     for (_thread_name, body) in head {
@@ -31,18 +30,18 @@ pub fn parse_file<'a>(
     }
     Ok((tail, hash))
 }
-/// parse_named_tree() addes the tree to the TreePool
-pub fn parse_named_tree<'a>(
+/// named_tree_parser() addes the tree to the TreePool
+pub fn named_tree_parser<'a>(
     input: &'a str,
     //    _prefix: &'b str
 ) -> IResult<&'a str, (ExecutionToken, TreePool), (&'a str, ErrorKind)> {
     //    let mut hash = HashMap::new();
     let (tail, (thread_name, _, _, _, (i, db))) = tuple((
-        parse_ident,
-        parse_space,
+        ident_parser,
+        space_parser,
         char('='),
-        parse_space,
-        map_res(parse_tree, |x| {
+        space_parser,
+        map_res(tree_parser, |x| {
             let Thingie::Tree(i, used) = x else {
                 return Err(()).into();
             };
@@ -122,7 +121,7 @@ sat_hunger = selector{
     }
 }
 "#;
-    let (tail, db) = parse_file(source).unwrap();
+    let (tail, db) = file_parser(source).unwrap();
     println!("{db:?}");
     assert_eq!(tail, "");
 }

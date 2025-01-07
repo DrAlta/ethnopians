@@ -7,32 +7,32 @@
 //!
 
 use super::{Thread, TreePool};
-use nom::character::complete::multispace0 as parse_space;
+use nom::character::complete::multispace0 as space_parser;
 
 mod selector;
-pub use selector::parse_selector;
+pub use selector::selector_parser;
 mod sequence;
-pub use sequence::parse_sequence;
-mod parse_action;
-pub use parse_action::parse_action;
-mod parse_combine;
-pub use parse_combine::parse_combine;
-mod parse_eat;
-pub use parse_eat::parse_eat;
-mod parse_file;
-pub use parse_file::parse_file;
-mod parse_ident;
-pub use parse_ident::parse_ident;
-mod parse_inventory_have_ge;
-pub use parse_inventory_have_ge::parse_inventory_have_ge;
-mod parse_token;
-pub use parse_token::parse_token;
-mod parse_tree;
-pub use parse_tree::parse_tree;
-mod parse_u8;
-pub use parse_u8::parse_u8;
-mod parse_use;
-pub use parse_use::parse_use;
+pub use sequence::sequence_parser;
+mod action_parser;
+pub use action_parser::action_parser;
+mod combine_parser;
+pub use combine_parser::combine_parser;
+mod eat_parser;
+pub use eat_parser::eat_parser;
+mod file_parser;
+pub use file_parser::file_parser;
+mod ident_parser;
+pub use ident_parser::ident_parser;
+mod inventory_have_ge_parser;
+pub use inventory_have_ge_parser::inventory_have_ge_parser;
+mod token_parser;
+pub use token_parser::token_parser;
+mod tree_parser;
+pub use tree_parser::tree_parser;
+mod u8_parser;
+pub use u8_parser::u8_parser;
+mod use_parser;
+pub use use_parser::use_parser;
 
 type TreesUsed = TreePool;
 

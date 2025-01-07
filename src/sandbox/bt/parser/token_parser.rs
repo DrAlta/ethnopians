@@ -1,9 +1,9 @@
 use nom::{error::ErrorKind, IResult};
 
-use super::{parse_ident, Thingie};
+use super::{ident_parser, Thingie};
 
-pub fn parse_token<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
-    let (tail, head) = parse_ident(input)?;
+pub fn token_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
+    let (tail, head) = ident_parser(input)?;
     Ok((tail, Thingie::Token(head.to_owned())))
 }
 
@@ -18,7 +18,7 @@ mod tests {
 
     #[test]
     fn act1_test() {
-        let (_, Thingie::Token(token)) = parse_token("act1").unwrap() else {
+        let (_, Thingie::Token(token)) = token_parser("act1").unwrap() else {
             panic!()
         };
         assert_eq!(token, "act1".to_owned(),);
