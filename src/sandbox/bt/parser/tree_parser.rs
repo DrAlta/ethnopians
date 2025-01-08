@@ -3,8 +3,8 @@ use nom::{branch::alt, error::ErrorKind, IResult};
 use crate::sandbox::bt::parser::selector_parser;
 
 use super::{
-    combine_parser, eat_parser, inventory_have_ge_parser, sequence_parser, token_parser, use_parser,
-    Thingie,
+    combine_parser, eat_parser, inventory_have_ge_parser, sequence_parser, token_parser,
+    use_parser, Thingie,
 };
 
 pub fn tree_parser<'a>(

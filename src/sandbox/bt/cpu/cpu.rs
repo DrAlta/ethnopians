@@ -1,19 +1,9 @@
 use std::collections::HashMap;
 
-use super::{ExecutionToken, StackItem, Status, Thread};
-
-#[cfg(test)]
-mod tests;
-mod tick_action;
-pub use tick_action::tick_action;
-mod tick_selector;
-pub use tick_selector::tick_selector;
-mod tick_sequence;
-pub use tick_sequence::tick_sequence;
-
-type ProgramCounter = Option<ExecutionToken>;
-type Stack = Vec<StackItem>;
-type ReturnStack = Vec<ExecutionToken>;
+use crate::sandbox::bt::{
+    cpu::{ProgramCounter, ReturnStack, Stack, StackItem},
+    ExecutionToken, Status, Thread,
+};
 
 pub struct CPU {
     pub pc: ProgramCounter,
