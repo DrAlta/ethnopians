@@ -23,7 +23,7 @@ pub fn use_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, Err
     Ok((
         tail,
         Thingie::Tree(
-            Instruction::Use(item_a.to_owned(), item_b.to_owned()),
+            vec![Instruction::Use(item_a.to_owned(), item_b.to_owned())],
             HashMap::new(),
         ),
     ))
@@ -37,6 +37,9 @@ mod tests {
         let (_, Thingie::Tree(i, _db)) = use_parser("use ( stone , stick)").unwrap() else {
             panic!()
         };
-        assert_eq!(i, Instruction::Use("stone".to_owned(), "stick".to_owned()))
+        assert_eq!(
+            i,
+            vec![Instruction::Use("stone".to_owned(), "stick".to_owned())]
+        )
     }
 }

@@ -1,10 +1,12 @@
-use crate::sandbox::bt::{ExecutionToken, InpulseId, StackItem, Status};
+use crate::sandbox::bt::{InpulseId, StackItem, Status};
+
+use super::{ProgramCounter, ReturnStack, Stack};
 
 pub fn tick_action(
     action_id: &InpulseId,
-    stack: &mut Vec<StackItem>,
-    return_stack: &mut Vec<ExecutionToken>,
-    pc: &mut Option<ExecutionToken>,
+    stack: &mut Stack,
+    return_stack: &mut ReturnStack,
+    pc: &mut ProgramCounter,
 ) -> Result<Status, String> {
     let Some(tos) = stack.pop() else {
         return Err("Nothing on stack when checking result of child".into());

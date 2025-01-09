@@ -13,7 +13,7 @@ pub struct CPU {
 
 impl CPU {
     pub fn load(token: ExecutionToken) -> Self {
-        let pc = Some(token.clone());
+        let pc = Some((token.clone(), 0));
         let stack = vec![StackItem::Init];
         let return_stack = Vec::new();
 
@@ -24,13 +24,16 @@ impl CPU {
         }
     }
     pub fn step(&mut self, bt: &HashMap<ExecutionToken, Thread>) -> Result<Status, String> {
-        let Some(token) = &self.pc else {
+        let Some((token, idx)) = &self.pc else {
             return Err("program halted".into());
         };
 
         let Some(thread) = bt.get(token) else {
             return Err("failed to get thread {token}".into());
         };
-        thread.tick(&mut self.stack, &mut self.return_stack, &mut self.pc)
+        let Some(i) = thread.get(*idx) else {
+            return Err("failed to get instruction{idx} from thread {token}".into());
+        };
+        i.tick(&mut self.stack, &mut self.return_stack, &mut self.pc)
     }
 }

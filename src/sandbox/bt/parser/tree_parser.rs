@@ -64,18 +64,28 @@ mod tests {
         };
         assert_eq!(
             i,
-            Instruction::Selector(vec!["_1".to_owned(), "_2".to_owned(), "act3".to_owned()]),
+            vec![Instruction::Selector(vec![
+                "_1".to_owned(),
+                "_2".to_owned(),
+                "act3".to_owned()
+            ])],
         );
         assert_eq!(
             db,
             HashMap::from([
                 (
                     "_1".to_owned(),
-                    Instruction::Sequence(vec!["act1".to_owned(), "act1".to_owned()])
+                    vec![Instruction::Sequence(vec![
+                        "act1".to_owned(),
+                        "act1".to_owned()
+                    ])]
                 ),
                 (
                     "_2".to_owned(),
-                    Instruction::Sequence(vec!["act2".to_owned(), "act2".to_owned()])
+                    vec![Instruction::Sequence(vec![
+                        "act2".to_owned(),
+                        "act2".to_owned()
+                    ])]
                 ),
             ])
         );

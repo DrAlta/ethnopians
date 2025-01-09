@@ -1,11 +1,9 @@
 use std::collections::BTreeSet;
 
-use qol::logy;
-
 use crate::sandbox::{
     bt::{
-        cpu::{tick_action, tick_selector, tick_sequence},
-        ExecutionToken, InpulseId, ItemId, StackItem, Status,
+        cpu::{tick_action, tick_selector, tick_sequence, ProgramCounter, ReturnStack, Stack},
+        ExecutionToken, InpulseId, ItemId, Status,
     },
     ItemClass,
 };
@@ -21,33 +19,46 @@ pub enum Instruction {
     Selector(Vec<ExecutionToken>),
     Sequence(Vec<ExecutionToken>),
     Use(ItemId, ItemId),
+    //
+    /*
+    ForthGetHP,
+    ForthLit(StackItem),
+    ForthAdd,
+    ForthSub,
+    ForthMul,
+    ForthDiv,
+    ForthRem,
+    ForthGT,
+    ForthLT,
+    ForthGE,
+    ForthLE,
+    */
 }
 
 impl Instruction {
-    pub fn missing_threads_used(&self, bt: & TreePool) -> BTreeSet<ExecutionToken> {
+    pub fn missing_threads_used(&self, bt: &TreePool) -> BTreeSet<ExecutionToken> {
         let mut missing = BTreeSet::new();
         match self {
             Instruction::Action(_inpulse_id) => (),
             Instruction::Combine(_, _) => (),
             Instruction::Eat(_) => (),
             Instruction::InventoryGE(_, _) => (),
-            Instruction::Selector(vec) |
-            Instruction::Sequence(vec) => {
+            Instruction::Selector(vec) | Instruction::Sequence(vec) => {
                 for token in vec {
-                    if ! bt.contains_key(token) {
+                    if !bt.contains_key(token) {
                         missing.insert(token.clone());
                     }
                 }
-            },
+            }
             Instruction::Use(_, _) => (),
         }
         missing
     }
     pub fn tick(
         &self,
-        stack: &mut Vec<StackItem>,
-        return_stack: &mut Vec<ExecutionToken>,
-        pc: &mut Option<ExecutionToken>,
+        stack: &mut Stack,
+        return_stack: &mut ReturnStack,
+        pc: &mut ProgramCounter,
     ) -> Result<Status, String> {
         match self {
             Instruction::Action(action_id) => tick_action(action_id, stack, return_stack, pc),
@@ -65,8 +76,7 @@ impl Instruction {
             Instruction::Combine(_, _) => (),
             Instruction::Eat(_) => (),
             Instruction::InventoryGE(_, _) => (),
-            Instruction::Selector(vec) |
-            Instruction::Sequence(vec) => {
+            Instruction::Selector(vec) | Instruction::Sequence(vec) => {
                 vec.into_iter().for_each(|x| {
                     if x.starts_with('_') {
                         let y = format!("{prefix}{x}");
@@ -80,12 +90,11 @@ impl Instruction {
 }
 
 #[test]
-fn correct_test (){
-    let mut i = Instruction::Selector(vec!["_2".to_owned(),"_3".to_owned()]);
+fn correct_test() {
+    let mut i = Instruction::Selector(vec!["_2".to_owned(), "_3".to_owned()]);
     i.correct("prefix");
     assert_eq!(
         i,
-        Instruction::Selector(vec!["prefix_2".to_owned(),"prefix_3".to_owned()])
+        Instruction::Selector(vec!["prefix_2".to_owned(), "prefix_3".to_owned()])
     )
-
 }

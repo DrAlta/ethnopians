@@ -19,8 +19,10 @@ pub enum InpulseId {
     Act2,
     Act3,
 }
-pub type ExecutionToken = String;
+pub type ThreadName = String;
+pub type ExecutionToken = ThreadName;
+pub type ExecutionPointer = (ExecutionToken, usize);
 pub type World = (bool, bool);
-pub type Thread = Instruction;
-pub type TreePool = HashMap<ExecutionToken, Thread>;
+pub type Thread = Vec<Instruction>;
+pub type TreePool = HashMap<ThreadName, Thread>;
 pub type ItemId = String;

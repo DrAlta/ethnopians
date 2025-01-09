@@ -18,7 +18,7 @@ pub fn action_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, 
             Ok::<Instruction, ()>(Instruction::Action(InpulseId::Act3))
         }),
     ))(input)?;
-    Ok((tail, Thingie::Tree(i, HashMap::new())))
+    Ok((tail, Thingie::Tree(vec![i], HashMap::new())))
 }
 #[cfg(test)]
 mod tests {
@@ -31,7 +31,7 @@ mod tests {
         let (_, Thingie::Tree(i, db)) = action_parser("act1").unwrap() else {
             panic!()
         };
-        assert_eq!(i, Instruction::Action(InpulseId::Act1),);
+        assert_eq!(i, vec![Instruction::Action(InpulseId::Act1)]);
         assert_eq!(db, HashMap::new());
     }
     #[test]
@@ -39,7 +39,7 @@ mod tests {
         let (_, Thingie::Tree(i, db)) = action_parser("act2").unwrap() else {
             panic!()
         };
-        assert_eq!(i, Instruction::Action(InpulseId::Act2),);
+        assert_eq!(i, vec![Instruction::Action(InpulseId::Act2)]);
         assert_eq!(db, HashMap::new());
     }
     #[test]
@@ -47,7 +47,7 @@ mod tests {
         let (_, Thingie::Tree(i, db)) = action_parser("act3").unwrap() else {
             panic!()
         };
-        assert_eq!(i, Instruction::Action(InpulseId::Act3),);
+        assert_eq!(i, vec![Instruction::Action(InpulseId::Act3)]);
         assert_eq!(db, HashMap::new());
     }
 }

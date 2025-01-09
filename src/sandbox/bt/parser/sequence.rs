@@ -12,30 +12,17 @@ use crate::sandbox::bt::{
 
 use super::Thingie;
 
-pub fn sequence_parser<'a, 'b>(
-    input: &'a str,
-) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
+pub fn sequence_parser<'a, 'b>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
     let mut hash = HashMap::new();
-    let (tail, (_, _, _, _, head, _, _)) =
-        tuple((
-            alt((
-                tag("sequence"),
-                tag("seq"),
-            )),
-            space_parser,
-            char('{'),
-            space_parser,
-            separated_list1(
-                tuple((
-                    space_parser,
-                    char(','),
-                    space_parser
-                )),
-                tree_parser
-            ),
-            space_parser,
-            char('}'),
-        ))(input)?;
+    let (tail, (_, _, _, _, head, _, _)) = tuple((
+        alt((tag("sequence"), tag("seq"))),
+        space_parser,
+        char('{'),
+        space_parser,
+        separated_list1(tuple((space_parser, char(','), space_parser)), tree_parser),
+        space_parser,
+        char('}'),
+    ))(input)?;
 
     let mut vec = Vec::new();
     for (idx, thingie) in head.into_iter().enumerate() {
@@ -44,16 +31,16 @@ pub fn sequence_parser<'a, 'b>(
             Thingie::Tree(mut this_i, db) => {
                 let thread_name = format!("_{}", idx + 1);
                 for (k, mut v) in db.into_iter() {
-                    v.correct(&thread_name);
+                    v.iter_mut().for_each(|x| x.correct(&thread_name));
                     assert_eq!(hash.insert(format!("{thread_name}{k}"), v), None,);
                 }
                 vec.push(thread_name.clone());
-                this_i.correct(&thread_name);
+                this_i.iter_mut().for_each(|x| x.correct(&thread_name));
                 hash.insert(thread_name, this_i);
             }
         }
     }
-    Ok((tail, Thingie::Tree(Instruction::Sequence(vec), hash)))
+    Ok((tail, Thingie::Tree(vec![Instruction::Sequence(vec)], hash)))
 }
 
 #[cfg(test)]
@@ -69,18 +56,28 @@ mod tests {
         };
         assert_eq!(
             i,
-            Instruction::Sequence(vec!["_1".to_owned(), "_2".to_owned(), "act3".to_owned()]),
+            vec![Instruction::Sequence(vec![
+                "_1".to_owned(),
+                "_2".to_owned(),
+                "act3".to_owned()
+            ])],
         );
         assert_eq!(
             db,
             HashMap::from([
                 (
                     "_1".to_owned(),
-                    Instruction::Sequence(vec!["act1".to_owned(), "act1".to_owned()])
+                    vec![Instruction::Sequence(vec![
+                        "act1".to_owned(),
+                        "act1".to_owned()
+                    ])]
                 ),
                 (
                     "_2".to_owned(),
-                    Instruction::Sequence(vec!["act2".to_owned(), "act2".to_owned()])
+                    vec![Instruction::Sequence(vec![
+                        "act2".to_owned(),
+                        "act2".to_owned()
+                    ])]
                 ),
             ])
         );
@@ -92,11 +89,11 @@ mod tests {
         };
         assert_eq!(
             i,
-            Instruction::Sequence(vec![
+            vec![Instruction::Sequence(vec![
                 "act1".to_owned(),
                 "act2".to_owned(),
                 "act3".to_owned()
-            ]),
+            ])],
         );
         assert_eq!(
             db,

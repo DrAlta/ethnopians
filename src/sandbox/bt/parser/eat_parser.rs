@@ -20,7 +20,7 @@ pub fn eat_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, Err
     ))(input)?;
     Ok((
         tail,
-        Thingie::Tree(Instruction::Eat(item_a.to_owned()), HashMap::new()),
+        Thingie::Tree(vec![Instruction::Eat(item_a.to_owned())], HashMap::new()),
     ))
 }
 #[cfg(test)]
@@ -32,6 +32,6 @@ mod tests {
         let (_, Thingie::Tree(i, _db)) = eat_parser("eat ( stone )").unwrap() else {
             panic!()
         };
-        assert_eq!(i, Instruction::Eat("stone".to_owned(),))
+        assert_eq!(i, vec![Instruction::Eat("stone".to_owned())])
     }
 }

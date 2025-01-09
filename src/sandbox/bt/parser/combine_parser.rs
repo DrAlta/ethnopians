@@ -23,7 +23,7 @@ pub fn combine_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str,
     Ok((
         tail,
         Thingie::Tree(
-            Instruction::Combine(item_a.to_owned(), item_b.to_owned()),
+            vec![Instruction::Combine(item_a.to_owned(), item_b.to_owned())],
             HashMap::new(),
         ),
     ))
@@ -39,7 +39,7 @@ mod tests {
         };
         assert_eq!(
             i,
-            Instruction::Combine("stone".to_owned(), "stick".to_owned())
+            vec![Instruction::Combine("stone".to_owned(), "stick".to_owned())]
         )
     }
 }

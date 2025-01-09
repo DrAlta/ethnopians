@@ -1,4 +1,4 @@
-use super::{ExecutionToken, StackItem};
+use super::{ExecutionPointer, StackItem};
 
 mod cpu;
 pub use cpu::CPU;
@@ -12,6 +12,6 @@ pub use tick_sequence::tick_sequence;
 #[cfg(test)]
 mod tests;
 
-type ProgramCounter = Option<ExecutionToken>;
-type Stack = Vec<StackItem>;
-type ReturnStack = Vec<ExecutionToken>;
+pub type ProgramCounter = Option<ExecutionPointer>;
+pub type Stack = Vec<StackItem>;
+pub type ReturnStack = Vec<ExecutionPointer>;

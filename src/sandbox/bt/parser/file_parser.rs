@@ -7,7 +7,7 @@ use nom::{
 
 use crate::sandbox::bt::{
     parser::{ident_parser, space_parser, tree_parser, Thingie, TreesUsed},
-    ExecutionToken, Instruction, TreePool,
+    Thread, ThreadName, TreePool,
 };
 
 pub fn file_parser<'a>(
@@ -33,7 +33,7 @@ pub fn file_parser<'a>(
 pub fn named_tree_parser<'a>(
     input: &'a str,
     //    _prefix: &'b str
-) -> IResult<&'a str, (ExecutionToken, TreePool), (&'a str, ErrorKind)> {
+) -> IResult<&'a str, (ThreadName, TreePool), (&'a str, ErrorKind)> {
     //    let mut hash = HashMap::new();
     let (tail, (thread_name, _, _, _, (mut i, db))) = tuple((
         ident_parser,
@@ -44,25 +44,25 @@ pub fn named_tree_parser<'a>(
             let Thingie::Tree(i, used) = x else {
                 return Err(()).into();
             };
-            Ok::<(Instruction, TreesUsed), ()>((i, used))
+            Ok::<(Thread, TreesUsed), ()>((i, used))
         }),
     ))(input)?;
     let mut hash = HashMap::new();
     for (k, mut v) in db.into_iter() {
-        v.correct(thread_name);
+        v.iter_mut().for_each(|x| x.correct(thread_name));
         assert_eq!(hash.insert(format!("{thread_name}{k}"), v), None,);
     }
-    i.correct(thread_name);
+    i.iter_mut().for_each(|x| x.correct(thread_name));
     hash.insert(thread_name.to_owned(), i);
     Ok((tail, (thread_name.to_owned(), hash)))
 }
 
-
 #[cfg(test)]
 mod tests {
+    use crate::sandbox::bt::Instruction;
     use std::collections::BTreeMap;
-    use super::*;
 
+    use super::*;
 
     #[test]
     fn named_tree_parser_test() {
@@ -73,29 +73,26 @@ mod tests {
         use(axe, tree)
     }"#;
         let (tail, db) = file_parser(source).unwrap();
-    let standard =         HashMap::from([
-        (
-            "have_2_wood_2".to_owned(),
-            Instruction::Selector(vec![
+        let standard = HashMap::from([
+            (
+                "have_2_wood_2".to_owned(),
+                vec![Instruction::Selector(vec![
+                    "have_2_wood_2_1".to_owned(),
+                    "have_axe".to_owned(),
+                    "go_to_tree".to_owned(),
+                    "have_2_wood_2_4".to_owned(),
+                ])],
+            ),
+            (
                 "have_2_wood_2_1".to_owned(),
-                "have_axe".to_owned(),
-                "go_to_tree".to_owned(),
+                vec![Instruction::InventoryGE("wood".to_owned(), 2)],
+            ),
+            (
                 "have_2_wood_2_4".to_owned(),
-            ]),
-        ),
-        (
-            "have_2_wood_2_1".to_owned(),
-            Instruction::InventoryGE("wood".to_owned(), 2)
-        ),
-        (
-            "have_2_wood_2_4".to_owned(),
-            Instruction::Use("axe".to_owned(), "tree".to_owned())
-        )
-    ]);
-        assert_eq!(
-            db,
-            standard
-        );
+                vec![Instruction::Use("axe".to_owned(), "tree".to_owned())],
+            ),
+        ]);
+        assert_eq!(db, standard);
         assert_eq!(tail, "");
     }
     #[test]
@@ -111,31 +108,22 @@ mod tests {
         let standard = BTreeMap::from([
             (
                 "sat_hunger".to_owned(),
-                Instruction::Selector(vec![
-                    "sat_hunger_1".to_owned(),
-                ]),
+                vec![Instruction::Selector(vec!["sat_hunger_1".to_owned()])],
             ),
             (
                 "sat_hunger_1".to_owned(),
-                Instruction::Selector(vec![
-                    "sat_hunger_1_1".to_owned(),
-                ])
+                vec![Instruction::Selector(vec!["sat_hunger_1_1".to_owned()])],
             ),
             (
                 "sat_hunger_1_1".to_owned(),
-                Instruction::Selector(vec![
-                    "sat_hunger_1_1_1".to_owned(),
-                ])
+                vec![Instruction::Selector(vec!["sat_hunger_1_1_1".to_owned()])],
             ),
             (
                 "sat_hunger_1_1_1".to_owned(),
-                Instruction::InventoryGE("veg".to_owned(), 1)
-            )
+                vec![Instruction::InventoryGE("veg".to_owned(), 1)],
+            ),
         ]);
-        assert_eq!(
-            standard,
-            db.into_iter().collect(),
-        );
+        assert_eq!(standard, db.into_iter().collect(),);
         assert_eq!(tail, "");
     }
     /*

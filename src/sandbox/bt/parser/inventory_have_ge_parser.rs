@@ -25,7 +25,7 @@ pub fn inventory_have_ge_parser<'a>(
     Ok((
         tail,
         Thingie::Tree(
-            Instruction::InventoryGE(item.to_owned(), number),
+            vec![Instruction::InventoryGE(item.to_owned(), number)],
             HashMap::new(),
         ),
     ))
@@ -41,6 +41,6 @@ mod tests {
         else {
             panic!()
         };
-        assert_eq!(i, Instruction::InventoryGE("stone".to_owned(), 1))
+        assert_eq!(i, vec![Instruction::InventoryGE("stone".to_owned(), 1)])
     }
 }

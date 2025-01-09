@@ -2,11 +2,13 @@ use qol::logy;
 
 use crate::sandbox::bt::{ExecutionToken, StackItem, Status};
 
+use super::{ProgramCounter, ReturnStack, Stack};
+
 pub fn tick_selector(
     children: &Vec<ExecutionToken>,
-    stack: &mut Vec<StackItem>,
-    return_stack: &mut Vec<ExecutionToken>,
-    pc: &mut Option<ExecutionToken>,
+    stack: &mut Stack,
+    return_stack: &mut ReturnStack,
+    pc: &mut ProgramCounter,
 ) -> Result<Status, String> {
     let Some(tos) = stack.pop() else {
         return Err("Nothing on stack when checking result of child".into());
@@ -21,7 +23,7 @@ pub fn tick_selector(
         };
         logy!("trace-tick-selector", "Initalizing Selector");
         return_stack.push(pc.clone().unwrap());
-        *pc = Some(child_token.clone());
+        *pc = Some((child_token.clone(), 0));
         return Ok(Status::None);
 
         /* this just initalize and lets the next stepping of the execution handle it
@@ -70,7 +72,7 @@ pub fn tick_selector(
             stack.push(StackItem::Selector(idx + 1));
             stack.push(StackItem::Init);
             return_stack.push(pc.clone().unwrap());
-            *pc = Some(child_token.clone());
+            *pc = Some((child_token.clone(), 0));
             return Ok(Status::None);
         }
         (_, _) => return Err("TOS wasn't a Success or a Failure".into()),
@@ -84,7 +86,7 @@ mod tests {
     pub fn selector_init_test() {
         let mut stack = vec![StackItem::Init];
         let mut rs = Vec::new();
-        let mut pc = Some("1".to_owned());
+        let mut pc = Some(("1".to_owned(), 0));
 
         let children = vec!["42".to_owned()];
 
@@ -93,8 +95,8 @@ mod tests {
             Ok(Status::None)
         );
         assert_eq!(stack, vec![StackItem::Selector(1), StackItem::Init]);
-        assert_eq!(rs, vec!["1".to_owned()]);
-        assert_eq!(pc, Some("42".to_owned()));
+        assert_eq!(rs, vec![("1".to_owned(), 0)]);
+        assert_eq!(pc, Some(("42".to_owned(), 0)));
     }
     /*
         #[test]

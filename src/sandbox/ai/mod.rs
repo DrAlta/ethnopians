@@ -15,7 +15,10 @@ pub use hermit::get_hermit_behavoir_tree;
 
 #[cfg(test)]
 mod tests {
-    use crate::sandbox::{ai::get_hermit_behavoir_tree, bt::{cpu::CPU, Status}};
+    use crate::sandbox::{
+        ai::get_hermit_behavoir_tree,
+        bt::{cpu::CPU, Status},
+    };
 
     #[test]
     pub fn hermit_ai_run_test() {

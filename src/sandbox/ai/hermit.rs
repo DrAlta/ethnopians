@@ -1,4 +1,4 @@
-use crate::sandbox::bt::{TreePool, parser::file_parser};
+use crate::sandbox::bt::{parser::file_parser, TreePool};
 
 pub fn get_hermit_behavoir_tree() -> TreePool {
     let source = r#"
@@ -78,18 +78,17 @@ mod tests {
     pub fn check_for_missing_threads_in_hermit_ai() {
         let bt = get_hermit_behavoir_tree();
         let mut missing = HashMap::new();
-        for(thread, i) in &bt {
-            let x = i.missing_threads_used(&bt);
-            if !x.is_empty() {
-                missing.insert(thread, x);
+        for (thread_name, thread) in &bt {
+            for i in thread {
+                let x = i.missing_threads_used(&bt);
+                if !x.is_empty() {
+                    missing.insert(thread_name, x);
+                }
             }
         }
-        for (a,b) in &missing {
+        for (a, b) in &missing {
             println!("{a}:{b:?}");
         }
-        assert_eq!(
-            missing,
-            HashMap::new()
-        )
+        assert_eq!(missing, HashMap::new())
     }
 }
