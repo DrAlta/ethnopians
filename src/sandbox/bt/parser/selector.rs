@@ -14,7 +14,6 @@ use super::Thingie;
 
 pub fn selector_parser<'a, 'b>(
     input: &'a str,
-    //    bt: &'b HashMap<ExecutionToken, Vec::<Instruction>>,
 ) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
     let mut hash = HashMap::new();
     let (tail, (_, _, _, _, head, _, _)) = //map_res(
@@ -36,26 +35,21 @@ pub fn selector_parser<'a, 'b>(
             ),
             space_parser,
             char('}'),
-        ))/*,
+        ))(input)?;
 
-        |(_, _, head, _, _)| {
-            
-
-        }
-    )*/
-    (input)?;
     let mut vec = Vec::new();
     for (idx, thingie) in head.into_iter().enumerate() {
         match thingie {
             Thingie::Token(token) => vec.push(token),
-            Thingie::Tree(i, db) => {
-                let thread_name = format!("_{}", idx + 2);
+            Thingie::Tree(mut this_i, db) => {
+                let thread_name = format!("_{}", idx + 1);
                 for (k, mut v) in db.into_iter() {
                     v.correct(&thread_name);
                     assert_eq!(hash.insert(format!("{thread_name}{k}"), v), None,);
                 }
                 vec.push(thread_name.clone());
-                hash.insert(thread_name, i);
+                this_i.correct(&thread_name);
+                hash.insert(thread_name, this_i);
             }
         }
     }
@@ -75,17 +69,17 @@ mod tests {
         };
         assert_eq!(
             i,
-            Instruction::Selector(vec!["_2".to_owned(), "_3".to_owned(), "act3".to_owned()]),
+            Instruction::Selector(vec!["_1".to_owned(), "_2".to_owned(), "act3".to_owned()]),
         );
         assert_eq!(
             db,
             HashMap::from([
                 (
-                    "_2".to_owned(),
+                    "_1".to_owned(),
                     Instruction::Selector(vec!["act1".to_owned(), "act1".to_owned()])
                 ),
                 (
-                    "_3".to_owned(),
+                    "_2".to_owned(),
                     Instruction::Selector(vec!["act2".to_owned(), "act2".to_owned()])
                 ),
             ])
@@ -105,5 +99,33 @@ mod tests {
             ]),
         );
         assert_eq!(db, HashMap::new());
+    }
+    #[test]
+    fn selector_eats_test() {
+        let (_, Thingie::Tree(i, db)) = selector_parser("sel{eat(pizza), eat(pizza), eat(pizza)}").unwrap() else {
+            panic!()
+        };
+        assert_eq!(
+            i,
+            Instruction::Selector(vec![
+                "_1".to_owned(),
+                "_2".to_owned(),
+                "_3".to_owned()
+            ]),
+        );
+        assert_eq!(db, HashMap::from([
+            (
+                "_1".to_owned(),
+                Instruction::Eat("pizza".to_owned())
+            ),
+            (
+                "_2".to_owned(),
+                Instruction::Eat("pizza".to_owned())
+            ),
+            (
+                "_3".to_owned(),
+                Instruction::Eat("pizza".to_owned())
+            ),
+        ]));
     }
 }

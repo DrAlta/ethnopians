@@ -5,8 +5,6 @@ use std::collections::HashMap;
 
 pub use blackboard::{Blackboard, Variable};
 pub mod cpu;
-mod hermit;
-pub use hermit::get_hermit_behavoir_tree;
 mod instruction;
 pub use instruction::Instruction;
 pub mod parser;
@@ -21,8 +19,8 @@ pub enum InpulseId {
     Act2,
     Act3,
 }
-type ExecutionToken = String;
-type World = (bool, bool);
-type Thread = Instruction;
-type TreePool = HashMap<ExecutionToken, Thread>;
-type ItemId = String;
+pub type ExecutionToken = String;
+pub type World = (bool, bool);
+pub type Thread = Instruction;
+pub type TreePool = HashMap<ExecutionToken, Thread>;
+pub type ItemId = String;

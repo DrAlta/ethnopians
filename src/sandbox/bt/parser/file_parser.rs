@@ -35,7 +35,7 @@ pub fn named_tree_parser<'a>(
     //    _prefix: &'b str
 ) -> IResult<&'a str, (ExecutionToken, TreePool), (&'a str, ErrorKind)> {
     //    let mut hash = HashMap::new();
-    let (tail, (thread_name, _, _, _, (i, db))) = tuple((
+    let (tail, (thread_name, _, _, _, (mut i, db))) = tuple((
         ident_parser,
         space_parser,
         char('='),
@@ -52,75 +52,138 @@ pub fn named_tree_parser<'a>(
         v.correct(thread_name);
         assert_eq!(hash.insert(format!("{thread_name}{k}"), v), None,);
     }
+    i.correct(thread_name);
     hash.insert(thread_name.to_owned(), i);
     Ok((tail, (thread_name.to_owned(), hash)))
 }
 
-#[test]
-fn foo() {
-    let source = r#"
-have_2_stone_2 = sel{
-    inventory_have_ge(stone, 2),
-    seq{
-        go_to_stone,
-        take_stone
-    }
-};
-have_2_stone = seq{
-    have_2_stone_2,
-    have_2_stone_2
-};
-have_knife = sel{
-    inventory_have_ge(knife, 1), 
-    seq{
-        have_2_stone,
-        combine(stone, stone)
-    }
-};
-have_stick = sel{
-    inventory_have_ge(stick, 1), 
-    seq{
+
+#[cfg(test)]
+mod tests {
+    use std::collections::BTreeMap;
+    use super::*;
+
+
+    #[test]
+    fn named_tree_parser_test() {
+        let source = r#"have_2_wood_2 = sel{
+        inventory_have_ge(wood, 2),
+        have_axe,
         go_to_tree,
-        use(hands, tree)
+        use(axe, tree)
+    }"#;
+        let (tail, db) = file_parser(source).unwrap();
+    let standard =         HashMap::from([
+        (
+            "have_2_wood_2".to_owned(),
+            Instruction::Selector(vec![
+                "have_2_wood_2_1".to_owned(),
+                "have_axe".to_owned(),
+                "go_to_tree".to_owned(),
+                "have_2_wood_2_4".to_owned(),
+            ]),
+        ),
+        (
+            "have_2_wood_2_1".to_owned(),
+            Instruction::InventoryGE("wood".to_owned(), 2)
+        ),
+        (
+            "have_2_wood_2_4".to_owned(),
+            Instruction::Use("axe".to_owned(), "tree".to_owned())
+        )
+    ]);
+        assert_eq!(
+            db,
+            standard
+        );
+        assert_eq!(tail, "");
     }
-};
-have_axe = sel{
-    inventory_have_ge(axe, 1),
-    seq{
-        have_knife,
-        have_stick,
-        combine(stick, knife)
+    #[test]
+    fn named_tree_parser_test2() {
+        let source = r#"sat_hunger = selector{
+        sel{
+            selector{
+                inventory_have_ge(veg, 1)
+            }
+        }
+    }"#;
+        let (tail, db) = file_parser(source).unwrap();
+        let standard = BTreeMap::from([
+            (
+                "sat_hunger".to_owned(),
+                Instruction::Selector(vec![
+                    "sat_hunger_1".to_owned(),
+                ]),
+            ),
+            (
+                "sat_hunger_1".to_owned(),
+                Instruction::Selector(vec![
+                    "sat_hunger_1_1".to_owned(),
+                ])
+            ),
+            (
+                "sat_hunger_1_1".to_owned(),
+                Instruction::Selector(vec![
+                    "sat_hunger_1_1_1".to_owned(),
+                ])
+            ),
+            (
+                "sat_hunger_1_1_1".to_owned(),
+                Instruction::InventoryGE("veg".to_owned(), 1)
+            )
+        ]);
+        assert_eq!(
+            standard,
+            db.into_iter().collect(),
+        );
+        assert_eq!(tail, "");
     }
-};
-have_2_wood_2 = sel{
-    inventory_have_ge(wood, 2),
-    have_axe,
-    go_to_tree,
-    use(axe, tree)
-};
-have_2_wood =seq{
-    have_2_wood_2,
-    have_2_wood_2
-};
-have_house = sel {
-    is_house_in_range,
-    seq{
-        have_2_wood,
-        combine(wood,wood)
+    /*
+    #[test]
+    fn named_tree_parser_test2() {
+        let source = r#"sat_hunger = selector{
+        dont_need_to_eat,
+        seq{
+            selector{
+                inventory_have_ge(veg, 1),
+                get_veg
+            },
+            eat(veg)
+        }
+    }"#;
+        let (tail, db) = file_parser(source).unwrap();
+        let standard = BTreeMap::from([
+            (
+                "sat_hunger".to_owned(),
+                Instruction::Selector(vec![
+                    "dont_need_to_eat".to_owned(),
+                    "sat_hunger_2".to_owned(),
+                ]),
+            ),
+            (
+                "sat_hunger_2".to_owned(),
+                Instruction::Sequence(vec![
+                    "sat_hunger_2_1".to_owned(),
+                    "sat_hunger_2_2".to_owned(),
+                ])
+            ),
+            (
+                "sat_hunger_2_1".to_owned(),
+                Instruction::Selector(vec![
+                    "sat_hunger_2_1_1".to_owned(),
+                    "get_veg".to_owned(),
+                ])
+            ),
+            (
+                "sat_hunger_2_2".to_owned(),
+                Instruction::Eat("veg".to_owned())
+            )
+        ]);
+        assert_eq!(
+            standard,
+            db.into_iter().collect(),
+        );
+        assert_eq!(tail, "");
     }
-};
-sat_hunger = selector{
-    dont_need_to_eat,
-    seq{
-        selector{
-            inventory_have_ge(veg, 1),
-            get_veg
-        },
-        eat(veg)
-    }
-}
-"#;
-    let (tail, db) = file_parser(source).unwrap();
-    println!("{db:?}");
-    assert_eq!(tail, "");
+    */
 }

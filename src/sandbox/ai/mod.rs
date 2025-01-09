@@ -10,12 +10,15 @@
 //!
 //! knife has higher DPS than axe but shorter range
 
+mod hermit;
+pub use hermit::get_hermit_behavoir_tree;
+
 #[cfg(test)]
 mod tests {
-    use crate::sandbox::bt::{cpu::CPU, get_hermit_behavoir_tree, Status};
+    use crate::sandbox::{ai::get_hermit_behavoir_tree, bt::{cpu::CPU, Status}};
 
     #[test]
-    pub fn foo() {
+    pub fn hermit_ai_run_test() {
         let bt = get_hermit_behavoir_tree();
         let mut cpu = CPU::load("hermit".to_owned());
         loop {

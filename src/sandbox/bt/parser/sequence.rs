@@ -14,10 +14,9 @@ use super::Thingie;
 
 pub fn sequence_parser<'a, 'b>(
     input: &'a str,
-    //    bt: &'b HashMap<ExecutionToken, Vec::<Instruction>>,
 ) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
     let mut hash = HashMap::new();
-    let (tail, (_, _, _, _, head, _, _)) = //map_res(
+    let (tail, (_, _, _, _, head, _, _)) =
         tuple((
             alt((
                 tag("sequence"),
@@ -36,27 +35,21 @@ pub fn sequence_parser<'a, 'b>(
             ),
             space_parser,
             char('}'),
-        ))/*,
-
-        |(_, _, head, _, _)| {
-            
-
-        }
-    )*/
-    (input)?;
+        ))(input)?;
 
     let mut vec = Vec::new();
     for (idx, thingie) in head.into_iter().enumerate() {
         match thingie {
             Thingie::Token(token) => vec.push(token),
-            Thingie::Tree(i, db) => {
-                let thread_name = format!("_{}", idx + 2);
+            Thingie::Tree(mut this_i, db) => {
+                let thread_name = format!("_{}", idx + 1);
                 for (k, mut v) in db.into_iter() {
                     v.correct(&thread_name);
                     assert_eq!(hash.insert(format!("{thread_name}{k}"), v), None,);
                 }
                 vec.push(thread_name.clone());
-                hash.insert(thread_name, i);
+                this_i.correct(&thread_name);
+                hash.insert(thread_name, this_i);
             }
         }
     }
@@ -76,17 +69,17 @@ mod tests {
         };
         assert_eq!(
             i,
-            Instruction::Sequence(vec!["_2".to_owned(), "_3".to_owned(), "act3".to_owned()]),
+            Instruction::Sequence(vec!["_1".to_owned(), "_2".to_owned(), "act3".to_owned()]),
         );
         assert_eq!(
             db,
             HashMap::from([
                 (
-                    "_2".to_owned(),
+                    "_1".to_owned(),
                     Instruction::Sequence(vec!["act1".to_owned(), "act1".to_owned()])
                 ),
                 (
-                    "_3".to_owned(),
+                    "_2".to_owned(),
                     Instruction::Sequence(vec!["act2".to_owned(), "act2".to_owned()])
                 ),
             ])

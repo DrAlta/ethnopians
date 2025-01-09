@@ -1,10 +1,8 @@
-use crate::sandbox::bt::parser::file_parser;
-
-use super::TreePool;
+use crate::sandbox::bt::{TreePool, parser::file_parser};
 
 pub fn get_hermit_behavoir_tree() -> TreePool {
     let source = r#"
-have_2_stone_2 = sel{
+have_2_stone_02 = sel{
     inventory_have_ge(stone, 2),
     seq{
         go_to_stone,
@@ -12,8 +10,8 @@ have_2_stone_2 = sel{
     }
 };
 have_2_stone = seq{
-    have_2_stone_2,
-    have_2_stone_2
+    have_2_stone_02,
+    have_2_stone_02
 };
 have_knife = sel{
     inventory_have_ge(knife, 1), 
@@ -37,15 +35,15 @@ have_axe = sel{
         combine(stick, knife)
     }
 };
-have_2_wood_2 = sel{
+have_2_wood_02 = sel{
     inventory_have_ge(wood, 2),
     have_axe,
     go_to_tree,
     use(axe, tree)
 };
 have_2_wood =seq{
-    have_2_wood_2,
-    have_2_wood_2
+    have_2_wood_02,
+    have_2_wood_02
 };
 have_house = sel {
     is_house_in_range,
@@ -68,4 +66,30 @@ sat_hunger = selector{
     let (tail, db) = file_parser(source).unwrap();
     assert_eq!(tail, "");
     db
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+
+    use super::*;
+
+    #[test]
+    pub fn check_for_missing_threads_in_hermit_ai() {
+        let bt = get_hermit_behavoir_tree();
+        let mut missing = HashMap::new();
+        for(thread, i) in &bt {
+            let x = i.missing_threads_used(&bt);
+            if !x.is_empty() {
+                missing.insert(thread, x);
+            }
+        }
+        for (a,b) in &missing {
+            println!("{a}:{b:?}");
+        }
+        assert_eq!(
+            missing,
+            HashMap::new()
+        )
+    }
 }
