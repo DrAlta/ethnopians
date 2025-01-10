@@ -17,7 +17,8 @@ pub use hermit::get_hermit_behavoir_tree;
 mod tests {
     use crate::sandbox::{
         ai::get_hermit_behavoir_tree,
-        bt::{cpu::CPU, Status}, World,
+        bt::{cpu::CPU, Status},
+        World,
     };
 
     //#[test]

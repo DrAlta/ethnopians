@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use super::TreePool;
 
-pub trait Corrent{
+pub trait Corrent {
     fn correct(&mut self, prefix: &str);
 }
 impl Corrent for TreePool {

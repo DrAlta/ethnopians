@@ -46,7 +46,15 @@ impl World {
         let r#type = HashMap::new();
         let highest_id = 0;
         let movement = HashMap::new();
-        World { locations, energy, hp, sizes, r#type, highest_id, movement }
+        World {
+            locations,
+            energy,
+            hp,
+            sizes,
+            r#type,
+            highest_id,
+            movement,
+        }
     }
     pub fn new(
         locations: HashMap<ObjectId, Location>,

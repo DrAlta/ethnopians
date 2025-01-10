@@ -1,9 +1,12 @@
 use std::collections::HashMap;
 
-use crate::sandbox::{bt::{
-    cpu::{ProgramCounter, ReturnStack, Stack, StackItem},
-    ExecutionToken, Status, Thread,
-}, World};
+use crate::sandbox::{
+    bt::{
+        cpu::{ProgramCounter, ReturnStack, Stack, StackItem},
+        ExecutionToken, Status, Thread,
+    },
+    World,
+};
 
 pub struct CPU {
     pub pc: ProgramCounter,
@@ -23,7 +26,11 @@ impl CPU {
             return_stack,
         }
     }
-    pub fn step(&mut self, bt: &HashMap<ExecutionToken, Thread>, world: &World) -> Result<Status, String> {
+    pub fn step(
+        &mut self,
+        bt: &HashMap<ExecutionToken, Thread>,
+        world: &World,
+    ) -> Result<Status, String> {
         let Some((token, idx)) = &self.pc else {
             return Err("program halted".into());
         };

@@ -1,7 +1,10 @@
 use std::collections::HashMap;
 
 use super::*;
-use crate::sandbox::{bt::{InpulseId, Instruction, Status, Thread, ThreadName, TreePool}, World};
+use crate::sandbox::{
+    bt::{InpulseId, Instruction, Status, Thread, ThreadName, TreePool},
+    World,
+};
 
 #[test]
 fn step_test() {
@@ -153,7 +156,6 @@ fn step_test() {
 #[test]
 fn test() {
     let world = World::new_empty();
-
 
     let mut bt = HashMap::<ThreadName, Thread>::new();
     let action1 = "a1".to_owned();
