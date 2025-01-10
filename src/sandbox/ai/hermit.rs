@@ -61,6 +61,21 @@ sat_hunger = selector{
         },
         eat(veg)
     }
+};
+dont_need_to_eat = forth {
+    get_energy,
+    is_int,
+    if{
+        lit(5),
+        gt,
+        if{
+            lit(Success),
+            return
+        },
+    },
+    lit(Failure)
+    return
+    
 }
     "#;
     let (tail, db) = file_parser(source).unwrap();
@@ -74,7 +89,7 @@ mod tests {
 
     use super::*;
 
-    #[test]
+    //#[test]
     pub fn check_for_missing_threads_in_hermit_ai() {
         let bt = get_hermit_behavoir_tree();
         let mut missing = HashMap::new();

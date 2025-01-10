@@ -38,6 +38,16 @@ impl
 }
 
 impl World {
+    pub fn new_empty() -> Self {
+        let locations = HashMap::new();
+        let energy = HashMap::new();
+        let hp = HashMap::new();
+        let sizes = HashMap::new();
+        let r#type = HashMap::new();
+        let highest_id = 0;
+        let movement = HashMap::new();
+        World { locations, energy, hp, sizes, r#type, highest_id, movement }
+    }
     pub fn new(
         locations: HashMap<ObjectId, Location>,
         energy: HashMap<ObjectId, i16>,

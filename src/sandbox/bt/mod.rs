@@ -4,6 +4,8 @@ mod blackboard;
 use std::collections::HashMap;
 
 pub use blackboard::{Blackboard, Variable};
+mod correct;
+pub use correct::Corrent;
 pub mod cpu;
 mod instruction;
 pub use instruction::Instruction;
@@ -22,7 +24,6 @@ pub enum InpulseId {
 pub type ThreadName = String;
 pub type ExecutionToken = ThreadName;
 pub type ExecutionPointer = (ExecutionToken, usize);
-pub type World = (bool, bool);
 pub type Thread = Vec<Instruction>;
 pub type TreePool = HashMap<ThreadName, Thread>;
 pub type ItemId = String;

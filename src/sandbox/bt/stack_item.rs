@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Hash)]
 pub enum StackItem {
     //Behaior states
     Sequence(usize),
@@ -7,4 +7,7 @@ pub enum StackItem {
     Success,
     Failure,
     Init,
+    Int(i32),
+    True,
+    False,
 }

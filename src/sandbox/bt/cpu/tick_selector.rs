@@ -1,6 +1,6 @@
 use qol::logy;
 
-use crate::sandbox::bt::{ExecutionToken, StackItem, Status};
+use crate::sandbox::bt::{ExecutionToken, Instruction, StackItem, Status};
 
 use super::{ProgramCounter, ReturnStack, Stack};
 
@@ -41,15 +41,12 @@ pub fn tick_selector(
         // if we had a success then we succeed
         (_, StackItem::Success) => {
             stack.push(StackItem::Success);
-            if let Some(parent_token) = return_stack.pop() {
-                // return to calling fuction
-                *pc = Some(parent_token);
-                return Ok(Status::None);
+            let status = if pc.is_none() {
+                Status::None
             } else {
-                // the program finished
-                *pc = None;
-                return Ok(Status::Success);
+                Status::Success
             };
+            Instruction::exit(status, return_stack, pc)
         }
         (true, StackItem::Failure) => {
             // if we reached the end without a Success then we fail

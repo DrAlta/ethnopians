@@ -1,10 +1,11 @@
 use std::collections::HashMap;
 
 use super::*;
-use crate::sandbox::bt::{InpulseId, Instruction, Status, Thread, ThreadName, TreePool};
+use crate::sandbox::{bt::{InpulseId, Instruction, Status, Thread, ThreadName, TreePool}, World};
 
 #[test]
 fn step_test() {
+    let world = World::new_empty();
     let mut bt = TreePool::new();
     let action1 = "act1".to_owned();
     bt.insert(action1.clone(), vec![Instruction::Action(InpulseId::Act1)]);
@@ -31,11 +32,11 @@ fn step_test() {
 
     let mut cpu = CPU::load(selector.clone());
     //step 1 selectpr does its init and sets the cpu up to call its first child, sequence.
-    assert_eq!(cpu.step(&bt), Ok(Status::None));
+    assert_eq!(cpu.step(&bt, &world), Ok(Status::None));
     assert_eq!(&cpu.stack, &vec![StackItem::Selector(1), StackItem::Init]);
     assert_eq!(&cpu.return_stack, &vec![(selector.clone(), 0)]);
     //step 2 sequence intalized and set the cpu up to call its first child, action1
-    assert_eq!(cpu.step(&bt), Ok(Status::None));
+    assert_eq!(cpu.step(&bt, &world), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
         &vec![
@@ -49,7 +50,7 @@ fn step_test() {
         &vec![(selector.clone(), 0), (sequence.clone(), 0)]
     );
     //step 3 action1 puts it's state on the stack,Success, and prays Running(1)
-    assert_eq!(cpu.step(&bt), Ok(Status::Running(InpulseId::Act1)));
+    assert_eq!(cpu.step(&bt, &world), Ok(Status::Running(InpulseId::Act1)));
     assert_eq!(
         &cpu.stack,
         &vec![
@@ -64,7 +65,7 @@ fn step_test() {
     );
     assert_eq!(&cpu.pc, &Some((action1, 0)));
     //step 4 action1 sees it's status on the stack and returns it seting the cpu to return to the calling thread
-    assert_eq!(cpu.step(&bt), Ok(Status::None));
+    assert_eq!(cpu.step(&bt, &world), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
         &vec![
@@ -75,7 +76,7 @@ fn step_test() {
     );
     assert_eq!(&cpu.return_stack, &vec![(selector.clone(), 0)]);
     //step 5  sequence sets the cpu up to run it's second child, action2
-    assert_eq!(cpu.step(&bt), Ok(Status::None));
+    assert_eq!(cpu.step(&bt, &world), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
         &vec![
@@ -90,7 +91,7 @@ fn step_test() {
         &vec![(selector.clone(), 0), (sequence.clone(), 0)]
     );
     //step 6 action2 intalizes and prays Running(2)
-    assert_eq!(cpu.step(&bt), Ok(Status::Running(InpulseId::Act2)));
+    assert_eq!(cpu.step(&bt, &world), Ok(Status::Running(InpulseId::Act2)));
     assert_eq!(
         &cpu.stack,
         &vec![
@@ -104,7 +105,7 @@ fn step_test() {
         &vec![(selector.clone(), 0), (sequence, 0)]
     );
     //step 7 action2 returns to sequence
-    assert_eq!(cpu.step(&bt), Ok(Status::None));
+    assert_eq!(cpu.step(&bt, &world), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
         &vec![
@@ -115,42 +116,45 @@ fn step_test() {
     );
     assert_eq!(&cpu.return_stack, &vec![(selector.clone(), 0)]);
     //step 8 sequence sees it's last child has returned failure to returns failure to select
-    assert_eq!(cpu.step(&bt), Ok(Status::None));
+    assert_eq!(cpu.step(&bt, &world), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
         &vec![StackItem::Selector(1), StackItem::Failure]
     );
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
     //step 9 selector sees it's first child has returned failure so puts it's new state and then init on the stack and set up the cpu to run it's second child, action3
-    assert_eq!(cpu.step(&bt), Ok(Status::None));
+    assert_eq!(cpu.step(&bt, &world), Ok(Status::None));
     assert_eq!(&cpu.stack, &vec![StackItem::Selector(2), StackItem::Init]);
     assert_eq!(&cpu.return_stack, &vec![(selector.clone(), 0)]);
     //step 10 action3 sees init and puts Success on tha stack and prays Running(3)
-    assert_eq!(cpu.step(&bt), Ok(Status::Running(InpulseId::Act3)));
+    assert_eq!(cpu.step(&bt, &world), Ok(Status::Running(InpulseId::Act3)));
     assert_eq!(
         &cpu.stack,
         &vec![StackItem::Selector(2), StackItem::Success]
     );
     assert_eq!(&cpu.return_stack, &vec![(selector, 0)]);
     //step 11 action3 sees the success on the stack and returns it to the calling function
-    assert_eq!(cpu.step(&bt), Ok(Status::None));
+    assert_eq!(cpu.step(&bt, &world), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
         &vec![StackItem::Selector(2), StackItem::Success]
     );
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
     //step 12 selection sees its it's child return success then seens its' has no calling function so holts execution and prays Success
-    assert_eq!(cpu.step(&bt), Ok(Status::Success));
+    assert_eq!(cpu.step(&bt, &world), Ok(Status::Success));
     assert_eq!(&cpu.stack, &vec![StackItem::Success]);
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
     //step 13 the program has is holted
-    assert_eq!(cpu.step(&bt), Err("program halted".into()));
+    assert_eq!(cpu.step(&bt, &world), Err("program halted".into()));
     assert_eq!(&cpu.stack, &vec![StackItem::Success]);
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
 }
 
 #[test]
 fn test() {
+    let world = World::new_empty();
+
+
     let mut bt = HashMap::<ThreadName, Thread>::new();
     let action1 = "a1".to_owned();
     bt.insert(action1.clone(), vec![Instruction::Action(InpulseId::Act1)]);
@@ -182,7 +186,7 @@ fn test() {
 
     for _ in 0..13 {
         //            println!("----\nStack:{stack:?}\nreturn_stack:{rs:?}");
-        match cpu.step(&bt) {
+        match cpu.step(&bt, &world) {
             Ok(ok) => {
                 println!("{ok:?}");
             }

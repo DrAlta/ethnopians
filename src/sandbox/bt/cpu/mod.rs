@@ -1,4 +1,4 @@
-use super::{ExecutionPointer, StackItem};
+use super::{ExecutionPointer, StackItem, Status};
 
 mod cpu;
 pub use cpu::CPU;
@@ -15,3 +15,4 @@ mod tests;
 pub type ProgramCounter = Option<ExecutionPointer>;
 pub type Stack = Vec<StackItem>;
 pub type ReturnStack = Vec<ExecutionPointer>;
+pub type Prayer = Result<Status, String>;
