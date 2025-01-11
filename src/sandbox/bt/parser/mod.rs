@@ -16,7 +16,7 @@ pub use combine_parser::combine_parser;
 mod eat_parser;
 pub use eat_parser::eat_parser;
 mod file_parser;
-pub use file_parser::file_parser;
+pub use file_parser::{file_parser, named_tree_parser};
 pub mod forth_parser;
 mod forth_tree_parser;
 pub use forth_tree_parser::forth_tree_parser;

@@ -36,6 +36,7 @@ pub enum Instruction {
     ForthLT,
     ForthMul,
     ForthRem,
+    ForthReturn,
     ForthSub,
 }
 
@@ -73,6 +74,7 @@ impl Instruction {
             | Instruction::ForthGE
             | Instruction::ForthLE
             | Instruction::ForthIsInt
+            | Instruction::ForthReturn
             | Instruction::ForthIf(_) => (),
         }
         missing
@@ -206,6 +208,7 @@ impl Instruction {
                 stack.push(value);
                 Self::next(Status::None, pc)
             }
+            Instruction::ForthReturn => Self::exit(Status::None, return_stack, pc),
         }
     }
     pub fn correct(&mut self, prefix: &str) {
@@ -242,6 +245,7 @@ impl Instruction {
             | Instruction::ForthGE
             | Instruction::ForthLE
             | Instruction::ForthIsInt
+            | Instruction::ForthReturn
             | Instruction::ForthIf(_) => (),
         }
     }

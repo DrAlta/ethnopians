@@ -7,7 +7,7 @@ use nom::{
 
 use crate::sandbox::bt::{
     parser::{ident_parser, space_parser, tree_parser, Thingie, TreesUsed},
-    Thread, ThreadName, TreePool,
+    Instruction, Thread, ThreadName, TreePool,
 };
 
 pub fn file_parser<'a>(
@@ -41,8 +41,11 @@ pub fn named_tree_parser<'a>(
         char('='),
         space_parser,
         map_res(tree_parser, |x| {
-            let Thingie::Tree(i, used) = x else {
-                return Err(()).into();
+            let (i, used) = match x {
+                Thingie::Token(token) => {
+                    (vec![Instruction::Selector(vec![token])], TreePool::new())
+                }
+                Thingie::Tree(vec, hash_map) => (vec, hash_map),
             };
             Ok::<(Thread, TreesUsed), ()>((i, used))
         }),

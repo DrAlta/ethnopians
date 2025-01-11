@@ -63,16 +63,16 @@ sat_hunger = selector{
     }
 };
 dont_need_to_eat = forth {
-    get_energy(self),
-    is_int,
+    get_energy(self)
+    is_int
     if{
-        lit(5),
-        gt,
+        lit(5)
+        gt
         if{
-            lit(Success),
+            lit(Success)
             return
-        },
-    },
+        }
+    }
     lit(Failure)
     return
     
@@ -87,7 +87,47 @@ dont_need_to_eat = forth {
 mod tests {
     use std::collections::HashMap;
 
+    use crate::sandbox::bt::{parser::named_tree_parser, Instruction, StackItem};
+
     use super::*;
+    #[test]
+    fn hermit_test() {
+        let input = "dont_need_to_eat = forth {
+    get_energy(self)
+    is_int
+    if{
+        lit(5)
+        gt
+        if{
+            lit(Success)
+            return
+        }
+    }
+    lit(Failure)
+    return
+    
+}";
+        let (tail, (_name, body)) = named_tree_parser(input).unwrap();
+        assert_eq!(tail, "");
+        assert_eq!(
+            body,
+            TreePool::from([(
+                "dont_need_to_eat".to_owned(),
+                vec![
+                    Instruction::ForthGetEnergy("self".to_owned()),
+                    Instruction::ForthIsInt,
+                    Instruction::ForthIf(5),
+                    Instruction::ForthLit(StackItem::Int(5)),
+                    Instruction::ForthGT,
+                    Instruction::ForthIf(2),
+                    Instruction::ForthLit(StackItem::Success),
+                    Instruction::ForthReturn,
+                    Instruction::ForthLit(StackItem::Failure),
+                    Instruction::ForthReturn,
+                ]
+            )])
+        );
+    }
 
     #[test]
     pub fn check_for_missing_threads_in_hermit_ai() {

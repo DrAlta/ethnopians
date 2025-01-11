@@ -50,3 +50,19 @@ pub fn lit_parser<'a>(
     ))(input)?;
     Ok((tail, (vec![body], TreePool::new())))
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::sandbox::bt::Instruction;
+
+    use super::*;
+
+    #[test]
+    fn success_test() {
+        let input = "lit(Success)";
+        let (tail, (body, used)) = lit_parser(input).unwrap();
+        assert_eq!(tail, "");
+        assert_eq!(used, TreePool::new());
+        assert_eq!(body, vec![Instruction::ForthLit(StackItem::Success)])
+    }
+}

@@ -9,8 +9,8 @@ use crate::sandbox::bt::{
 };
 
 use super::{
-    add_parser, div_parser, ge_parser, gt_parser, is_int_parser, le_parser, lt_parser, mul_parser,
-    rem_parser, sub_parser,
+    add_parser, div_parser, ge_parser, gt_parser, if_parser, is_int_parser, le_parser, lt_parser,
+    mul_parser, rem_parser, return_parser, sub_parser,
 };
 
 pub fn forth_threadette_parser<'a>(
@@ -33,6 +33,9 @@ pub fn forth_threadette_parser<'a>(
         le_parser,
         lt_parser,
         is_int_parser,
+        //flow
+        if_parser,
+        return_parser,
         // function calls, this needs to be last so as not to gobble the other tags
         map_res(token_parser, |x| {
             Ok::<(Thread, TreePool), ()>(match x {

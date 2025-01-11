@@ -1,15 +1,23 @@
 use std::collections::HashMap;
 
-use nom::{error::ErrorKind, multi::separated_list1, IResult};
-
-use crate::sandbox::bt::{parser::space_parser, Corrent, Thread, TreePool};
+use crate::sandbox::bt::{Corrent, Thread, TreePool};
+use nom::{
+    character::complete::{multispace0, multispace1},
+    error::ErrorKind,
+    multi::separated_list1,
+    sequence::tuple,
+    IResult,
+};
 
 use super::forth_threadette_parser;
 
 pub fn forth_parser<'a>(
     input: &'a str,
 ) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
-    let (tail, body) = separated_list1(space_parser, forth_threadette_parser)(input)?;
+    let (tail, (body, _)) = tuple((
+        separated_list1(multispace1, forth_threadette_parser),
+        multispace0,
+    ))(input)?;
     let mut thread = Vec::new();
     let mut pool = HashMap::new();
     for (idx, (mut vec, mut hash_map)) in body.into_iter().enumerate() {
@@ -20,4 +28,44 @@ pub fn forth_parser<'a>(
         pool.extend(hash_map.into_iter());
     }
     Ok((tail, (thread, pool)))
+}
+#[cfg(test)]
+mod tests {
+    use crate::sandbox::bt::{Instruction, StackItem};
+
+    use super::*;
+
+    #[test]
+    fn forth_parser_test() {
+        let input = "get_energy(self)
+    is_int
+    if{
+        lit(5)
+        gt
+        if{
+            lit(Success)
+            return
+        }
+    }
+    lit(Failure)
+    return";
+        let (tail, (body, used)) = forth_parser(input).unwrap();
+        assert_eq!(tail, "");
+        assert_eq!(used, TreePool::new());
+        assert_eq!(
+            body,
+            vec![
+                Instruction::ForthGetEnergy("self".to_owned()),
+                Instruction::ForthIsInt,
+                Instruction::ForthIf(5),
+                Instruction::ForthLit(StackItem::Int(5)),
+                Instruction::ForthGT,
+                Instruction::ForthIf(2),
+                Instruction::ForthLit(StackItem::Success),
+                Instruction::ForthReturn,
+                Instruction::ForthLit(StackItem::Failure),
+                Instruction::ForthReturn,
+            ]
+        )
+    }
 }
