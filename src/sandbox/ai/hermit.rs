@@ -89,7 +89,7 @@ mod tests {
 
     use super::*;
 
-    //#[test]
+    #[test]
     pub fn check_for_missing_threads_in_hermit_ai() {
         let bt = get_hermit_behavoir_tree();
         let mut missing = HashMap::new();

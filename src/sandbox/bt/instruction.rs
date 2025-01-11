@@ -22,20 +22,21 @@ pub enum Instruction {
     Sequence(Vec<ExecutionToken>),
     Use(ItemId, ItemId),
     //
+    ForthAdd,
+    ForthCall(ThreadName, usize),
+    ForthDiv,
+    ForthGE,
     ForthGetHP(BlackboardKey),
     ForthGetEnergy(BlackboardKey),
-    ForthLit(StackItem),
-    ForthAdd,
-    ForthSub,
-    ForthMul,
-    ForthDiv,
-    ForthRem,
     ForthGT,
-    ForthLT,
-    ForthGE,
-    ForthLE,
     ForthIf(usize),
-    ForthCall(ThreadName, usize),
+    ForthIsInt,
+    ForthLE,
+    ForthLit(StackItem),
+    ForthLT,
+    ForthMul,
+    ForthRem,
+    ForthSub,
 }
 
 impl Instruction {
@@ -71,6 +72,7 @@ impl Instruction {
             | Instruction::ForthLT
             | Instruction::ForthGE
             | Instruction::ForthLE
+            | Instruction::ForthIsInt
             | Instruction::ForthIf(_) => (),
         }
         missing
@@ -195,6 +197,15 @@ impl Instruction {
                 *pc = Some((token.clone(), *idx));
                 Ok(Status::None)
             }
+            Instruction::ForthIsInt => {
+                let value = if let Some(StackItem::Int(_)) = stack.last() {
+                    StackItem::True
+                } else {
+                    StackItem::False
+                };
+                stack.push(value);
+                Self::next(Status::None, pc)
+            }
         }
     }
     pub fn correct(&mut self, prefix: &str) {
@@ -230,6 +241,7 @@ impl Instruction {
             | Instruction::ForthLT
             | Instruction::ForthGE
             | Instruction::ForthLE
+            | Instruction::ForthIsInt
             | Instruction::ForthIf(_) => (),
         }
     }
