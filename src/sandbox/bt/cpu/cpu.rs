@@ -2,8 +2,9 @@ use std::collections::HashMap;
 
 use crate::sandbox::{
     bt::{
+        blackboard::Blackboard,
         cpu::{ProgramCounter, ReturnStack, Stack, StackItem},
-        ExecutionToken, Status, Thread,
+        BlackboardKey, BlackboardValue, ExecutionToken, Status, Thread,
     },
     World,
 };
@@ -29,6 +30,7 @@ impl CPU {
     pub fn step(
         &mut self,
         bt: &HashMap<ExecutionToken, Thread>,
+        blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
         world: &World,
     ) -> Result<Status, String> {
         let Some((token, idx)) = &self.pc else {
@@ -41,6 +43,12 @@ impl CPU {
         let Some(i) = thread.get(*idx) else {
             return Err("failed to get instruction{idx} from thread {token}".into());
         };
-        i.tick(&mut self.stack, &mut self.return_stack, &mut self.pc, world)
+        i.tick(
+            &mut self.stack,
+            &mut self.return_stack,
+            &mut self.pc,
+            blackboard,
+            world,
+        )
     }
 }

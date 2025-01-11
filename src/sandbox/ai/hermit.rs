@@ -63,7 +63,7 @@ sat_hunger = selector{
     }
 };
 dont_need_to_eat = forth {
-    get_energy,
+    get_energy(self),
     is_int,
     if{
         lit(5),

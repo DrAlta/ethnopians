@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::Debug};
+use std::{borrow::Borrow, collections::HashMap, fmt::Debug, hash::Hash};
 
 use super::Variable;
 
@@ -16,12 +16,16 @@ impl<K: Debug + std::cmp::Eq + std::hash::Hash, V: Debug> Blackboard<K, V> {
             .expect("we added an items if the stack was empty")
             .insert(k, v)
     }
-    pub fn get(&self, k: &K) -> Option<&V> {
+    pub fn get<Q>(&self, k: &Q) -> Option<&V>
+    where
+        Q: ?Sized + Hash + Eq,
+        K: Borrow<Q>,
+    {
         let mut current_key = k;
         for i in 1..self.stack.len() + 1 {
             if let Some(hashmap) = self.stack.get(self.stack.len() - i) {
                 match hashmap.get(current_key) {
-                    Some(Variable::Defer(id)) => current_key = id,
+                    Some(Variable::Defer(id)) => current_key = id.borrow(),
                     Some(Variable::Chit(value)) => return Some(value),
                     None => (),
                 }

@@ -1,9 +1,10 @@
 #![allow(dead_code)]
-
-mod blackboard;
 use std::collections::HashMap;
 
+mod blackboard;
 pub use blackboard::{Blackboard, Variable};
+mod blackboard_value;
+pub use blackboard_value::BlackboardValue;
 mod correct;
 pub use correct::Corrent;
 pub mod cpu;
@@ -21,6 +22,8 @@ pub enum InpulseId {
     Act2,
     Act3,
 }
+
+pub type BlackboardKey = String;
 pub type ThreadName = String;
 pub type ExecutionToken = ThreadName;
 pub type ExecutionPointer = (ExecutionToken, usize);

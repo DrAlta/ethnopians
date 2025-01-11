@@ -17,17 +17,19 @@ pub use hermit::get_hermit_behavoir_tree;
 mod tests {
     use crate::sandbox::{
         ai::get_hermit_behavoir_tree,
-        bt::{cpu::CPU, Status},
+        bt::{cpu::CPU, Blackboard, Status},
         World,
     };
 
     //#[test]
     pub fn hermit_ai_run_test() {
         let world = World::new_empty();
+        let mut blackboard = Blackboard::new();
+
         let bt = get_hermit_behavoir_tree();
         let mut cpu = CPU::load("hermit".to_owned());
         loop {
-            match cpu.step(&bt, &world) {
+            match cpu.step(&bt, &mut blackboard, &world) {
                 Ok(status) => match status {
                     Status::Success => todo!(),
                     Status::Failure => todo!(),

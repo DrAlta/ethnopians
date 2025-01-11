@@ -8,7 +8,9 @@ use crate::sandbox::{
     ItemClass, World,
 };
 
-use super::{cpu::Prayer, StackItem, ThreadName, TreePool};
+use super::{
+    cpu::Prayer, Blackboard, BlackboardKey, BlackboardValue, StackItem, ThreadName, TreePool,
+};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Instruction {
@@ -20,7 +22,8 @@ pub enum Instruction {
     Sequence(Vec<ExecutionToken>),
     Use(ItemId, ItemId),
     //
-    ForthGetHP,
+    ForthGetHP(BlackboardKey),
+    ForthGetEnergy(BlackboardKey),
     ForthLit(StackItem),
     ForthAdd,
     ForthSub,
@@ -56,7 +59,8 @@ impl Instruction {
             | Instruction::Eat(_)
             | Instruction::InventoryGE(_, _)
             | Instruction::Use(_, _)
-            | Instruction::ForthGetHP
+            | Instruction::ForthGetHP(_)
+            | Instruction::ForthGetEnergy(_)
             | Instruction::ForthLit(..)
             | Instruction::ForthAdd
             | Instruction::ForthSub
@@ -76,6 +80,7 @@ impl Instruction {
         stack: &mut Stack,
         return_stack: &mut ReturnStack,
         pc: &mut ProgramCounter,
+        blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
         world: &World,
     ) -> Prayer {
         match self {
@@ -86,17 +91,31 @@ impl Instruction {
             Instruction::Selector(children) => tick_selector(children, stack, return_stack, pc),
             Instruction::Sequence(children) => tick_sequence(children, stack, return_stack, pc),
             Instruction::Use(_, _) => todo!(),
-            Instruction::ForthGetHP => {
-                todo!("replace todo_replace_this{:?}", {
-                    let todo_replace_this = 0;
-                    let Some(hp) = world.get_hp(&todo_replace_this) else {
-                        stack.push(StackItem::False);
-                        return Self::next(Status::None, pc);
-                    };
-                    stack.push(StackItem::Int(*hp as i32));
-                    Self::next(Status::None, pc)
-                })
+            Instruction::ForthGetHP(key) => {
+                let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(key) else {
+                    stack.push(StackItem::False);
+                    return Self::next(Status::None, pc);
+                };
+                let Some(hp) = world.get_hp(entity_id) else {
+                    stack.push(StackItem::False);
+                    return Self::next(Status::None, pc);
+                };
+                stack.push(StackItem::Int(*hp as i32));
+                Self::next(Status::None, pc)
             }
+            Instruction::ForthGetEnergy(key) => {
+                let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(key) else {
+                    stack.push(StackItem::False);
+                    return Self::next(Status::None, pc);
+                };
+                let Some(energy) = world.get_energy(entity_id) else {
+                    stack.push(StackItem::False);
+                    return Self::next(Status::None, pc);
+                };
+                stack.push(StackItem::Int(*energy as i32));
+                Self::next(Status::None, pc)
+            }
+
             Instruction::ForthLit(value) => {
                 stack.push(value.clone());
                 Self::next(Status::None, pc)
@@ -199,7 +218,8 @@ impl Instruction {
             | Instruction::Eat(_)
             | Instruction::InventoryGE(_, _)
             | Instruction::Use(_, _)
-            | Instruction::ForthGetHP
+            | Instruction::ForthGetHP(_)
+            | Instruction::ForthGetEnergy(_)
             | Instruction::ForthLit(_)
             | Instruction::ForthAdd
             | Instruction::ForthSub

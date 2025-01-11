@@ -2,6 +2,8 @@ use nom::{branch::alt, combinator::map_res, error::ErrorKind, IResult};
 
 use crate::sandbox::bt::{parser::token_parser, Instruction, Thread, TreePool};
 
+use super::lit_parser;
+
 pub fn forth_threadette_parser<'a>(
     input: &'a str,
 ) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
@@ -14,6 +16,6 @@ pub fn forth_threadette_parser<'a>(
                 crate::sandbox::bt::parser::Thingie::Tree(vec, hash_map) => (vec, hash_map),
             })
         }),
-        |x| Ok((x, (Thread::new(), TreePool::new()))),
+        lit_parser,
     ))(input)
 }
