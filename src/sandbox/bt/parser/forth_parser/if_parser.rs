@@ -9,13 +9,13 @@ use nom::{
 
 use crate::sandbox::bt::{Thread, TreePool};
 
-use super::{balanced::balanced, forth_threadette_parser};
+use super::{balanced_parser::balanced_parser, forth_threadette_parser};
 
 mod r#if;
 use r#if::If;
 
 pub fn if_parser<'a>(input: &'a str) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
-    let (tail, body) = balanced(
+    let (tail, body) = balanced_parser(
         map_res(tuple((multispace0, forth_threadette_parser)), |(_, x)| {
             Result::<(Thread, TreePool), (&'a str, ErrorKind)>::Ok(x)
         }),

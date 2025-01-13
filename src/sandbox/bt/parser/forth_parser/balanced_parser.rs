@@ -75,16 +75,16 @@ use nom::{
     multi::many_till,
     Err, IResult, InputLength, Parser,
 };
-pub fn balanced<I, O, E, Fill, Open, Close>(
+pub fn balanced_parser<I, O, A, B, E, Fill, Open, Close>(
     mut fill: Fill,
     mut open: Open,
     mut close: Close,
 ) -> impl FnMut(I) -> IResult<I, Vec<Tract<O>>, E>
 where
-    I: Clone + InputLength + Debug,
+    I: Clone + InputLength,
     Fill: Parser<I, O, E>,
-    Open: Parser<I, I, E>,
-    Close: Parser<I, I, E>,
+    Open: Parser<I, A, E>,
+    Close: Parser<I, B, E>,
     E: ParseError<I>,
 {
     move |input: I| {
@@ -94,7 +94,6 @@ where
         levels.push(Rc::clone(&building));
         let mut count = 0;
         loop {
-            println!("{count}:{tail:?}");
             if count == 10 {
                 panic!()
             }
@@ -123,8 +122,6 @@ where
             }
 
             if term {
-                println!("open");
-
                 let Some(level_cell) = levels.last() else {
                     return Err(Err::Error(E::from_error_kind(tail, ErrorKind::Fail)));
                 };
@@ -137,10 +134,8 @@ where
 
                 tail = inner_tail
             } else {
-                println!("close");
                 levels.pop();
                 if levels.is_empty() {
-                    println!("returning ok");
                     return Ok((
                         inner_tail,
                         Rc::into_inner(building)
@@ -153,7 +148,6 @@ where
                 } else {
                     tail = inner_tail;
                 }
-                
             }
         }
     }
@@ -171,7 +165,7 @@ mod tests {
     fn two_test() {
         let source = "ifaifbthencthen";
         let (_tail, x) =
-            balanced(one_of::<_, _, ()>("abcdifthen"), tag("if"), tag("then"))(source).unwrap();
+            balanced_parser(one_of::<_, _, ()>("abcdifthen"), tag("if"), tag("then"))(source).unwrap();
 
         assert_eq!(x, vec![Item('a'), Level(vec![Item('b'),]), Item('c'),])
     }
@@ -190,7 +184,7 @@ mod tests {
         then"*/
         let source = "ifaifbifcthendthenethen";
         let (_tail, x) =
-            balanced(one_of::<_, _, ()>("abcdifthen"), tag("if"), tag("then"))(source).unwrap();
+            balanced_parser(one_of::<_, _, ()>("abcdifthen"), tag("if"), tag("then"))(source).unwrap();
 
         assert_eq!(
             x,
