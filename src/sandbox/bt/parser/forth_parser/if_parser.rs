@@ -1,6 +1,6 @@
 use nom::{
     bytes::complete::tag,
-    character::streaming::multispace1,
+    character::streaming::multispace0,
     combinator::{map_res, recognize},
     error::ErrorKind,
     sequence::tuple,
@@ -16,11 +16,11 @@ use r#if::If;
 
 pub fn if_parser<'a>(input: &'a str) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
     let (tail, body) = balanced(
-        map_res(tuple((forth_threadette_parser, multispace1)), |(x, _)| {
+        map_res(tuple((multispace0, forth_threadette_parser)), |(_, x)| {
             Result::<(Thread, TreePool), (&'a str, ErrorKind)>::Ok(x)
         }),
-        recognize(tuple((tag("if"), multispace1))),
-        tag("then"),
+        recognize(tuple((multispace0, tag("if")))),
+        recognize(tuple((multispace0, tag("then")))),
     )(input)?;
 
     let x = body.flatten();
