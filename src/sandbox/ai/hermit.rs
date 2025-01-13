@@ -65,14 +65,14 @@ sat_hunger = selector{
 dont_need_to_eat = forth {
     get_energy(self)
     is_int
-    if{
+    if
         lit(5)
         gt
-        if{
+        if
             lit(Success)
             return
-        }
-    }
+        then
+    then
     lit(Failure)
     return
     
@@ -95,14 +95,14 @@ mod tests {
         let input = "dont_need_to_eat = forth {
     get_energy(self)
     is_int
-    if{
+    if
         lit(5)
         gt
-        if{
+        if
             lit(Success)
             return
-        }
-    }
+        then
+    then
     lit(Failure)
     return
     

@@ -39,14 +39,14 @@ mod tests {
     fn forth_parser_test() {
         let input = "get_energy(self)
     is_int
-    if{
+    if
         lit(5)
         gt
-        if{
+        if
             lit(Success)
             return
-        }
-    }
+        then
+    then
     lit(Failure)
     return";
         let (tail, (body, used)) = forth_parser(input).unwrap();

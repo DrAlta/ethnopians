@@ -1,27 +1,3 @@
-//!
-//! you want something like
-//! ```
-//! pub fn balanced(fill, open, close)
-//!     let (tail, body) = open(input)?;
-//!     let mut count = 1;
-//!     let mut inner_tail = tail;
-//!     while {
-//!         let(inner_tail ,(filler, term)) = many_till(
-//!             fill,
-//!             alt((
-//!                 open,
-//!                 close
-//!             ))
-//!         )(inner_tail)?
-//!         if let Ok(_) = open(term) {
-//!             count += 1;
-//!         } else {
-//!             count -=1;
-//!             if count == 0 {
-//!                 return Ok(inner_tail)
-//!             }
-//! ```
-
 pub enum Tract<T> {
     Item(T),
     Level(Vec<Tract<T>>),
@@ -183,27 +159,53 @@ mod tests {
     use Tract::*;
 
     #[test]
-    fn main() {
-        let source = "if yes if no then some then";
+    fn two_test() {
+        let source = "ifaifbthencthen";
         let (_tail, x) =
-            balanced(one_of::<_, _, ()>("if yesnomth"), tag("if"), tag("then"))(source).unwrap();
+            balanced(one_of::<_, _, ()>("abcdifthen"), tag("if"), tag("then"))(source).unwrap();
 
         assert_eq!(
             x,
             vec![
-                Item(' '),
-                Item('y'),
-                Item('e'),
-                Item('s'),
-                Item(' '),
-                Level(vec![Item(' '), Item('n'), Item('o'), Item(' '),]),
-                Item(' '),
-                Item('s'),
-                Item('o'),
-                Item('m'),
-                Item('e'),
-                Item(' '),
+                Item('a'),
+                Level(vec![
+                    Item('b'),
+                ]),
+                Item('c'),
             ]
         )
     }
+    #[test]
+    fn three_test() {
+/*"if
+    a
+    if
+        b
+        if
+            c
+        then
+        d
+    then
+    e
+then"*/
+        let source = "ifaifbifcthendthenethen";
+        let (_tail, x) =
+            balanced(one_of::<_, _, ()>("abcdifthen"), tag("if"), tag("then"))(source).unwrap();
+
+        assert_eq!(
+            x,
+            vec![
+                Item('a'),
+                Level(vec![
+                    Item('b'),
+                    Level(vec![
+                        Item('c'),
+                    ]),
+                    Item('d'),
+                    ]),
+                Item('e'),
+            ]
+        )
+    }
+
 }

@@ -29,14 +29,14 @@ mod tests {
         let input = "forth {
             get_energy(self)
             is_int
-            if{
+            if
                 lit(5)
                 gt
-                if{
+                if
                     lit(Success)
                     return
-                }
-            }
+                then
+            then
             lit(Failure)
             return
             
