@@ -4,13 +4,17 @@ use crate::sandbox::{
     bt::{
         cpu::{tick_action, tick_selector, tick_sequence, ProgramCounter, ReturnStack, Stack},
         ExecutionToken, InpulseId, ItemId, Status,
-    },
-    ItemClass, World,
+    }, ItemClass, World
 };
 
 use super::{
     cpu::Prayer, Blackboard, BlackboardKey, BlackboardValue, StackItem, ThreadName, TreePool,
 };
+///
+/// ForthFindNearest{entity_id: ObjectId, item_class: ItemClass},
+/// ForthGetHP(BlackboardKey),
+/// and ForthGetEnergy(BlackboardKey),
+/// should probably take their argumants off the stack
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Instruction {
@@ -25,9 +29,13 @@ pub enum Instruction {
     ForthAdd,
     ForthCall(ThreadName, usize),
     ForthDiv,
+    //(ObjectId ItemClass -- Option<Coord>) finds the neared item of ItemClass to ObjectId
+    ForthFindNearest,
     ForthGE,
-    ForthGetHP(BlackboardKey),
-    ForthGetEnergy(BlackboardKey),
+    //(BlackboardKey -- Option<Int>)
+    ForthGetHP,
+    //(BlackboardKey -- Option<Int>)
+    ForthGetEnergy,
     ForthGT,
     ForthIf(usize),
     ForthIsInt,
@@ -61,8 +69,8 @@ impl Instruction {
             | Instruction::Eat(_)
             | Instruction::InventoryGE(_, _)
             | Instruction::Use(_, _)
-            | Instruction::ForthGetHP(_)
-            | Instruction::ForthGetEnergy(_)
+            | Instruction::ForthGetHP
+            | Instruction::ForthGetEnergy
             | Instruction::ForthLit(..)
             | Instruction::ForthAdd
             | Instruction::ForthSub
@@ -75,6 +83,7 @@ impl Instruction {
             | Instruction::ForthLE
             | Instruction::ForthIsInt
             | Instruction::ForthReturn
+            | Instruction::ForthFindNearest
             | Instruction::ForthIf(_) => (),
         }
         missing
@@ -95,8 +104,14 @@ impl Instruction {
             Instruction::Selector(children) => tick_selector(children, stack, return_stack, pc),
             Instruction::Sequence(children) => tick_sequence(children, stack, return_stack, pc),
             Instruction::Use(_, _) => todo!(),
-            Instruction::ForthGetHP(key) => {
-                let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(key) else {
+            Instruction::ForthGetHP => {
+                let Some(StackItem::String(_)) = stack.last() else {
+                    return Err("tos wasn't a sting".to_owned())
+                };
+                let Some(StackItem::String(key)) = stack.pop() else {
+                    unreachable!()
+                };
+                let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(&key) else {
                     stack.push(StackItem::False);
                     return Self::next(Status::None, pc);
                 };
@@ -107,8 +122,14 @@ impl Instruction {
                 stack.push(StackItem::Int(*hp as i32));
                 Self::next(Status::None, pc)
             }
-            Instruction::ForthGetEnergy(key) => {
-                let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(key) else {
+            Instruction::ForthGetEnergy => {
+                let Some(StackItem::String(_)) = stack.last() else {
+                    return Err("tos wasn't a sting".to_owned())
+                };
+                let Some(StackItem::String(key)) = stack.pop() else {
+                    unreachable!()
+                };
+                let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(&key) else {
                     stack.push(StackItem::False);
                     return Self::next(Status::None, pc);
                 };
@@ -209,6 +230,30 @@ impl Instruction {
                 Self::next(Status::None, pc)
             }
             Instruction::ForthReturn => Self::exit(Status::None, return_stack, pc),
+            Instruction::ForthFindNearest => {
+                let Some(StackItem::String(_)) = stack.last() else {
+                    return Err("tos wasn't a sting".to_owned())
+                };
+                let Some(StackItem::EntityId(_)) = stack.get(stack.len() - 2) else {
+                    return Err("nos wasn't an EntityId".to_owned())
+                };
+                let Some(StackItem::String(item_class)) = stack.pop() else {
+                    unreachable!()
+                };
+                let Some(StackItem::EntityId(entity_id)) = stack.pop() else {
+                    unreachable!()
+                };
+                match world.find_nearest(entity_id, &item_class) {
+                    Some(thing) => {
+                        stack.push(StackItem::Coord { x: thing.x as i32, y: thing.y as i32 });
+                        Self::next(Status::None, pc)
+                    },
+                    None => {
+                        stack.push(StackItem::False);
+                        Self::next(Status::None, pc)
+                    },
+                }
+            }
         }
     }
     pub fn correct(&mut self, prefix: &str) {
@@ -232,8 +277,8 @@ impl Instruction {
             | Instruction::Eat(_)
             | Instruction::InventoryGE(_, _)
             | Instruction::Use(_, _)
-            | Instruction::ForthGetHP(_)
-            | Instruction::ForthGetEnergy(_)
+            | Instruction::ForthGetHP
+            | Instruction::ForthGetEnergy
             | Instruction::ForthLit(_)
             | Instruction::ForthAdd
             | Instruction::ForthSub
@@ -246,6 +291,7 @@ impl Instruction {
             | Instruction::ForthLE
             | Instruction::ForthIsInt
             | Instruction::ForthReturn
+            | Instruction::ForthFindNearest
             | Instruction::ForthIf(_) => (),
         }
     }

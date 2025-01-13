@@ -9,8 +9,7 @@ use crate::sandbox::bt::{
 };
 
 use super::{
-    add_parser, div_parser, ge_parser, gt_parser, if_parser, is_int_parser, le_parser, lt_parser,
-    mul_parser, rem_parser, return_parser, sub_parser,
+    add_parser, div_parser, find_nearest_parser, ge_parser, gt_parser, if_parser, is_int_parser, le_parser, lt_parser, mul_parser, rem_parser, return_parser, sub_parser
 };
 
 pub fn forth_threadette_parser<'a>(
@@ -27,6 +26,7 @@ pub fn forth_threadette_parser<'a>(
         // getters
         get_hp_parser,
         get_energy_parser,
+        find_nearest_parser,
         // comparisions
         ge_parser,
         gt_parser,

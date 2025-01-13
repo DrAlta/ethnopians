@@ -27,7 +27,8 @@ mod tests {
     #[test]
     fn forth_tree_parser_test() {
         let input = "forth {
-            get_energy(self)
+            lit(\"self\")
+            get_energy
             is_int
             if
                 lit(5)
@@ -52,7 +53,8 @@ mod tests {
         assert_eq!(
             body,
             vec![
-                Instruction::ForthGetEnergy("self".to_owned()),
+                Instruction::ForthLit(StackItem::String("self".to_owned())),
+                Instruction::ForthGetEnergy,
                 Instruction::ForthIsInt,
                 Instruction::ForthIf(5),
                 Instruction::ForthLit(StackItem::Int(5)),

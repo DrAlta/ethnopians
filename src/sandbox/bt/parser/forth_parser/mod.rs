@@ -5,6 +5,8 @@ pub use balanced_parser::balanced_parser;
 mod div_parser;
 pub use div_parser::div_parser;
 mod forth_parser;
+mod find_nearest_parser;
+pub use find_nearest_parser::find_nearest_parser;
 pub use forth_parser::forth_parser;
 mod forth_threadette_parser;
 pub use forth_threadette_parser::forth_threadette_parser;

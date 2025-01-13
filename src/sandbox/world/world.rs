@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::sandbox::{Item, Location, ObjectId, Prev};
+use crate::{sandbox::{Item, ItemClass, Location, ObjectId, Prev}, Vec2};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct World {
@@ -38,6 +38,9 @@ impl
 }
 
 impl World {
+    pub fn find_nearest(&self, _entity_id: ObjectId, _item_class: &ItemClass) -> Option<Vec2> {
+        todo!()
+    }
     pub fn new_empty() -> Self {
         let locations = HashMap::new();
         let energy = HashMap::new();

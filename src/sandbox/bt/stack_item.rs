@@ -1,3 +1,5 @@
+use crate::sandbox::ObjectId;
+
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Hash)]
 pub enum StackItem {
     //Behaior states
@@ -10,4 +12,7 @@ pub enum StackItem {
     Int(i32),
     True,
     False,
+    Coord{x: i32, y: i32},
+    String(String),
+    EntityId(ObjectId),
 }

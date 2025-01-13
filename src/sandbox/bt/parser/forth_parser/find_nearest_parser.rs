@@ -6,9 +6,9 @@ use crate::sandbox::bt::{
     Instruction, Thread, TreePool,
 };
 
-pub fn get_energy_parser<'a>(
+pub fn find_nearest_parser<'a>(
     input: &'a str,
 ) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
-    let (tail, _body) = tag("get_energy")(input)?;
-    Ok((tail, (vec![Instruction::ForthGetEnergy], TreePool::new())))
+    let (tail, _body) = tag("find_nearest")(input)?;
+    Ok((tail, (vec![Instruction::ForthFindNearest], TreePool::new())))
 }

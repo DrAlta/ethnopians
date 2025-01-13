@@ -63,7 +63,8 @@ sat_hunger = selector{
     }
 };
 dont_need_to_eat = forth {
-    get_energy(self)
+    let(\"self\")
+    get_energy
     is_int
     if
         lit(5)
@@ -93,7 +94,8 @@ mod tests {
     #[test]
     fn hermit_test() {
         let input = "dont_need_to_eat = forth {
-    get_energy(self)
+    lit(\"self\")
+    get_energy
     is_int
     if
         lit(5)
@@ -114,7 +116,8 @@ mod tests {
             TreePool::from([(
                 "dont_need_to_eat".to_owned(),
                 vec![
-                    Instruction::ForthGetEnergy("self".to_owned()),
+                    Instruction::ForthLit(StackItem::String("self".to_owned())),
+                    Instruction::ForthGetEnergy,
                     Instruction::ForthIsInt,
                     Instruction::ForthIf(5),
                     Instruction::ForthLit(StackItem::Int(5)),

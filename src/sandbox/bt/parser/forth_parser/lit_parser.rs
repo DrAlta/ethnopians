@@ -9,7 +9,7 @@ use nom::{
     IResult,
 };
 
-use crate::sandbox::bt::{parser::space_parser, Instruction, StackItem, Thread, TreePool};
+use crate::sandbox::bt::{parser::{ident_parser, space_parser}, Instruction, StackItem, Thread, TreePool};
 
 pub fn lit_parser<'a>(
     input: &'a str,
@@ -43,6 +43,13 @@ pub fn lit_parser<'a>(
             }),
             map_res(tag_no_case("false"), |_| {
                 Ok::<Instruction, ()>(Instruction::ForthLit(StackItem::False))
+            }),
+            map_res(tuple((
+                char('"'),
+                ident_parser,
+                char('"'),
+            )), |(_,x,_)| {
+                Ok::<Instruction, ()>(Instruction::ForthLit(StackItem::String(x.to_owned())))
             }),
         )),
         space_parser,
