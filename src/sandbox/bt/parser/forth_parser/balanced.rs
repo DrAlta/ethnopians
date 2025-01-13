@@ -99,9 +99,20 @@ where
                 panic!()
             }
             count += 1;
-            let (inner_tail, (filler, term)) = many_till(
+            
+
+            let (inner_tail, (filler, term)) = many_till::<I, O, bool,_,_,_>(
                 |x| fill.parse(x),
-                alt((|x| open.parse(x), |x| close.parse(x))),
+                alt((
+                    |x| {
+                        let (tail, _) = open.parse(x)?;
+                        Ok::<(I, bool), Err<_>>((tail, true))
+                    }, 
+                    |x| {
+                        let (tail, _ ) = close.parse(x)?;
+                        Ok::<(I, bool), Err<_>>((tail, false))
+                    }
+                ))
             )(tail.clone())?;
             {
                 let Some(level_cell) = levels.last() else {
@@ -110,7 +121,8 @@ where
                 let mut level = level_cell.borrow_mut();
                 level.extend(filler.into_iter().map(|x| InnerTract::Item(x)));
             }
-            if let Ok(_) = open.parse(term) {
+
+            if term {
                 println!("open");
 
                 let Some(level_cell) = levels.last() else {
@@ -141,15 +153,12 @@ where
                 } else {
                     tail = inner_tail;
                 }
-                /* count -=1;
-                if count == 0 {
-                    return Ok(inner_tail)
-                }
-                */
+                
             }
         }
     }
 }
+
 
 #[cfg(test)]
 mod tests {
@@ -164,30 +173,21 @@ mod tests {
         let (_tail, x) =
             balanced(one_of::<_, _, ()>("abcdifthen"), tag("if"), tag("then"))(source).unwrap();
 
-        assert_eq!(
-            x,
-            vec![
-                Item('a'),
-                Level(vec![
-                    Item('b'),
-                ]),
-                Item('c'),
-            ]
-        )
+        assert_eq!(x, vec![Item('a'), Level(vec![Item('b'),]), Item('c'),])
     }
     #[test]
     fn three_test() {
-/*"if
-    a
-    if
-        b
-        if
-            c
-        then
-        d
-    then
-    e
-then"*/
+        /*"if
+            a
+            if
+                b
+                if
+                    c
+                then
+                d
+            then
+            e
+        then"*/
         let source = "ifaifbifcthendthenethen";
         let (_tail, x) =
             balanced(one_of::<_, _, ()>("abcdifthen"), tag("if"), tag("then"))(source).unwrap();
@@ -196,16 +196,9 @@ then"*/
             x,
             vec![
                 Item('a'),
-                Level(vec![
-                    Item('b'),
-                    Level(vec![
-                        Item('c'),
-                    ]),
-                    Item('d'),
-                    ]),
+                Level(vec![Item('b'), Level(vec![Item('c'),]), Item('d'),]),
                 Item('e'),
             ]
         )
     }
-
 }
