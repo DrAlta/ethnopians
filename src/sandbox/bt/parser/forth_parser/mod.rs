@@ -1,5 +1,7 @@
 mod add_parser;
 pub use add_parser::add_parser;
+mod balanced;
+pub use balanced::balanced;
 mod div_parser;
 pub use div_parser::div_parser;
 mod forth_parser;
