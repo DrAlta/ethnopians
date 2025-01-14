@@ -63,7 +63,7 @@ sat_hunger = selector{
     }
 };
 dont_need_to_eat = forth {
-    let(\"self\")
+    lit("self")
     get_energy
     is_int
     if
@@ -77,8 +77,7 @@ dont_need_to_eat = forth {
     lit(Failure)
     return
     
-}
-    "#;
+}"#;
     let (tail, db) = file_parser(source).unwrap();
     assert_eq!(tail, "");
     db

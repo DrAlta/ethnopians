@@ -2,6 +2,8 @@ use super::{ExecutionPointer, StackItem, Status};
 
 mod cpu;
 pub use cpu::CPU;
+mod tick_active_selector;
+pub use tick_active_selector::tick_active_selector;
 mod tick_action;
 pub use tick_action::tick_action;
 mod tick_selector;
