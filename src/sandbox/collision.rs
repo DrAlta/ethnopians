@@ -1,6 +1,6 @@
-use super::{Command, Location, ObjectId, World};
+use super::{Command, Location, EntityId, World};
 /// we need to keep calling this until is returns an empty Vec
-pub fn collide(a: ObjectId, b: ObjectId, world: &World) -> Vec<Command> {
+pub fn collide(a: EntityId, b: EntityId, world: &World) -> Vec<Command> {
     let empty = Vec::new();
     let Some(Location::World { x: ax, y: ay }) = world.get_location(&a) else {
         return empty;

@@ -1,9 +1,9 @@
 use std::collections::{BTreeSet, HashMap};
 
-use broad_phase::{AARect, Entity, EntityId, SpatialBloom};
+use broad_phase::{AARect, Entity, EntityId as SpatialId, SpatialBloom};
 use qol::logy;
 
-use crate::sandbox::ObjectId;
+use crate::sandbox::EntityId;
 
 use super::{collision, Avalibility, Prev};
 
@@ -11,18 +11,18 @@ use super::{collision, Avalibility, Prev};
 // C R R
 // 1 1 2
 //
-// add rearended: BTreeSet<ObjectId, ObjectId>;
+// add rearended: BTreeSet<EntityId, EntityId>;
 // `match RearEnded(obstacle_id) => {rearended.insert((unit_id, obstacle_id))}`
 //
 /// need to change map.get() to take a rectacle and return all the overlaping rects in it
 /// then when you detect a collicon add the a new `Avalibility::Collision(colliding_object)`
 /// for when it wanted to move and a `Avalibility::RearEnded` for the unit's corrent rectangle  
 pub fn moveit<T: Prev>(
-    desired: HashMap<ObjectId, (f32, f32)>,
-    mut avals: HashMap<EntityId, Avalibility>,
+    desired: HashMap<EntityId, (f32, f32)>,
+    mut avals: HashMap<SpatialId, Avalibility>,
     mut map: SpatialBloom,
     prev: &T,
-) -> [HashMap<ObjectId, Entity>; 3] {
+) -> [HashMap<EntityId, Entity>; 3] {
     for (unit_id, destination) in desired {
         let Some(size) = prev.get_size(&unit_id) else {
             continue;

@@ -4,7 +4,7 @@ use broad_phase::{AARect, Entity, AABB};
 use qol::logy;
 
 use crate::{
-    sandbox::{Command, Location, ObjectId, Return, World},
+    sandbox::{Command, Location, EntityId, Return, World},
     Vec2,
 };
 
@@ -14,7 +14,7 @@ pub fn process_movement(
     max_step: f32,
     time_step: f32,
     world: &World,
-) -> (Return<Command>, Vec<[HashMap<ObjectId, Entity>; 3]>) {
+) -> (Return<Command>, Vec<[HashMap<EntityId, Entity>; 3]>) {
     #[cfg(feature = "move_history")]
     logy!("debug-process-movement", "Going tosaving histoy");
 
@@ -31,12 +31,12 @@ pub fn process_movement(
     });
     let time_substep = time_step / number_of_substeps;
 
-    let mut rearendings = HashMap::<ObjectId, Entity>::new();
-    let mut collisions = HashMap::<ObjectId, Entity>::new();
-    let mut froms = HashMap::<ObjectId, Entity>::new();
+    let mut rearendings = HashMap::<EntityId, Entity>::new();
+    let mut collisions = HashMap::<EntityId, Entity>::new();
+    let mut froms = HashMap::<EntityId, Entity>::new();
     #[allow(unused_mut)]
     let mut history = Vec::new();
-    let mut last_froms = HashMap::<ObjectId, (f32, f32)>::new();
+    let mut last_froms = HashMap::<EntityId, (f32, f32)>::new();
     for step_number in 1..(number_of_substeps as usize + 1) {
         logy!("debug-process-movement", "processing step {step_number}");
         let desired = world.movement_iter().filter_map(
@@ -141,16 +141,16 @@ pub fn process_movement(
 }
 
 struct Previous<'a> {
-    pub sizes: &'a HashMap<ObjectId, (f32, f32)>,
-    pub locations: &'a HashMap<ObjectId, (f32, f32)>,
+    pub sizes: &'a HashMap<EntityId, (f32, f32)>,
+    pub locations: &'a HashMap<EntityId, (f32, f32)>,
 }
 impl<'a> Prev for Previous<'a> {
-    fn get_location(&self, id: &ObjectId) -> Option<(f32, f32)> {
+    fn get_location(&self, id: &EntityId) -> Option<(f32, f32)> {
         let (x, y) = self.locations.get(id)?;
         Some((*x, *y))
     }
 
-    fn get_size(&self, id: &ObjectId) -> Option<(f32, f32)> {
+    fn get_size(&self, id: &EntityId) -> Option<(f32, f32)> {
         let (w, h) = self.sizes.get(id)?;
         Some((*w, *h))
     }

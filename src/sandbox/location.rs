@@ -1,7 +1,7 @@
-use super::ObjectId;
+use super::EntityId;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub enum Location {
-    Inventory(ObjectId),
+    Inventory(EntityId),
     World { x: f32, y: f32 },
 }

@@ -1,7 +1,7 @@
 use crate::sandbox::World;
 
-use super::{ObjectId, Return};
+use super::{EntityId, Return};
 
 pub trait UseObject<Command> {
-    fn use_object(agent_idx: ObjectId, object_idx: ObjectId, world: &World) -> Return<Command>;
+    fn use_object(agent_idx: EntityId, object_idx: EntityId, world: &World) -> Return<Command>;
 }

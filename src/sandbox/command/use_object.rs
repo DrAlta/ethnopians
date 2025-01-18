@@ -1,10 +1,10 @@
-use crate::sandbox::{within_range, Item, Location, ObjectId, World, MAX_ENERGY};
+use crate::sandbox::{within_range, Item, Location, EntityId, World, MAX_ENERGY};
 
 use super::super::{Return, UseObject};
 use super::Command;
 
 impl UseObject<Command> for Command {
-    fn use_object(agent_id: ObjectId, object_id: ObjectId, world: &World) -> Return<Command> {
+    fn use_object(agent_id: EntityId, object_id: EntityId, world: &World) -> Return<Command> {
         // get the agent
         let Some(Item::Agent) = world.get_type(&agent_id) else {
             return Return::ActionInvalid("Agent not found!".to_owned());

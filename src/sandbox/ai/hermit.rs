@@ -77,6 +77,18 @@ dont_need_to_eat = forth {
     lit(Failure)
     return
     
+};
+is_house_in_range = forth{
+    lit("house")
+    find_nearest
+    is_false
+    if
+        lit(Failure)
+        return
+    then
+    lit("self")
+    lit(Success)
+    return
 }"#;
     let (tail, db) = file_parser(source).unwrap();
     assert_eq!(tail, "");

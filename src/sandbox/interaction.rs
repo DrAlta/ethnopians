@@ -1,10 +1,10 @@
-use super::{ObjectId, Return, UseObject, World};
+use super::{EntityId, Return, UseObject, World};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct Interaction<Command> {
     //    pub av: fn (&Agent, &Item) ->bool,
     pub name: String,
-    pub act: fn(ObjectId, ObjectId, &World) -> Return<Command>,
+    pub act: fn(EntityId, EntityId, &World) -> Return<Command>,
 }
 
 impl<Command> std::fmt::Display for Interaction<Command> {
@@ -21,8 +21,8 @@ pub fn get_interactions<Command: UseObject<Command>>() -> Vec<Interaction<Comman
 }
 
 pub fn foofoo<Command: UseObject<Command>>(
-    ag: ObjectId,
-    direct_object: ObjectId,
+    ag: EntityId,
+    direct_object: EntityId,
     world: &World,
 ) -> Vec<usize> {
     get_interactions()

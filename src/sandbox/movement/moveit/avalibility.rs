@@ -1,8 +1,8 @@
-use crate::sandbox::ObjectId;
+use crate::sandbox::EntityId;
 
 #[allow(dead_code)]
 pub enum Avalibility {
-    From(ObjectId),
-    Collision(ObjectId),
-    RearEnded(ObjectId),
+    From(EntityId),
+    Collision(EntityId),
+    RearEnded(EntityId),
 }

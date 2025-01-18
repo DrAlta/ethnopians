@@ -4,17 +4,17 @@ impl World {
     pub fn execute_command(&mut self, command: Command) {
         match command {
             Command::AddItem { item, loc } => {
-                let new_id = self.get_new_object_id();
+                let new_id = self.get_new_entity_id();
                 self.highest_id = new_id.clone();
                 self.r#type.insert(new_id.clone(), item);
                 self.locations.insert(new_id.clone(), loc);
             }
-            Command::Remove(object_id) => {
-                self.locations.remove(&object_id);
-                self.energy.remove(&object_id);
-                self.hp.remove(&object_id);
-                self.sizes.remove(&object_id);
-                self.r#type.remove(&object_id);
+            Command::Remove(entity_id) => {
+                self.locations.remove(&entity_id);
+                self.energy.remove(&entity_id);
+                self.hp.remove(&entity_id);
+                self.sizes.remove(&entity_id);
+                self.r#type.remove(&entity_id);
             }
             Command::Damage { agent_id, ammount } => {
                 if let Some(hp) = self.hp.get_mut(&agent_id) {

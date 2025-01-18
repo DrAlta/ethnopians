@@ -28,16 +28,22 @@ pub enum Instruction {
     //
     ForthAdd,
     ForthCall(ThreadName, usize),
+    //(Coord Coord -- Int)
+    ForthDistance,
     ForthDiv,
     //(ObjectId ItemClass -- Option<Coord>) finds the neared item of ItemClass to ObjectId
     ForthFindNearest,
     ForthGE,
+    //(BlackboardKey -- Option<_>)
+    ForthGetBlackboard,
+    ForthGetEnergy,
     //(BlackboardKey -- Option<Int>)
     ForthGetHP,
-    //(BlackboardKey -- Option<Int>)
-    ForthGetEnergy,
+    //(BlackboardKey -- Option<Coord>)
+    ForthGetLocation,
     ForthGT,
     ForthIf(usize),
+    //(_ -- (_ false or Int true))
     ForthIsInt,
     ForthLE,
     ForthLit(StackItem),
@@ -46,6 +52,10 @@ pub enum Instruction {
     ForthRem,
     ForthReturn,
     ForthSub,
+    //(_ -- (_ false or EntityId true))
+    ForthSomeEntityId,
+    //(_ -- (_ false or Int true))
+    ForthSomeInt,
 }
 
 impl Instruction {
@@ -84,6 +94,11 @@ impl Instruction {
             | Instruction::ForthIsInt
             | Instruction::ForthReturn
             | Instruction::ForthFindNearest
+            | Instruction::ForthGetBlackboard
+            | Instruction::ForthGetLocation
+            | Instruction::ForthSomeInt
+            | Instruction::ForthSomeEntityId
+            | Instruction::ForthDistance
             | Instruction::ForthIf(_) => (),
         }
         missing
@@ -104,132 +119,37 @@ impl Instruction {
             Instruction::Selector(children) => tick_selector(children, stack, return_stack, pc),
             Instruction::Sequence(children) => tick_sequence(children, stack, return_stack, pc),
             Instruction::Use(_, _) => todo!(),
-            Instruction::ForthGetHP => {
-                let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos wasn't a sting".to_owned())
-                };
-                let Some(StackItem::String(key)) = stack.pop() else {
-                    unreachable!()
-                };
-                let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(&key) else {
-                    stack.push(StackItem::False);
-                    return Self::next(Status::None, pc);
-                };
-                let Some(hp) = world.get_hp(entity_id) else {
-                    stack.push(StackItem::False);
-                    return Self::next(Status::None, pc);
-                };
-                stack.push(StackItem::Int(*hp as i32));
-                Self::next(Status::None, pc)
-            }
-            Instruction::ForthGetEnergy => {
-                let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos wasn't a sting".to_owned())
-                };
-                let Some(StackItem::String(key)) = stack.pop() else {
-                    unreachable!()
-                };
-                let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(&key) else {
-                    stack.push(StackItem::False);
-                    return Self::next(Status::None, pc);
-                };
-                let Some(energy) = world.get_energy(entity_id) else {
-                    stack.push(StackItem::False);
-                    return Self::next(Status::None, pc);
-                };
-                stack.push(StackItem::Int(*energy as i32));
-                Self::next(Status::None, pc)
-            }
-
-            Instruction::ForthLit(value) => {
-                stack.push(value.clone());
-                Self::next(Status::None, pc)
-            }
             Instruction::ForthAdd => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
                 stack.push(StackItem::Int(nos + tos));
                 Self::next(Status::None, pc)
             }
-            Instruction::ForthSub => {
-                let (nos, tos) = Self::get_two_ints(stack)?;
-                stack.push(StackItem::Int(nos - tos));
-                Self::next(Status::None, pc)
+            Instruction::ForthCall(token, idx) => {
+                *pc = Some((token.clone(), *idx));
+                Ok(Status::None)
             }
-            Instruction::ForthMul => {
-                let (nos, tos) = Self::get_two_ints(stack)?;
-                stack.push(StackItem::Int(nos * tos));
-                Self::next(Status::None, pc)
+            Instruction::ForthDistance => {
+                let Some(StackItem::Coord{..}) = stack.last() else {
+                    return Err("top of stack not a number".into());
+                };
+                let Some(StackItem::Coord{..}) = stack.get(stack.len() - 2) else {
+                    return Err("next of stack not a number".into());
+                };
+                let Some(StackItem::Coord{x: tos_x, y: tos_y}) = stack.pop() else {
+                    unreachable!()
+                };
+                let Some(StackItem::Coord{x: nos_x, y: nos_y}) = stack.pop() else {
+                    unreachable!()
+                };
+                let distance = ((nos_x - tos_x).abs().pow(2) + (nos_y - tos_y).abs().pow(2)).isqrt();
+                stack.push(StackItem::Int(distance));
+                Self::exit(Status::None, return_stack, pc)
             }
             Instruction::ForthDiv => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
                 stack.push(StackItem::Int(nos / tos));
                 Self::next(Status::None, pc)
             }
-            Instruction::ForthRem => {
-                let (nos, tos) = Self::get_two_ints(stack)?;
-                stack.push(StackItem::Int(nos % tos));
-                Self::next(Status::None, pc)
-            }
-            Instruction::ForthGT => {
-                let (nos, tos) = Self::get_two_ints(stack)?;
-                if nos > tos {
-                    stack.push(StackItem::True);
-                } else {
-                    stack.push(StackItem::False);
-                }
-                Self::next(Status::None, pc)
-            }
-            Instruction::ForthLT => {
-                let (nos, tos) = Self::get_two_ints(stack)?;
-                if nos < tos {
-                    stack.push(StackItem::True);
-                } else {
-                    stack.push(StackItem::False);
-                }
-                Self::next(Status::None, pc)
-            }
-            Instruction::ForthGE => {
-                let (nos, tos) = Self::get_two_ints(stack)?;
-                if nos >= tos {
-                    stack.push(StackItem::True);
-                } else {
-                    stack.push(StackItem::False);
-                }
-                Self::next(Status::None, pc)
-            }
-            Instruction::ForthLE => {
-                let (nos, tos) = Self::get_two_ints(stack)?;
-                if nos <= tos {
-                    stack.push(StackItem::True);
-                } else {
-                    stack.push(StackItem::False);
-                }
-                Self::next(Status::None, pc)
-            }
-            Instruction::ForthIf(skip) => {
-                let Some((_, idx)) = pc else {
-                    return Err("unexptect end of program".to_owned());
-                };
-                *idx += 1;
-                if Some(StackItem::True) != stack.pop() {
-                    *idx += skip;
-                }
-                Ok(Status::None)
-            }
-            Instruction::ForthCall(token, idx) => {
-                *pc = Some((token.clone(), *idx));
-                Ok(Status::None)
-            }
-            Instruction::ForthIsInt => {
-                let value = if let Some(StackItem::Int(_)) = stack.last() {
-                    StackItem::True
-                } else {
-                    StackItem::False
-                };
-                stack.push(value);
-                Self::next(Status::None, pc)
-            }
-            Instruction::ForthReturn => Self::exit(Status::None, return_stack, pc),
             Instruction::ForthFindNearest => {
                 let Some(StackItem::String(_)) = stack.last() else {
                     return Err("tos wasn't a sting".to_owned())
@@ -254,6 +174,204 @@ impl Instruction {
                     },
                 }
             }
+            Instruction::ForthGetEnergy => {
+                let Some(StackItem::String(_)) = stack.last() else {
+                    return Err("tos wasn't a sting".to_owned())
+                };
+                let Some(StackItem::String(key)) = stack.pop() else {
+                    unreachable!()
+                };
+                let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(&key) else {
+                    stack.push(StackItem::False);
+                    return Self::next(Status::None, pc);
+                };
+                let Some(energy) = world.get_energy(entity_id) else {
+                    stack.push(StackItem::False);
+                    return Self::next(Status::None, pc);
+                };
+                stack.push(StackItem::Int(*energy as i32));
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthGetLocation => {
+                let Some(StackItem::EntityId(_)) = stack.last() else {
+                    return Err("tos wasn't an EntityId".to_owned())
+                };
+                let Some(StackItem::EntityId(entity_id)) = stack.pop() else {
+                    unreachable!()
+                };
+                match world.get_location(&entity_id) {
+                    Some(crate::sandbox::Location::World { x, y }) => {
+                        stack.push(StackItem::Coord { x: *x as i32, y: *y as i32 });
+                        Self::next(Status::None, pc)
+                    },
+                    _ => {
+                        stack.push(StackItem::False);
+                        Self::next(Status::None, pc)
+                    },
+                }
+            }
+            Instruction::ForthGetHP => {
+                let Some(StackItem::String(_)) = stack.last() else {
+                    return Err("tos wasn't a sting".to_owned())
+                };
+                let Some(StackItem::String(key)) = stack.pop() else {
+                    unreachable!()
+                };
+                let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(&key) else {
+                    stack.push(StackItem::False);
+                    return Self::next(Status::None, pc);
+                };
+                let Some(hp) = world.get_hp(entity_id) else {
+                    stack.push(StackItem::False);
+                    return Self::next(Status::None, pc);
+                };
+                stack.push(StackItem::Int(*hp as i32));
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthGE => {
+                let (nos, tos) = Self::get_two_ints(stack)?;
+                if nos >= tos {
+                    stack.push(StackItem::True);
+                } else {
+                    stack.push(StackItem::False);
+                }
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthGetBlackboard => {
+                let Some(StackItem::String(_)) = stack.last() else {
+                    return Err("tos wasn't a sting".to_owned())
+                };
+                let Some(StackItem::String(key)) = stack.pop() else {
+                    unreachable!()
+                };
+                /*
+                stack.push( match blackboard.get(&key) {
+                    Some(x) => match x {
+                        BlackboardValue::EntityId(y) => StackItem::EntityId(y.clone()),
+                    }
+                    None => StackItem::False
+                });
+                */
+                stack.push( match blackboard.get(&key) {
+                    Some(x) => StackItem::Option(
+                        match x {
+                            BlackboardValue::EntityId(y) => Some(
+                                Box::new(
+                                    StackItem::EntityId(y.clone())
+                                )
+                            ),
+                        }
+                    ),
+                    None => StackItem::Option(None)
+
+                });
+                Self::next(Status::None, pc)
+
+            }
+            Instruction::ForthGT => {
+                let (nos, tos) = Self::get_two_ints(stack)?;
+                if nos > tos {
+                    stack.push(StackItem::True);
+                } else {
+                    stack.push(StackItem::False);
+                }
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthIf(skip) => {
+                let Some((_, idx)) = pc else {
+                    return Err("unexptect end of program".to_owned());
+                };
+                *idx += 1;
+                if Some(StackItem::True) != stack.pop() {
+                    *idx += skip;
+                }
+                Ok(Status::None)
+            }
+            Instruction::ForthIsInt => {
+                let value = if let Some(StackItem::Int(_)) = stack.last() {
+                    StackItem::True
+                } else {
+                    StackItem::False
+                };
+                stack.push(value);
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthLE => {
+                let (nos, tos) = Self::get_two_ints(stack)?;
+                if nos <= tos {
+                    stack.push(StackItem::True);
+                } else {
+                    stack.push(StackItem::False);
+                }
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthLT => {
+                let (nos, tos) = Self::get_two_ints(stack)?;
+                if nos < tos {
+                    stack.push(StackItem::True);
+                } else {
+                    stack.push(StackItem::False);
+                }
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthLit(value) => {
+                stack.push(value.clone());
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthMul => {
+                let (nos, tos) = Self::get_two_ints(stack)?;
+                stack.push(StackItem::Int(nos * tos));
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthRem => {
+                let (nos, tos) = Self::get_two_ints(stack)?;
+                stack.push(StackItem::Int(nos % tos));
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthSomeEntityId => {
+                let Some(StackItem::Option(Some(x))) = stack.last() else{
+                    stack.push(StackItem::False);
+                    return Self::next(Status::None, pc)
+                };
+                match x.as_ref() {
+                    StackItem::EntityId(_) => (),
+                    _ => {
+                        stack.push(StackItem::False);
+                        return Self::next(Status::None, pc)
+                    }
+                }
+                let Some(StackItem::Option(Some(y))) = stack.pop() else {
+                    unreachable!()
+                };
+                stack.push(Box::into_inner(y));
+                stack.push(StackItem::True);
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthSomeInt => {
+                let Some(StackItem::Option(Some(x))) = stack.last() else{
+                    stack.push(StackItem::False);
+                    return Self::next(Status::None, pc)
+                };
+                match x.as_ref() {
+                    StackItem::Int(_) => (),
+                    _ => {
+                        stack.push(StackItem::False);
+                        return Self::next(Status::None, pc)
+                    }
+                }
+                let Some(StackItem::Option(Some(y))) = stack.pop() else {
+                    unreachable!()
+                };
+                stack.push(Box::into_inner(y));
+                stack.push(StackItem::True);
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthSub => {
+                let (nos, tos) = Self::get_two_ints(stack)?;
+                stack.push(StackItem::Int(nos - tos));
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthReturn => Self::exit(Status::None, return_stack, pc),
         }
     }
     pub fn correct(&mut self, prefix: &str) {
@@ -292,6 +410,11 @@ impl Instruction {
             | Instruction::ForthIsInt
             | Instruction::ForthReturn
             | Instruction::ForthFindNearest
+            | Instruction::ForthGetBlackboard
+            | Instruction::ForthGetLocation
+            | Instruction::ForthSomeInt
+            | Instruction::ForthSomeEntityId
+            | Instruction::ForthDistance
             | Instruction::ForthIf(_) => (),
         }
     }

@@ -1,14 +1,14 @@
 use std::collections::{BTreeSet, HashMap};
 
-use broad_phase::{AARect, Entity, EntityId, SpatialBloom};
+use broad_phase::{AARect, Entity, EntityId as SpatialID, SpatialBloom};
 
-use crate::sandbox::{ObjectId, Prev};
+use crate::sandbox::{EntityId, Prev};
 
 use super::Avalibility;
 
 pub fn collision<T: Prev>(
-    mut todo: BTreeSet<ObjectId>,
-    aval: &mut HashMap<EntityId, Avalibility>,
+    mut todo: BTreeSet<EntityId>,
+    aval: &mut HashMap<SpatialID, Avalibility>,
     map: &mut SpatialBloom,
     prev: &T,
 ) {

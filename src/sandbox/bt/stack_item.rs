@@ -1,4 +1,4 @@
-use crate::sandbox::ObjectId;
+use crate::sandbox::EntityId;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Hash)]
 pub enum StackItem {
@@ -14,5 +14,6 @@ pub enum StackItem {
     False,
     Coord{x: i32, y: i32},
     String(String),
-    EntityId(ObjectId),
+    EntityId(EntityId),
+    Option(Option<Box<StackItem>>)
 }

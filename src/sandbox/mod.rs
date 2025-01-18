@@ -49,5 +49,5 @@ pub use use_object::UseObject;
 mod world;
 pub use world::World;
 
-pub type ObjectId = usize;
+pub type EntityId = usize;
 pub type ItemClass = String;

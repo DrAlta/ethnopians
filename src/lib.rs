@@ -1,4 +1,6 @@
+#![feature(box_into_inner)]
 #![feature(btree_cursors)]
+#![feature(isqrt)]
 mod types;
 pub use types::{radians_to_u8, u8_to_radians, ActionId, ActorId, Desire, Steering, TimeIndex};
 
