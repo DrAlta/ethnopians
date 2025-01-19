@@ -29,7 +29,6 @@ pub mod interaction;
 
 mod acts;
 pub use acts::Acts;
-pub mod bt;
 pub mod collision;
 mod command;
 pub use command::Command;

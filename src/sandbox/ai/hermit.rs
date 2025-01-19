@@ -1,4 +1,4 @@
-use crate::sandbox::bt::{parser::file_parser, TreePool};
+use crate::sandbox::ai::{parser::file_parser, TreePool};
 
 pub fn get_hermit_behavoir_tree() -> TreePool {
     let source = r#"
@@ -166,7 +166,7 @@ eat_veg = forth {
 mod tests {
     use std::collections::HashMap;
 
-    use crate::sandbox::bt::{parser::named_tree_parser, Instruction, StackItem};
+    use crate::sandbox::ai::{parser::named_tree_parser, Instruction, StackItem};
 
     use super::*;
     #[test]

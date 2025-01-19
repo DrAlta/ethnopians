@@ -10,14 +10,48 @@
 //!
 //! knife has higher DPS than axe but shorter range
 
+mod cpu;
+use std::collections::HashMap;
+
+pub use cpu::CPU;
+mod behavior_tree;
+pub use behavior_tree::Corrent;
+mod blackboard;
+pub use blackboard::Blackboard;
+mod blackboard_value;
+pub use blackboard_value::BlackboardValue;
 mod hermit;
 pub use hermit::get_hermit_behavoir_tree;
+mod instruction;
+pub use instruction::Instruction;
+mod parser;
+pub use parser::{file_parser, forth_parser};
+mod stack_item;
+pub use stack_item::StackItem;
+mod status;
+pub use status::Status;
+
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub enum InpulseId {
+    Act1,
+    Act2,
+    Act3,
+}
+
+pub type BlackboardKey = String;
+pub type ThreadName = String;
+pub type ExecutionToken = ThreadName;
+pub type ExecutionPointer = (ExecutionToken, usize);
+pub type Thread = Vec<Instruction>;
+pub type TreePool = HashMap<ThreadName, Thread>;
+pub type ItemId = String;
+
 
 #[cfg(test)]
 mod tests {
     use crate::sandbox::{
-        ai::get_hermit_behavoir_tree,
-        bt::{cpu::CPU, Blackboard, Status},
+        ai::{get_hermit_behavoir_tree, CPU, Blackboard, Status},
         World,
     };
 
