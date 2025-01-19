@@ -1,6 +1,6 @@
 use nom::{error::ErrorKind, IResult};
 
-use super::{ident_parser, Thingie};
+use crate::sandbox::bt::parser::{ident_parser, behavior_tree_parser::Thingie};
 
 pub fn token_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
     let (tail, head) = ident_parser(input)?;

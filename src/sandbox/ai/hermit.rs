@@ -54,24 +54,30 @@ have_house = sel {
 };
 sat_hunger = selector{
     dont_need_to_eat,
-    seq{
-        selector{
-            inventory_have_ge(veg, 1),
-            get_veg
-        },
-        eat(veg)
+    blackboard("food" = "veg") {
+        seq{
+            selector{
+                inventory_have_ge("food", 1),
+                get_veg
+            },
+            eat("food")
+        }
     }
 };
 dont_need_to_eat = forth {
     lit("self")
-    get_energy
-    is_int
+    get_blackboard
+    some_entity_id
     if
-        lit(5)
-        gt
+        get_energy
+        is_int
         if
-            lit(Success)
-            return
+            lit(5)
+            gt
+            if
+                lit(Success)
+                return
+            then
         then
     then
     lit(Failure)
@@ -79,17 +85,78 @@ dont_need_to_eat = forth {
     
 };
 is_house_in_range = forth{
-    lit("house")
-    find_nearest
-    is_false
+    lit("self")
+    get_blackboard
+    some_entity_id
     if
+        get_location
+        some_coord
+        if
+            dup
+            lit("house")
+            find_nearest
+            some_entity_id
+            if
+                get_location
+                some_coord
+                if
+                    distance
+                    lit(1000)
+                    le
+                    if
+                        lit(Success)
+                        return
+                    then
+                then
+            then
+        then
+    then
+    lit(Failure)
+    return
+};
+get_veg = selector {
+    blackboard(food => veg)
+    inventory_have_ge(food, 1)
+    forth {
+        lit("self")
+        get_blackboard
+        some_entity_id
+        if
+            lit("veg")
+            find_nearest
+            some_entity_id
+            if
+                dup
+                get_location
+                some_coord
+                if
+                    go_to
+                    take
+                then
+            then
+        then
         lit(Failure)
         return
-    then
+    }
+};
+"#;
+/*
+eat_veg = forth {
     lit("self")
-    lit(Success)
+    get_blackboard
+    some_entity_id
+    if
+        lit("veg")
+        find_inventory
+        some_entity_id
+        if
+            eat
+        then
+    then
+    lit(failure)
     return
-}"#;
+};
+*/
     let (tail, db) = file_parser(source).unwrap();
     assert_eq!(tail, "");
     db

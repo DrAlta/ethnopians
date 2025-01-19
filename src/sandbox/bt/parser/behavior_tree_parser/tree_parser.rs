@@ -1,11 +1,8 @@
 use nom::{branch::alt, error::ErrorKind, IResult};
 
-use crate::sandbox::bt::parser::selector_parser;
+use crate::sandbox::bt::parser::behavior_tree_parser::{combine_parser, eat_parser, forth_tree_parser, inventory_have_ge_parser, sequence_parser,
+    token_parser, use_parser, selector_parser, Thingie};
 
-use super::{
-    combine_parser, eat_parser, forth_tree_parser, inventory_have_ge_parser, sequence_parser,
-    token_parser, use_parser, Thingie,
-};
 
 pub fn tree_parser<'a>(
     input: &'a str,

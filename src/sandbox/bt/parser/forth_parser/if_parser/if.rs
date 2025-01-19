@@ -1,5 +1,5 @@
 use crate::sandbox::bt::{
-    parser::{forth_parser::balanced_parser::Tract, TreesUsed},
+    parser::{TreesUsed, forth_parser::balanced_parser::Tract},
     Instruction, Thread, TreePool,
 };
 

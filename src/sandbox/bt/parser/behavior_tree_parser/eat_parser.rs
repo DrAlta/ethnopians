@@ -4,9 +4,7 @@ use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
 };
 
-use crate::sandbox::bt::{parser::space_parser, Instruction};
-
-use super::{ident_parser, Thingie};
+use crate::sandbox::bt::{parser::{ident_parser, space_parser, behavior_tree_parser::Thingie}, Instruction};
 
 pub fn eat_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
     let (tail, (_, _, _, _, item_a, _, _)) = tuple((

@@ -3,8 +3,8 @@ use std::collections::BTreeSet;
 use crate::sandbox::{
     bt::{
         cpu::{tick_action, tick_selector, tick_sequence, ProgramCounter, ReturnStack, Stack},
-        ExecutionToken, InpulseId, ItemId, Status,
-    }, ItemClass, World
+        ExecutionToken, InpulseId, Status,
+    }, World
 };
 
 use super::{
@@ -15,15 +15,20 @@ use super::{
 /// ForthGetHP(BlackboardKey),
 /// and ForthGetEnergy(BlackboardKey),
 /// should probably take their argumants off the stack
-
+///
+/// should Combine, Use, Eat take a BlackboardKey that points to a ItemClass or the ItemClass directly? ether way InventoryGE should probably do the same
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Instruction {
     Action(InpulseId),
+    // takes two Blackboard keys that points to ItemClass
     Combine(BlackboardKey, BlackboardKey),
+    // takes a Blackboard key that points to an ItemClass
     Eat(BlackboardKey),
-    InventoryGE(ItemClass, u8),
+    // takes a Blackboard key that points to an ItemClass and u8 of the number to compare to
+    InventoryGE(BlackboardKey, u8),
     Selector(Vec<ExecutionToken>),
     Sequence(Vec<ExecutionToken>),
+    // takes two Blackboard keys that points to ItemClass
     Use(BlackboardKey, BlackboardKey),
     //--------------------------------------------------------------------------
     ForthAdd,

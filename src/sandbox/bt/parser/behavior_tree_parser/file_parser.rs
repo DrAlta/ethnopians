@@ -4,11 +4,13 @@ use nom::{
     character::complete::char, combinator::map_res, error::ErrorKind, multi::separated_list1,
     sequence::tuple, IResult,
 };
-
 use crate::sandbox::bt::{
-    parser::{ident_parser, space_parser, tree_parser, Thingie, TreesUsed},
-    Instruction, Thread, ThreadName, TreePool,
+    parser::{ident_parser, space_parser, 
+        behavior_tree_parser::{tree_parser, Thingie, TreesUsed}
+    }, 
+    Instruction, Thread, ThreadName, TreePool
 };
+
 
 pub fn file_parser<'a>(
     input: &'a str,
