@@ -17,3 +17,15 @@ pub enum StackItem {
     EntityId(EntityId),
     Option(Option<Box<StackItem>>)
 }
+impl StackItem {
+    pub fn some(value:StackItem) -> StackItem {
+        Self::Option(Some(
+            Box::new(
+                value
+            )
+        ))
+    }
+    pub fn none() -> StackItem {
+        Self::Option(None)
+    }
+}

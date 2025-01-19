@@ -19,19 +19,20 @@ use super::{
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Instruction {
     Action(InpulseId),
-    Combine(ItemId, ItemId),
-    Eat(ItemId),
+    Combine(BlackboardKey, BlackboardKey),
+    Eat(BlackboardKey),
     InventoryGE(ItemClass, u8),
     Selector(Vec<ExecutionToken>),
     Sequence(Vec<ExecutionToken>),
-    Use(ItemId, ItemId),
-    //
+    Use(BlackboardKey, BlackboardKey),
+    //--------------------------------------------------------------------------
     ForthAdd,
     ForthCall(ThreadName, usize),
     //(Coord Coord -- Int)
     ForthDistance,
     ForthDiv,
-    //(ObjectId ItemClass -- Option<Coord>) finds the neared item of ItemClass to ObjectId
+    ForthDup,
+    //(Coord ItemClass -- Option<ObjectId>) finds the neared item of ItemClass to ObjectId
     ForthFindNearest,
     ForthGE,
     //(BlackboardKey -- Option<_>)
@@ -52,10 +53,13 @@ pub enum Instruction {
     ForthRem,
     ForthReturn,
     ForthSub,
+    //(_ -- (_ false or coord true))
+    ForthSomeCoord,
     //(_ -- (_ false or EntityId true))
     ForthSomeEntityId,
     //(_ -- (_ false or Int true))
     ForthSomeInt,
+    ForthSwap,
 }
 
 impl Instruction {
@@ -96,9 +100,12 @@ impl Instruction {
             | Instruction::ForthFindNearest
             | Instruction::ForthGetBlackboard
             | Instruction::ForthGetLocation
+            | Instruction::ForthSomeCoord
             | Instruction::ForthSomeInt
             | Instruction::ForthSomeEntityId
             | Instruction::ForthDistance
+            | Instruction::ForthDup
+            | Instruction::ForthSwap
             | Instruction::ForthIf(_) => (),
         }
         missing
@@ -150,26 +157,33 @@ impl Instruction {
                 stack.push(StackItem::Int(nos / tos));
                 Self::next(Status::None, pc)
             }
+            Instruction::ForthDup => {
+                let Some(tos) = stack.last() else {
+                    return Err("top of stack not a number".into());
+                };
+                stack.push(tos.clone());
+                Self::next(Status::None, pc)
+            }
             Instruction::ForthFindNearest => {
                 let Some(StackItem::String(_)) = stack.last() else {
                     return Err("tos wasn't a sting".to_owned())
                 };
-                let Some(StackItem::EntityId(_)) = stack.get(stack.len() - 2) else {
-                    return Err("nos wasn't an EntityId".to_owned())
+                let Some(StackItem::Coord { .. }) = stack.get(stack.len() - 2) else {
+                    return Err("nos wasn't an coord".to_owned())
                 };
                 let Some(StackItem::String(item_class)) = stack.pop() else {
                     unreachable!()
                 };
-                let Some(StackItem::EntityId(entity_id)) = stack.pop() else {
+                let Some(StackItem::Coord { x, y }) = stack.pop() else {
                     unreachable!()
                 };
-                match world.find_nearest(entity_id, &item_class) {
+                match world.find_nearest(crate::Vec2 { x: x as f32, y: y as f32 }, &item_class) {
                     Some(thing) => {
-                        stack.push(StackItem::Coord { x: thing.x as i32, y: thing.y as i32 });
+                        stack.push(StackItem::some(StackItem::EntityId(thing)));
                         Self::next(Status::None, pc)
                     },
                     None => {
-                        stack.push(StackItem::False);
+                        stack.push(StackItem::Option(None));
                         Self::next(Status::None, pc)
                     },
                 }
@@ -182,14 +196,14 @@ impl Instruction {
                     unreachable!()
                 };
                 let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(&key) else {
-                    stack.push(StackItem::False);
+                    stack.push(StackItem::none());
                     return Self::next(Status::None, pc);
                 };
                 let Some(energy) = world.get_energy(entity_id) else {
-                    stack.push(StackItem::False);
+                    stack.push(StackItem::none());
                     return Self::next(Status::None, pc);
                 };
-                stack.push(StackItem::Int(*energy as i32));
+                stack.push(StackItem::some(StackItem::Int(*energy as i32)));
                 Self::next(Status::None, pc)
             }
             Instruction::ForthGetLocation => {
@@ -201,11 +215,11 @@ impl Instruction {
                 };
                 match world.get_location(&entity_id) {
                     Some(crate::sandbox::Location::World { x, y }) => {
-                        stack.push(StackItem::Coord { x: *x as i32, y: *y as i32 });
+                        stack.push(StackItem::some(StackItem::Coord { x: *x as i32, y: *y as i32 }));
                         Self::next(Status::None, pc)
                     },
                     _ => {
-                        stack.push(StackItem::False);
+                        stack.push(StackItem::none());
                         Self::next(Status::None, pc)
                     },
                 }
@@ -218,14 +232,14 @@ impl Instruction {
                     unreachable!()
                 };
                 let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(&key) else {
-                    stack.push(StackItem::False);
+                    stack.push(StackItem::none());
                     return Self::next(Status::None, pc);
                 };
                 let Some(hp) = world.get_hp(entity_id) else {
-                    stack.push(StackItem::False);
+                    stack.push(StackItem::none());
                     return Self::next(Status::None, pc);
                 };
-                stack.push(StackItem::Int(*hp as i32));
+                stack.push(StackItem::some(StackItem::Int(*hp as i32)));
                 Self::next(Status::None, pc)
             }
             Instruction::ForthGE => {
@@ -328,6 +342,25 @@ impl Instruction {
                 stack.push(StackItem::Int(nos % tos));
                 Self::next(Status::None, pc)
             }
+            Instruction::ForthSomeCoord => {
+                let Some(StackItem::Option(Some(x))) = stack.last() else{
+                    stack.push(StackItem::False);
+                    return Self::next(Status::None, pc)
+                };
+                match x.as_ref() {
+                    StackItem::Coord{..} => (),
+                    _ => {
+                        stack.push(StackItem::False);
+                        return Self::next(Status::None, pc)
+                    }
+                }
+                let Some(StackItem::Option(Some(y))) = stack.pop() else {
+                    unreachable!()
+                };
+                stack.push(Box::into_inner(y));
+                stack.push(StackItem::True);
+                Self::next(Status::None, pc)
+            }
             Instruction::ForthSomeEntityId => {
                 let Some(StackItem::Option(Some(x))) = stack.last() else{
                     stack.push(StackItem::False);
@@ -371,6 +404,20 @@ impl Instruction {
                 stack.push(StackItem::Int(nos - tos));
                 Self::next(Status::None, pc)
             }
+            Instruction::ForthSwap => {
+                let Some(_) = stack.get(stack.len() - 2) else {
+                    return Err("no nos".to_owned())
+                };
+                let Some(tos) = stack.pop() else {
+                    unreachable!()
+                };
+                let Some(nos) = stack.pop() else {
+                    unreachable!()
+                };
+                stack.push(tos);
+                stack.push(nos);
+                Self::next(Status::None, pc)
+            }
             Instruction::ForthReturn => Self::exit(Status::None, return_stack, pc),
         }
     }
@@ -412,9 +459,12 @@ impl Instruction {
             | Instruction::ForthFindNearest
             | Instruction::ForthGetBlackboard
             | Instruction::ForthGetLocation
+            | Instruction::ForthSomeCoord
             | Instruction::ForthSomeInt
             | Instruction::ForthSomeEntityId
             | Instruction::ForthDistance
+            | Instruction::ForthDup
+            | Instruction::ForthSwap
             | Instruction::ForthIf(_) => (),
         }
     }

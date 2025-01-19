@@ -38,7 +38,7 @@ impl
 }
 
 impl World {
-    pub fn find_nearest(&self, _entity_id: EntityId, _item_class: &ItemClass) -> Option<Vec2> {
+    pub fn find_nearest(&self, _pos: Vec2, _item_class: &ItemClass) -> Option<EntityId> {
         todo!()
     }
     pub fn new_empty() -> Self {
