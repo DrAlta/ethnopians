@@ -17,7 +17,7 @@ pub use cpu::CPU;
 mod behavior_tree;
 pub use behavior_tree::Corrent;
 mod blackboard;
-pub use blackboard::Blackboard;
+pub use blackboard::{Blackboard, Variable};
 mod blackboard_value;
 pub use blackboard_value::BlackboardValue;
 mod hermit;
@@ -37,6 +37,8 @@ pub enum InpulseId {
     Act1,
     Act2,
     Act3,
+
+    GoTo,
 }
 
 pub type BlackboardKey = String;

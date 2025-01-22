@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use super::*;
 use crate::sandbox::{
-    bt::{Blackboard, InpulseId, Instruction, Status, Thread, ThreadName, TreePool},
+    ai::{Blackboard, InpulseId, Instruction, Status, Thread, ThreadName, TreePool},
     World,
 };
 

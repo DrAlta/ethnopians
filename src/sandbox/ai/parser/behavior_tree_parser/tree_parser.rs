@@ -3,6 +3,8 @@ use nom::{branch::alt, error::ErrorKind, IResult};
 use crate::sandbox::ai::parser::behavior_tree_parser::{combine_parser, eat_parser, forth_tree_parser, inventory_have_ge_parser, sequence_parser,
     token_parser, use_parser, selector_parser, Thingie};
 
+use super::blackboard_parser;
+
 
 pub fn tree_parser<'a>(
     input: &'a str,
@@ -11,6 +13,7 @@ pub fn tree_parser<'a>(
     //    let mut hash = HashMap::new();
     //let x =
     alt((
+        blackboard_parser,
         combine_parser,
         eat_parser,
         inventory_have_ge_parser,

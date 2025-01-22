@@ -72,4 +72,20 @@ mod tests {
         assert_eq!(used, TreePool::new());
         assert_eq!(body, vec![Instruction::ForthLit(StackItem::Success)])
     }
+    #[test]
+    fn int_test() {
+        let input = "lit(1)";
+        let (tail, (body, used)) = lit_parser(input).unwrap();
+        assert_eq!(tail, "");
+        assert_eq!(used, TreePool::new());
+        assert_eq!(body, vec![Instruction::ForthLit(StackItem::Int(1))])
+    }
+    #[test]
+    fn string_test() {
+        let input = "lit(\"one\")";
+        let (tail, (body, used)) = lit_parser(input).unwrap();
+        assert_eq!(tail, "");
+        assert_eq!(used, TreePool::new());
+        assert_eq!(body, vec![Instruction::ForthLit(StackItem::String("one".to_owned()))])
+    }
 }

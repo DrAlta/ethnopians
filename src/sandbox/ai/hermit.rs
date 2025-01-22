@@ -54,13 +54,13 @@ have_house = sel {
 };
 sat_hunger = selector{
     dont_need_to_eat,
-    blackboard("food" = "veg") {
+    blackboard(food => veg) {
         seq{
             selector{
-                inventory_have_ge("food", 1),
+                inventory_have_ge(food, 1),
                 get_veg
             },
-            eat("food")
+            eat(food)
         }
     }
 };
@@ -115,31 +115,31 @@ is_house_in_range = forth{
     return
 };
 get_veg = selector {
-    blackboard(food => veg)
-    inventory_have_ge(food, 1)
-    forth {
-        lit("self")
-        get_blackboard
-        some_entity_id
-        if
-            lit("veg")
-            find_nearest
+    blackboard(food => veg) {
+        inventory_have_ge(food, 1),
+        forth {
+            lit("self")
+            get_blackboard
             some_entity_id
             if
-                dup
-                get_location
-                some_coord
+                lit("veg")
+                find_nearest
+                some_entity_id
                 if
-                    go_to
-                    take
+                    dup
+                    get_location
+                    some_coord
+                    if
+                        go_to
+                        take
+                    then
                 then
             then
-        then
-        lit(Failure)
-        return
+            lit(Failure)
+            return
+        }
     }
-};
-"#;
+}"#;
 /*
 eat_veg = forth {
     lit("self")
@@ -169,6 +169,7 @@ mod tests {
     use crate::sandbox::ai::{parser::named_tree_parser, Instruction, StackItem};
 
     use super::*;
+
     #[test]
     fn hermit_test() {
         let input = "dont_need_to_eat = forth {

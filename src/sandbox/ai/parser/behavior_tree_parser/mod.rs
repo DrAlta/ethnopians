@@ -12,6 +12,8 @@ use crate::sandbox::ai::{Thread, parser::TreesUsed};
 mod action_parser;
 pub use action_parser::action_parser;
 */
+mod blackboard_parser;
+pub use blackboard_parser::blackboard_parser;
 mod combine_parser;
 pub use combine_parser::combine_parser;
 mod eat_parser;
