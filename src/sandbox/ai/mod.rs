@@ -22,24 +22,16 @@ mod blackboard_value;
 pub use blackboard_value::BlackboardValue;
 mod hermit;
 pub use hermit::get_hermit_behavoir_tree;
+mod inpulse_id;
+pub use inpulse_id::InpulseId;
 mod instruction;
 pub use instruction::Instruction;
-mod parser;
-pub use parser::{file_parser, forth_parser};
+pub mod parser;
 mod stack_item;
 pub use stack_item::StackItem;
 mod status;
 pub use status::Status;
 
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub enum InpulseId {
-    Act1,
-    Act2,
-    Act3,
-
-    GoTo,
-}
 
 pub type BlackboardKey = String;
 pub type ThreadName = String;
@@ -57,8 +49,8 @@ mod tests {
         World,
     };
 
-    //#[test]
-    pub fn hermit_ai_run_test() {
+    #[test]
+    fn hermit_ai_run_test() {
         let world = World::new_empty();
         let mut blackboard = Blackboard::new();
 

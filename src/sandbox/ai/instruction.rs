@@ -36,6 +36,7 @@ pub enum Instruction {
     ForthDup,
     //(Coord ItemClass -- Option<ObjectId>) finds the neared item of ItemClass to ObjectId
     ForthFindNearest,
+    ForthEq,
     ForthGE,
     //(BlackboardKey -- Option<_>)
     ForthGetBlackboard,
@@ -108,6 +109,7 @@ impl Instruction {
             | Instruction::ForthDistance
             | Instruction::ForthDup
             | Instruction::ForthSwap
+            | Instruction::ForthEq
             | Instruction::ForthIf(_) => (),
         }
         missing
@@ -164,6 +166,15 @@ impl Instruction {
                     return Err("top of stack not a number".into());
                 };
                 stack.push(tos.clone());
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthEq => {
+                let (nos, tos) = Self::get_two_ints(stack)?;
+                if nos == tos {
+                    stack.push(StackItem::True);
+                } else {
+                    stack.push(StackItem::False);
+                }
                 Self::next(Status::None, pc)
             }
             Instruction::ForthFindNearest => {
@@ -467,6 +478,7 @@ impl Instruction {
             | Instruction::ForthDistance
             | Instruction::ForthDup
             | Instruction::ForthSwap
+            | Instruction::ForthEq
             | Instruction::ForthIf(_) => (),
         }
     }
