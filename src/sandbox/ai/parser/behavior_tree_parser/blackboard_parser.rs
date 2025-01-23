@@ -1,15 +1,25 @@
 use std::collections::HashMap;
 
-use crate::sandbox::ai::{Variable, parser::{behavior_tree_parser::{tree_parser, Thingie}, ident_parser, space_parser}, BlackboardKey, BlackboardValue, Instruction};
-
-use nom::{
-    bytes::complete::tag, character::{complete::char, streaming::multispace0}, error::ErrorKind,
-    multi::separated_list1, sequence::tuple, IResult,
+use crate::sandbox::ai::{
+    parser::{
+        behavior_tree_parser::{tree_parser, Thingie},
+        ident_parser, space_parser,
+    },
+    BlackboardKey, BlackboardValue, Instruction, Variable,
 };
 
+use nom::{
+    bytes::complete::tag,
+    character::{complete::char, streaming::multispace0},
+    error::ErrorKind,
+    multi::separated_list1,
+    sequence::tuple,
+    IResult,
+};
 
-
-pub fn blackboard_parser<'a, 'b>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
+pub fn blackboard_parser<'a, 'b>(
+    input: &'a str,
+) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
     let mut hash = HashMap::new();
     //                1  2  3  4  5       6  7  8  9 10, 11,  12 13
     let (tail, (_, _, _, _, values, _, _, _, _, _, tree, _, _)) = //map_res(
@@ -50,12 +60,10 @@ pub fn blackboard_parser<'a, 'b>(input: &'a str) -> IResult<&'a str, Thingie, (&
             space_parser,//12
             char('}'),//13
         ))(input)?;
-    let _: HashMap<BlackboardKey, Variable<BlackboardKey, BlackboardValue>> = values.into_iter().map(|(k, _ ,v)|{
-        (
-            k.to_owned(), 
-            Variable::Defer(v.to_owned())
-        )
-    }).collect();
+    let _: HashMap<BlackboardKey, Variable<BlackboardKey, BlackboardValue>> = values
+        .into_iter()
+        .map(|(k, _, v)| (k.to_owned(), Variable::Defer(v.to_owned())))
+        .collect();
 
     let mut vec = Vec::new();
     for (idx, thingie) in tree.into_iter().enumerate() {
@@ -82,12 +90,13 @@ mod tests {
 
     #[test]
     fn blackboard_parser_test() {
-        let (tail, Thingie::Tree(_i, _db)) =
-            blackboard_parser("blackboard ( a => one , b => two ) {use(hands, tree), use(tree, hands)}").unwrap()
-        else {
+        let (tail, Thingie::Tree(_i, _db)) = blackboard_parser(
+            "blackboard ( a => one , b => two ) {use(hands, tree), use(tree, hands)}",
+        )
+        .unwrap() else {
             panic!()
         };
         assert_eq!(tail, "");
-       // assert_eq!(i, vec![Instruction::InventoryGE("stone".to_owned(), 1)])
+        // assert_eq!(i, vec![Instruction::InventoryGE("stone".to_owned(), 1)])
     }
 }

@@ -1,4 +1,4 @@
-use super::{Item, Location, EntityId};
+use super::{EntityId, Item, Location};
 
 mod use_object;
 

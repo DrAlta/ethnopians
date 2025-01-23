@@ -140,23 +140,23 @@ get_veg = selector {
         }
     }
 }"#;
-/*
-eat_veg = forth {
-    lit("self")
-    get_blackboard
-    some_entity_id
-    if
-        lit("veg")
-        find_inventory
+    /*
+    eat_veg = forth {
+        lit("self")
+        get_blackboard
         some_entity_id
         if
-            eat
+            lit("veg")
+            find_inventory
+            some_entity_id
+            if
+                eat
+            then
         then
-    then
-    lit(failure)
-    return
-};
-*/
+        lit(failure)
+        return
+    };
+    */
     let (tail, db) = file_parser(source).unwrap();
     assert_eq!(tail, "");
     db

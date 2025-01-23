@@ -4,7 +4,10 @@ use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
 };
 
-use crate::sandbox::ai::{Instruction, parser::{ident_parser, u8_parser, space_parser, behavior_tree_parser::Thingie}};
+use crate::sandbox::ai::{
+    parser::{behavior_tree_parser::Thingie, ident_parser, space_parser, u8_parser},
+    Instruction,
+};
 
 pub fn inventory_have_ge_parser<'a>(
     input: &'a str,

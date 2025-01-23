@@ -2,9 +2,8 @@ use std::collections::HashMap;
 
 use crate::sandbox::{
     ai::{
-        Blackboard,
         cpu::{ProgramCounter, ReturnStack, Stack, StackItem},
-        BlackboardKey, BlackboardValue, ExecutionToken, Status, Thread,
+        Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, Status, Thread,
     },
     World,
 };

@@ -1,10 +1,6 @@
-use nom::{
-    bytes::complete::tag, error::ErrorKind, IResult,
-};
+use nom::{bytes::complete::tag, error::ErrorKind, IResult};
 
-use crate::sandbox::ai::{
-    Instruction, Thread, TreePool,
-};
+use crate::sandbox::ai::{Instruction, Thread, TreePool};
 
 pub fn get_location_parser<'a>(
     input: &'a str,

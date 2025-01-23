@@ -7,7 +7,10 @@ use nom::{
     IResult,
 };
 
-use crate::sandbox::ai::{Thread, TreePool, parser::{balanced_parser, forth_parser::forth_threadette_parser}};
+use crate::sandbox::ai::{
+    parser::{balanced_parser, forth_parser::forth_threadette_parser},
+    Thread, TreePool,
+};
 
 mod r#if;
 use r#if::If;

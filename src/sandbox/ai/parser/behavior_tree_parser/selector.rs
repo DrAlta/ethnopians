@@ -6,7 +6,7 @@ use nom::{
 };
 
 use crate::sandbox::ai::{
-    parser::{space_parser,behavior_tree_parser::tree_parser},
+    parser::{behavior_tree_parser::tree_parser, space_parser},
     Instruction,
 };
 

@@ -1,10 +1,14 @@
 use std::collections::BTreeSet;
 
 use crate::sandbox::{
-    ai::{Blackboard, BlackboardKey, BlackboardValue, StackItem, ThreadName, TreePool,
-        cpu::{Prayer, tick_action, tick_selector, tick_sequence, ProgramCounter, ReturnStack, Stack},
-        ExecutionToken, InpulseId, Status,
-    }, World
+    ai::{
+        cpu::{
+            tick_action, tick_selector, tick_sequence, Prayer, ProgramCounter, ReturnStack, Stack,
+        },
+        Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, InpulseId, StackItem, Status,
+        ThreadName, TreePool,
+    },
+    World,
 };
 
 ///
@@ -140,19 +144,20 @@ impl Instruction {
                 Ok(Status::None)
             }
             Instruction::ForthDistance => {
-                let Some(StackItem::Coord{..}) = stack.last() else {
+                let Some(StackItem::Coord { .. }) = stack.last() else {
                     return Err("top of stack not a number".into());
                 };
-                let Some(StackItem::Coord{..}) = stack.get(stack.len() - 2) else {
+                let Some(StackItem::Coord { .. }) = stack.get(stack.len() - 2) else {
                     return Err("next of stack not a number".into());
                 };
-                let Some(StackItem::Coord{x: tos_x, y: tos_y}) = stack.pop() else {
+                let Some(StackItem::Coord { x: tos_x, y: tos_y }) = stack.pop() else {
                     unreachable!()
                 };
-                let Some(StackItem::Coord{x: nos_x, y: nos_y}) = stack.pop() else {
+                let Some(StackItem::Coord { x: nos_x, y: nos_y }) = stack.pop() else {
                     unreachable!()
                 };
-                let distance = ((nos_x - tos_x).abs().pow(2) + (nos_y - tos_y).abs().pow(2)).isqrt();
+                let distance =
+                    ((nos_x - tos_x).abs().pow(2) + (nos_y - tos_y).abs().pow(2)).isqrt();
                 stack.push(StackItem::Int(distance));
                 Self::exit(Status::None, return_stack, pc)
             }
@@ -179,10 +184,10 @@ impl Instruction {
             }
             Instruction::ForthFindNearest => {
                 let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos wasn't a sting".to_owned())
+                    return Err("tos wasn't a sting".to_owned());
                 };
                 let Some(StackItem::Coord { .. }) = stack.get(stack.len() - 2) else {
-                    return Err("nos wasn't an coord".to_owned())
+                    return Err("nos wasn't an coord".to_owned());
                 };
                 let Some(StackItem::String(item_class)) = stack.pop() else {
                     unreachable!()
@@ -190,20 +195,26 @@ impl Instruction {
                 let Some(StackItem::Coord { x, y }) = stack.pop() else {
                     unreachable!()
                 };
-                match world.find_nearest(crate::Vec2 { x: x as f32, y: y as f32 }, &item_class) {
+                match world.find_nearest(
+                    crate::Vec2 {
+                        x: x as f32,
+                        y: y as f32,
+                    },
+                    &item_class,
+                ) {
                     Some(thing) => {
                         stack.push(StackItem::some(StackItem::EntityId(thing)));
                         Self::next(Status::None, pc)
-                    },
+                    }
                     None => {
                         stack.push(StackItem::Option(None));
                         Self::next(Status::None, pc)
-                    },
+                    }
                 }
             }
             Instruction::ForthGetEnergy => {
                 let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos wasn't a sting".to_owned())
+                    return Err("tos wasn't a sting".to_owned());
                 };
                 let Some(StackItem::String(key)) = stack.pop() else {
                     unreachable!()
@@ -221,25 +232,28 @@ impl Instruction {
             }
             Instruction::ForthGetLocation => {
                 let Some(StackItem::EntityId(_)) = stack.last() else {
-                    return Err("tos wasn't an EntityId".to_owned())
+                    return Err("tos wasn't an EntityId".to_owned());
                 };
                 let Some(StackItem::EntityId(entity_id)) = stack.pop() else {
                     unreachable!()
                 };
                 match world.get_location(&entity_id) {
                     Some(crate::sandbox::Location::World { x, y }) => {
-                        stack.push(StackItem::some(StackItem::Coord { x: *x as i32, y: *y as i32 }));
+                        stack.push(StackItem::some(StackItem::Coord {
+                            x: *x as i32,
+                            y: *y as i32,
+                        }));
                         Self::next(Status::None, pc)
-                    },
+                    }
                     _ => {
                         stack.push(StackItem::none());
                         Self::next(Status::None, pc)
-                    },
+                    }
                 }
             }
             Instruction::ForthGetHP => {
                 let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos wasn't a sting".to_owned())
+                    return Err("tos wasn't a sting".to_owned());
                 };
                 let Some(StackItem::String(key)) = stack.pop() else {
                     unreachable!()
@@ -266,7 +280,7 @@ impl Instruction {
             }
             Instruction::ForthGetBlackboard => {
                 let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos wasn't a sting".to_owned())
+                    return Err("tos wasn't a sting".to_owned());
                 };
                 let Some(StackItem::String(key)) = stack.pop() else {
                     unreachable!()
@@ -279,21 +293,15 @@ impl Instruction {
                     None => StackItem::False
                 });
                 */
-                stack.push( match blackboard.get(&key) {
-                    Some(x) => StackItem::Option(
-                        match x {
-                            BlackboardValue::EntityId(y) => Some(
-                                Box::new(
-                                    StackItem::EntityId(y.clone())
-                                )
-                            ),
+                stack.push(match blackboard.get(&key) {
+                    Some(x) => StackItem::Option(match x {
+                        BlackboardValue::EntityId(y) => {
+                            Some(Box::new(StackItem::EntityId(y.clone())))
                         }
-                    ),
-                    None => StackItem::Option(None)
-
+                    }),
+                    None => StackItem::Option(None),
                 });
                 Self::next(Status::None, pc)
-
             }
             Instruction::ForthGT => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
@@ -356,15 +364,15 @@ impl Instruction {
                 Self::next(Status::None, pc)
             }
             Instruction::ForthSomeCoord => {
-                let Some(StackItem::Option(Some(x))) = stack.last() else{
+                let Some(StackItem::Option(Some(x))) = stack.last() else {
                     stack.push(StackItem::False);
-                    return Self::next(Status::None, pc)
+                    return Self::next(Status::None, pc);
                 };
                 match x.as_ref() {
-                    StackItem::Coord{..} => (),
+                    StackItem::Coord { .. } => (),
                     _ => {
                         stack.push(StackItem::False);
-                        return Self::next(Status::None, pc)
+                        return Self::next(Status::None, pc);
                     }
                 }
                 let Some(StackItem::Option(Some(y))) = stack.pop() else {
@@ -375,15 +383,15 @@ impl Instruction {
                 Self::next(Status::None, pc)
             }
             Instruction::ForthSomeEntityId => {
-                let Some(StackItem::Option(Some(x))) = stack.last() else{
+                let Some(StackItem::Option(Some(x))) = stack.last() else {
                     stack.push(StackItem::False);
-                    return Self::next(Status::None, pc)
+                    return Self::next(Status::None, pc);
                 };
                 match x.as_ref() {
                     StackItem::EntityId(_) => (),
                     _ => {
                         stack.push(StackItem::False);
-                        return Self::next(Status::None, pc)
+                        return Self::next(Status::None, pc);
                     }
                 }
                 let Some(StackItem::Option(Some(y))) = stack.pop() else {
@@ -394,15 +402,15 @@ impl Instruction {
                 Self::next(Status::None, pc)
             }
             Instruction::ForthSomeInt => {
-                let Some(StackItem::Option(Some(x))) = stack.last() else{
+                let Some(StackItem::Option(Some(x))) = stack.last() else {
                     stack.push(StackItem::False);
-                    return Self::next(Status::None, pc)
+                    return Self::next(Status::None, pc);
                 };
                 match x.as_ref() {
                     StackItem::Int(_) => (),
                     _ => {
                         stack.push(StackItem::False);
-                        return Self::next(Status::None, pc)
+                        return Self::next(Status::None, pc);
                     }
                 }
                 let Some(StackItem::Option(Some(y))) = stack.pop() else {
@@ -419,7 +427,7 @@ impl Instruction {
             }
             Instruction::ForthSwap => {
                 let Some(_) = stack.get(stack.len() - 2) else {
-                    return Err("no nos".to_owned())
+                    return Err("no nos".to_owned());
                 };
                 let Some(tos) = stack.pop() else {
                     unreachable!()

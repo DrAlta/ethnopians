@@ -32,7 +32,6 @@ pub use stack_item::StackItem;
 mod status;
 pub use status::Status;
 
-
 pub type BlackboardKey = String;
 pub type ThreadName = String;
 pub type ExecutionToken = ThreadName;
@@ -41,11 +40,10 @@ pub type Thread = Vec<Instruction>;
 pub type TreePool = HashMap<ThreadName, Thread>;
 pub type ItemId = String;
 
-
 #[cfg(test)]
 mod tests {
     use crate::sandbox::{
-        ai::{get_hermit_behavoir_tree, CPU, Blackboard, Status},
+        ai::{get_hermit_behavoir_tree, Blackboard, Status, CPU},
         World,
     };
 

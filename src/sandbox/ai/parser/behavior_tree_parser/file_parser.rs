@@ -1,16 +1,16 @@
 use std::collections::HashMap;
 
+use crate::sandbox::ai::{
+    parser::{
+        behavior_tree_parser::{tree_parser, Thingie, TreesUsed},
+        ident_parser, space_parser,
+    },
+    Instruction, Thread, ThreadName, TreePool,
+};
 use nom::{
     character::complete::char, combinator::map_res, error::ErrorKind, multi::separated_list1,
     sequence::tuple, IResult,
 };
-use crate::sandbox::ai::{
-    parser::{ident_parser, space_parser, 
-        behavior_tree_parser::{tree_parser, Thingie, TreesUsed}
-    }, 
-    Instruction, Thread, ThreadName, TreePool
-};
-
 
 pub fn file_parser<'a>(
     input: &'a str,

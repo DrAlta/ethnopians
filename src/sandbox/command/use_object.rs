@@ -1,4 +1,4 @@
-use crate::sandbox::{within_range, Item, Location, EntityId, World, MAX_ENERGY};
+use crate::sandbox::{within_range, EntityId, Item, Location, World, MAX_ENERGY};
 
 use super::super::{Return, UseObject};
 use super::Command;

@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use crate::{sandbox::{Item, ItemClass, Location, EntityId, Prev}, Vec2};
+use crate::{
+    sandbox::{EntityId, Item, ItemClass, Location, Prev},
+    Vec2,
+};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct World {

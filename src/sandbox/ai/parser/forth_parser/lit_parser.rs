@@ -9,7 +9,10 @@ use nom::{
     IResult,
 };
 
-use crate::sandbox::ai::{parser::{ident_parser, space_parser}, Instruction, StackItem, Thread, TreePool};
+use crate::sandbox::ai::{
+    parser::{ident_parser, space_parser},
+    Instruction, StackItem, Thread, TreePool,
+};
 
 pub fn lit_parser<'a>(
     input: &'a str,
@@ -44,11 +47,7 @@ pub fn lit_parser<'a>(
             map_res(tag_no_case("false"), |_| {
                 Ok::<Instruction, ()>(Instruction::ForthLit(StackItem::False))
             }),
-            map_res(tuple((
-                char('"'),
-                ident_parser,
-                char('"'),
-            )), |(_,x,_)| {
+            map_res(tuple((char('"'), ident_parser, char('"'))), |(_, x, _)| {
                 Ok::<Instruction, ()>(Instruction::ForthLit(StackItem::String(x.to_owned())))
             }),
         )),
@@ -86,6 +85,9 @@ mod tests {
         let (tail, (body, used)) = lit_parser(input).unwrap();
         assert_eq!(tail, "");
         assert_eq!(used, TreePool::new());
-        assert_eq!(body, vec![Instruction::ForthLit(StackItem::String("one".to_owned()))])
+        assert_eq!(
+            body,
+            vec![Instruction::ForthLit(StackItem::String("one".to_owned()))]
+        )
     }
 }

@@ -1,4 +1,4 @@
-use super::{Command, Location, EntityId, World};
+use super::{Command, EntityId, Location, World};
 /// we need to keep calling this until is returns an empty Vec
 pub fn collide(a: EntityId, b: EntityId, world: &World) -> Vec<Command> {
     let empty = Vec::new();

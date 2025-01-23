@@ -4,8 +4,10 @@ use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
 };
 
-use crate::sandbox::ai::{parser::{ident_parser, space_parser, behavior_tree_parser::Thingie}, Instruction};
-
+use crate::sandbox::ai::{
+    parser::{behavior_tree_parser::Thingie, ident_parser, space_parser},
+    Instruction,
+};
 
 pub fn combine_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
     let (tail, (_, _, _, _, item_a, _, item_b, _, _)) = tuple((

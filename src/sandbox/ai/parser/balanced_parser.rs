@@ -98,20 +98,19 @@ where
                 panic!()
             }
             count += 1;
-            
 
-            let (inner_tail, (filler, term)) = many_till::<I, O, bool,_,_,_>(
+            let (inner_tail, (filler, term)) = many_till::<I, O, bool, _, _, _>(
                 |x| fill.parse(x),
                 alt((
                     |x| {
                         let (tail, _) = open.parse(x)?;
                         Ok::<(I, bool), Err<_>>((tail, true))
-                    }, 
+                    },
                     |x| {
-                        let (tail, _ ) = close.parse(x)?;
+                        let (tail, _) = close.parse(x)?;
                         Ok::<(I, bool), Err<_>>((tail, false))
-                    }
-                ))
+                    },
+                )),
             )(tail.clone())?;
             {
                 let Some(level_cell) = levels.last() else {
@@ -153,7 +152,6 @@ where
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use nom::{bytes::complete::tag, character::complete::one_of};
@@ -165,7 +163,8 @@ mod tests {
     fn two_test() {
         let source = "ifaifbthencthen";
         let (_tail, x) =
-            balanced_parser(one_of::<_, _, ()>("abcdifthen"), tag("if"), tag("then"))(source).unwrap();
+            balanced_parser(one_of::<_, _, ()>("abcdifthen"), tag("if"), tag("then"))(source)
+                .unwrap();
 
         assert_eq!(x, vec![Item('a'), Level(vec![Item('b'),]), Item('c'),])
     }
@@ -184,7 +183,8 @@ mod tests {
         then"*/
         let source = "ifaifbifcthendthenethen";
         let (_tail, x) =
-            balanced_parser(one_of::<_, _, ()>("abcdifthen"), tag("if"), tag("then"))(source).unwrap();
+            balanced_parser(one_of::<_, _, ()>("abcdifthen"), tag("if"), tag("then"))(source)
+                .unwrap();
 
         assert_eq!(
             x,

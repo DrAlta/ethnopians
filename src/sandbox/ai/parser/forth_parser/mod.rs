@@ -3,7 +3,10 @@ pub use actions::{go_to_parser, take_parser};
 mod arithmetic;
 pub use arithmetic::{add_parser, div_parser, mul_parser, rem_parser, sub_parser};
 mod comparison;
-pub use comparison::{eq_parser, ge_parser, gt_parser, is_int_parser, le_parser, lt_parser, some_coord_parser, some_entity_id_parser, some_int_parser};
+pub use comparison::{
+    eq_parser, ge_parser, gt_parser, is_int_parser, le_parser, lt_parser, some_coord_parser,
+    some_entity_id_parser, some_int_parser,
+};
 mod distance_parser;
 pub use distance_parser::distance_parser;
 mod dup_parser;
@@ -13,7 +16,9 @@ pub use forth_parser::forth_parser;
 mod forth_threadette_parser;
 pub use forth_threadette_parser::forth_threadette_parser;
 mod getters;
-pub use getters::{find_nearest_parser, get_blackboard, get_energy_parser, get_hp_parser, get_location_parser};
+pub use getters::{
+    find_nearest_parser, get_blackboard, get_energy_parser, get_hp_parser, get_location_parser,
+};
 mod if_parser;
 pub use if_parser::if_parser;
 mod lit_parser;

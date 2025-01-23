@@ -12,5 +12,4 @@ pub use u8_parser::u8_parser;
 
 use nom::character::complete::multispace0 as space_parser;
 
-
 type TreesUsed = crate::sandbox::ai::TreePool;

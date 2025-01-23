@@ -4,7 +4,7 @@ use broad_phase::{AARect, Entity, AABB};
 use qol::logy;
 
 use crate::{
-    sandbox::{Command, Location, EntityId, Return, World},
+    sandbox::{Command, EntityId, Location, Return, World},
     Vec2,
 };
 

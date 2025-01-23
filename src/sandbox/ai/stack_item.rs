@@ -12,18 +12,14 @@ pub enum StackItem {
     Int(i32),
     True,
     False,
-    Coord{x: i32, y: i32},
+    Coord { x: i32, y: i32 },
     String(String),
     EntityId(EntityId),
-    Option(Option<Box<StackItem>>)
+    Option(Option<Box<StackItem>>),
 }
 impl StackItem {
-    pub fn some(value:StackItem) -> StackItem {
-        Self::Option(Some(
-            Box::new(
-                value
-            )
-        ))
+    pub fn some(value: StackItem) -> StackItem {
+        Self::Option(Some(Box::new(value)))
     }
     pub fn none() -> StackItem {
         Self::Option(None)

@@ -1,10 +1,11 @@
 use nom::{branch::alt, error::ErrorKind, IResult};
 
-use crate::sandbox::ai::parser::behavior_tree_parser::{combine_parser, eat_parser, forth_tree_parser, inventory_have_ge_parser, sequence_parser,
-    token_parser, use_parser, selector_parser, Thingie};
+use crate::sandbox::ai::parser::behavior_tree_parser::{
+    combine_parser, eat_parser, forth_tree_parser, inventory_have_ge_parser, selector_parser,
+    sequence_parser, token_parser, use_parser, Thingie,
+};
 
 use super::blackboard_parser;
-
 
 pub fn tree_parser<'a>(
     input: &'a str,

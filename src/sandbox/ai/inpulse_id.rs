@@ -7,4 +7,3 @@ pub enum InpulseId {
     GoTo,
     Take,
 }
-

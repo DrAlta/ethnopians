@@ -6,7 +6,7 @@
 //! (seq{_2,_3,_4}, {_2:a, _3:b, _4:c})
 //!
 
-use crate::sandbox::ai::{Thread, parser::TreesUsed};
+use crate::sandbox::ai::{parser::TreesUsed, Thread};
 
 /*
 mod action_parser;

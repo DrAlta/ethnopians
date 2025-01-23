@@ -1,5 +1,5 @@
 use crate::sandbox::ai::{
-    parser::{TreesUsed, balanced_parser::Tract},
+    parser::{balanced_parser::Tract, TreesUsed},
     Instruction, Thread, TreePool,
 };
 
