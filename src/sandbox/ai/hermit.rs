@@ -1,58 +1,15 @@
 use crate::sandbox::ai::{parser::file_parser, TreePool};
 
 pub fn get_hermit_behavoir_tree() -> TreePool {
-    let source = r#"
-have_2_stone_02 = sel{
-    inventory_have_ge(stone, 2),
-    seq{
-        go_to_stone,
-        take_stone
-    }
-};
-have_2_stone = seq{
-    have_2_stone_02,
-    have_2_stone_02
-};
-have_knife = sel{
-    inventory_have_ge(knife, 1), 
-    seq{
-        have_2_stone,
-        combine(stone, stone)
-    }
-};
-have_stick = sel{
-    inventory_have_ge(stick, 1), 
-    seq{
-        go_to_tree,
-        use(hands, tree)
-    }
-};
-have_axe = sel{
-    inventory_have_ge(axe, 1),
-    seq{
-        have_knife,
-        have_stick,
-        combine(stick, knife)
-    }
-};
-have_2_wood_02 = sel{
-    inventory_have_ge(wood, 2),
-    have_axe,
-    go_to_tree,
-    use(axe, tree)
-};
-have_2_wood =seq{
-    have_2_wood_02,
-    have_2_wood_02
-};
-have_house = sel {
-    is_house_in_range,
-    seq{
-        have_2_wood,
-        combine(wood,wood)
-    }
-};
-sat_hunger = selector{
+    let root = {r#"hermit = sel{
+    sat_hunger,
+    sat_sleep,
+    have_house,
+    have_garden,
+    harvest_veg,
+    plant_veg
+}"#};
+    let hermit = {r#"sat_hunger = selector{
     dont_need_to_eat,
     blackboard(food => veg) {
         seq{
@@ -64,7 +21,50 @@ sat_hunger = selector{
         }
     }
 };
-dont_need_to_eat = forth {
+sat_sleep = forth {
+    lit("self")
+    get_blackboard
+    some_entity_id
+    if
+        get_hp
+        some_int
+        if
+            lit(50)
+            lt
+            if
+                lit("house")
+                find_nearest
+                some_entity_id
+                if
+                    dup
+                    get_location
+                    some_coord
+                    if
+                        go_to
+                        return
+                    then
+                then
+                lit(Failure)
+                return
+            then
+            lit(Success)
+            return
+        then
+    then
+    lit(Failure)
+    return
+};
+have_house = sel {
+    is_house_in_range,
+    seq{
+        have_2_wood,
+        combine(wood,wood)
+    }
+};
+have_garden = todo;
+harvest_veg = todo;
+plant_veg = todo"#};
+    let sat_hunger= {r#"dont_need_to_eat = forth {
     lit("self")
     get_blackboard
     some_entity_id
@@ -84,7 +84,38 @@ dont_need_to_eat = forth {
     return
     
 };
-is_house_in_range = forth{
+get_veg = selector {
+    blackboard(food => veg) {
+        inventory_have_ge(food, 1),
+        forth {
+            lit("self")
+            get_blackboard
+            some_entity_id
+            if
+                lit("veg")
+                find_nearest
+                some_entity_id
+                if
+                    dup
+                    get_location
+                    some_coord
+                    if
+                        go_to
+                        lit(Success)
+                        eq
+                        if
+                            take
+                            return
+                        then
+                    then
+                then
+            then
+            lit(Failure)
+            return
+        }
+    }
+}"#};
+    let have_house = {r#"is_house_in_range = forth{
     lit("self")
     get_blackboard
     some_entity_id
@@ -114,32 +145,98 @@ is_house_in_range = forth{
     lit(Failure)
     return
 };
-get_veg = selector {
-    blackboard(food => veg) {
-        inventory_have_ge(food, 1),
-        forth {
-            lit("self")
-            get_blackboard
+have_2_wood =seq{
+    have_2_wood_02,
+    have_2_wood_02
+}"#};
+    let have_2_wood = {r#"have_2_wood_02 = sel{
+    inventory_have_ge(wood, 2),
+    have_axe,
+    go_to_tree,
+    use(axe, tree)
+}"#};
+    let have_2_wood_02 = {r#"have_axe = sel{
+    inventory_have_ge(axe, 1),
+    seq{
+        have_knife,
+        have_stick,
+        combine(stick, knife)
+    }
+};
+go_to_tree = forth {
+    lit("self")
+    get_blackboard
+    some_entity_id
+    if
+        get_location
+        some_coord
+        if
+            lit("tree")
+            find_nearest
             some_entity_id
             if
-                lit("veg")
+                get_location
+                some_coord
+                if
+                    go_to
+                    return
+                then
+            then
+        then
+    then
+    lit(Failure)
+    return
+}"#};
+    let have_axe = {r#"have_knife = sel{
+    inventory_have_ge(knife, 1), 
+    seq{
+        have_2_stone,
+        combine(stone, stone)
+    }
+};
+have_stick = sel{
+    inventory_have_ge(stick, 1), 
+    seq{
+        go_to_tree,
+        use(hands, tree)
+    }
+}"#};
+    let have_knife = {r#"have_2_stone = seq{
+    have_2_stone_02,
+    have_2_stone_02
+}"#};
+    let have_2_stone = {r#"have_2_stone_02 = sel{
+    inventory_have_ge(stone, 2),
+    forth {
+        lit("self")
+        get_blackboard
+        some_entity_id
+        if
+            get_location
+            some_coord
+            if
+                lit("stone")
                 find_nearest
                 some_entity_id
                 if
                     dup
-                    get_location
                     some_coord
                     if
                         go_to
-                        take
+                        lit(Success)
+                        eq
+                        if
+                            take
+                            return
+                        then
                     then
                 then
             then
-            lit(Failure)
-            return
-        }
+        then
+        lit(Failure)
+        return
     }
-}"#;
+}"#};
     /*
     eat_veg = forth {
         lit("self")
@@ -157,8 +254,24 @@ get_veg = selector {
         return
     };
     */
-    let (tail, db) = file_parser(source).unwrap();
-    assert_eq!(tail, "");
+    let (tail1, mut db) = file_parser(root).unwrap();
+    assert_eq!(tail1, "");
+
+    for (idx, source) in [
+        hermit,
+        sat_hunger,
+        have_house,
+        have_2_wood,
+        have_2_wood_02,
+        have_axe,
+        have_knife,
+        have_2_stone,
+    ].into_iter().enumerate() {
+        let (tail, new_db) = file_parser(source).unwrap();
+        assert_eq!((tail, idx), ("", idx));
+        db.extend(new_db.into_iter());
+    }
+
     db
 }
 
@@ -169,13 +282,33 @@ mod tests {
     use crate::sandbox::ai::{parser::named_tree_parser, Instruction, StackItem};
 
     use super::*;
-
+/*
+    "self"
+    Some(self_id)
+    self_id, true
+    self_id
+    self_id, self_id
+    self_id, Some(hp)
+    self_id, hp, true
+    self_id, hp, 50
+    self_id, true
+    self_id, "house"
+    self_id, Some(house_id)
+    self_id, house_id, true
+    self_id, house_id, house_id,
+    self_id, house_id, Some(house_coord)
+    self_id, house_id, house_coord, true 
+    self_id, house_id, Success
+    self_id, house_id, Success, Success
+    self_id, house_id, true | if use
+    self_id, Success
+*/
     #[test]
     fn hermit_test() {
         let input = "dont_need_to_eat = forth {
     lit(\"self\")
     get_energy
-    is_int
+    some_int
     if
         lit(5)
         gt
@@ -197,7 +330,7 @@ mod tests {
                 vec![
                     Instruction::ForthLit(StackItem::String("self".to_owned())),
                     Instruction::ForthGetEnergy,
-                    Instruction::ForthIsInt,
+                    Instruction::ForthSomeInt,
                     Instruction::ForthIf(5),
                     Instruction::ForthLit(StackItem::Int(5)),
                     Instruction::ForthGT,
