@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use broad_phase::{AARect, Entity, SpatialBloom};
+
 use crate::{
     sandbox::{EntityId, Item, ItemClass, Location, Prev},
     Vec2,
@@ -14,6 +16,7 @@ pub struct World {
     pub(super) r#type: HashMap<EntityId, Item>,
     pub(super) highest_id: EntityId,
     pub(super) movement: HashMap<EntityId, ((f32, f32), f32)>,
+    pub(super) spatial_bloom_maybe: Option<(SpatialBloom, HashMap<broad_phase::EntityId, EntityId>)>,
 }
 
 impl
@@ -41,6 +44,27 @@ impl
 }
 
 impl World {
+    pub fn get_spatial_bloom(&self) -> Option<&(SpatialBloom, HashMap<broad_phase::EntityId, EntityId>)> {
+        self.spatial_bloom_maybe.as_ref()
+    }
+    pub fn pop_spatial_bloom(&mut self) -> &(SpatialBloom, HashMap<broad_phase::EntityId, EntityId>) {
+        let mut map = HashMap::new();
+        let mut sb = SpatialBloom::new(10.0, 10.0, Vec::new()).unwrap();
+ 
+        for (k,v) in self.locations.iter() {
+            let Location::World { x, y } = v else {
+                continue;
+            };
+            let Some((width, height)) = self.sizes.get(k) else {
+                continue;
+            };
+            let sb_entity = Entity::AARect(AARect::new(*x, *y, *width, *height));
+            let sb_id = sb.insert(sb_entity);
+            map.insert(sb_id, k.clone());
+        };
+        self.spatial_bloom_maybe = Some((sb, map));
+        self.spatial_bloom_maybe.as_ref().unwrap()
+    }
     pub fn find_nearest(&self, _pos: Vec2, _item_class: &ItemClass) -> Option<EntityId> {
         todo!()
     }
@@ -60,6 +84,7 @@ impl World {
             r#type,
             highest_id,
             movement,
+            spatial_bloom_maybe: None,
         }
     }
     pub fn new(
@@ -98,6 +123,7 @@ impl World {
             r#type,
             highest_id,
             movement,
+            spatial_bloom_maybe: None
         }
     }
     pub fn get_energy(&self, id: &EntityId) -> Option<&i16> {

@@ -1,20 +1,20 @@
 use nom::{branch::alt, combinator::map_res, error::ErrorKind, IResult};
+use qol::logy;
 
 use crate::sandbox::ai::{
     parser::{
-        behavior_tree_parser::{token_parser, Thingie},
         forth_parser::{
             add_parser, distance_parser, div_parser, dup_parser, eq_parser, find_nearest_parser,
             ge_parser, get_blackboard, get_energy_parser, get_hp_parser, get_location_parser,
             go_to_parser, gt_parser, if_parser, is_int_parser, le_parser, lit_parser, lt_parser,
             mul_parser, rem_parser, return_parser, some_coord_parser, some_entity_id_parser,
             some_int_parser, sub_parser, swap_parser, take_parser,
-        },
+        }, ident_parser,
     },
     Instruction, Thread, TreePool,
 };
 
-pub fn forth_threadette_parser<'a>(
+pub fn forth_threadette_parser_2<'a>(
     input: &'a str,
 ) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
     alt((
@@ -58,12 +58,49 @@ pub fn forth_threadette_parser<'a>(
         go_to_parser,
         take_parser,
         //        )),
-        // function calls, this needs to be last so as not to gobble the other tags
-        map_res(token_parser, |x| {
-            Ok::<(Thread, TreePool), ()>(match x {
-                Thingie::Token(token) => (vec![Instruction::ForthCall(token, 0)], TreePool::new()),
-                Thingie::Tree(vec, hash_map) => (vec, hash_map),
-            })
-        }),
     ))(input)
+}
+
+pub fn forth_threadette_parser<'a>(
+    input: &'a str,
+) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
+    alt((
+        map_res(ident_parser, |x| {
+            /*
+            #[cfg(test)]
+            println!("found: {x:?}");
+            */
+            // these 3 need to be handled special be couse they cover more that a single ident
+            match x {
+                "then" => {
+                    logy!("error", "we shouldn't find a 'then'");
+                    return Err(())
+                }
+                "if"
+                | "lit" => {
+                    return Err(())
+                }
+                _ => ()
+            };
+            let a = forth_threadette_parser_2(x);
+            if let Ok(("", b)) = a {
+                return Ok::<(Thread, TreePool), ()>(b)
+            } else {
+                Ok((vec![Instruction::ForthCall(x.to_owned(), 0)], TreePool::new()))
+            }
+        }),
+        forth_threadette_parser_2
+    ))(input)
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn call_test() {
+        let source = "get_entities";
+        let (tail, (head, _pool)) = forth_threadette_parser(source).unwrap();
+        assert_eq!(tail, "");
+        assert_eq!(head, vec![Instruction::ForthCall("get_entities".to_owned(), 0)])
+    }
 }

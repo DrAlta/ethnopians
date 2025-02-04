@@ -1,6 +1,23 @@
+use qol::logy;
+
 use crate::sandbox::ai::{parser::file_parser, TreePool};
 
 pub fn get_hermit_behavoir_tree() -> TreePool {
+    let test ={r#"get_my_home_location = forth {
+        lit("self")
+        get_blackboard
+        some_entity_id
+        if
+            lit("house")
+            find_nearest
+            some_entity_id
+            if
+                get_location
+                return
+            then
+        then
+        return
+    }"#};
     let root = {r#"hermit = sel{
     sat_hunger,
     sat_sleep,
@@ -9,6 +26,13 @@ pub fn get_hermit_behavoir_tree() -> TreePool {
     harvest_veg,
     plant_veg
 }"#};
+ /* in have_garden a gardern is (spacing * width) by (space * hiegth) plot with nothing but vegs and agents in it.
+ first we try placing it at 
+      `my_home_location + home_height - ((spacing * width) / 2)`(x: -10, y: 5 )
+ then `my_home_location + home_width - ((spacing * height) / 2)`(x: 5, y: -10 )
+ then `my_home_location - (home_width + width * spacing) - ((spacing * height) / 2)`(x: -25, y: -10)
+ then `my_home_location - home_height - ((spacing * width) / 2)`(x: -10, y -5 )
+ */
     let hermit = {r#"sat_hunger = selector{
     dont_need_to_eat,
     blackboard(food => veg) {
@@ -61,9 +85,132 @@ have_house = sel {
         combine(wood,wood)
     }
 };
-have_garden = todo;
+have_garden = forth {
+    lit("garden_location")
+    some_coord
+    if
+        drop
+        lit(Success)
+        return
+    then
+    get_my_home_location
+    some_coord
+    if
+        dup
+        lit(x: -10, y: 5)
+        add
+        dup
+        check_if_clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+        drop
+        
+        dup
+        lit(x: 5, y: -10)
+        add
+        dup
+        check_if_clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+        drop
+
+        dup
+        lit(x: -25, y: -10)
+        add
+        dup
+        check_if_clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+        drop
+
+        dup
+        lit(x: -10, y: -25)
+        add
+        dup
+        check_if_clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+        drop
+
+
+
+
+
+        dup
+        lit(x: -10, y: 5)
+        add
+        dup
+        clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+        drop
+        
+        dup
+        lit(x: 5, y: -10)
+        add
+        dup
+        clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+        drop
+
+        dup
+        lit(x: -25, y: -10)
+        add
+        dup
+        clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+        drop
+
+        dup
+        lit(x: -10, y: -25)
+        add
+        dup
+        clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+        drop
+        drop
+    then
+    lit(Failure)
+    return
+};
 harvest_veg = todo;
 plant_veg = todo"#};
+// vvv tasks used in hermit
     let sat_hunger= {r#"dont_need_to_eat = forth {
     lit("self")
     get_blackboard
@@ -149,12 +296,46 @@ have_2_wood =seq{
     have_2_wood_02,
     have_2_wood_02
 }"#};
+// have_garden check is their is a location of a garden in the blackboard, 
+// if not then it finds the agent's house 
+// then checks south, then west the east the north of the house for a spot that 
+// is clear of everything but veg and agents, 
+// when it finds one it sets that to the garden, 
+// else it tries to clear the spots in th same order 
+// and when it succeeds it sets the cleared spot to be the garden
+    let have_garden = {r#"get_my_home_location = forth {
+    lit("self")
+    get_blackboard
+    some_entity_id
+    if
+        lit("house")
+        find_nearest
+        some_entity_id
+        if
+            get_location
+            return
+        then
+    then
+    lit(false)
+    return
+};
+check_if_clear_for_garden = forth{
+    lit(x: 20, y: 20)
+    get_entities
+    lit("veg")
+    remove_entities_of_type
+    lit("agent")
+    remove_entities_of_type
+    is_empty
+}"#};
+// vvv tasks used in have_house
     let have_2_wood = {r#"have_2_wood_02 = sel{
     inventory_have_ge(wood, 2),
     have_axe,
     go_to_tree,
     use(axe, tree)
 }"#};
+// vvv tasks used in have_2_wood
     let have_2_wood_02 = {r#"have_axe = sel{
     inventory_have_ge(axe, 1),
     seq{
@@ -187,6 +368,7 @@ go_to_tree = forth {
     lit(Failure)
     return
 }"#};
+// vvv tasks used un have_2_wood_02
     let have_axe = {r#"have_knife = sel{
     inventory_have_ge(knife, 1), 
     seq{
@@ -237,6 +419,7 @@ have_stick = sel{
         return
     }
 }"#};
+// end tasks used in have_2_wood_02
     /*
     eat_veg = forth {
         lit("self")
@@ -258,9 +441,11 @@ have_stick = sel{
     assert_eq!(tail1, "");
 
     for (idx, source) in [
+        test,
         hermit,
         sat_hunger,
         have_house,
+        have_garden,
         have_2_wood,
         have_2_wood_02,
         have_axe,
@@ -272,12 +457,15 @@ have_stick = sel{
         db.extend(new_db.into_iter());
     }
 
+    logy!("debug", "{:?}", db.get("check_if_clear_for_garden"));
     db
 }
 
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+
+    use qol::InsertOrInsert;
 
     use crate::sandbox::ai::{parser::named_tree_parser, Instruction, StackItem};
 
@@ -352,7 +540,7 @@ mod tests {
             for i in thread {
                 let x = i.missing_threads_used(&bt);
                 if !x.is_empty() {
-                    missing.insert(thread_name, x);
+                    missing.insert_or_insert(thread_name, x);
                 }
             }
         }

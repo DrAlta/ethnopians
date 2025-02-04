@@ -32,3 +32,32 @@ impl std::fmt::Display for Item {
         )
     }
 }
+
+impl TryFrom<&str> for Item {
+    
+    type Error = ();
+    
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Ok(if value.eq_ignore_ascii_case("Agent") {
+            Item::Agent
+        } else if value.eq_ignore_ascii_case("Axe") {
+            Item::Axe
+        } else if value.eq_ignore_ascii_case("Food") {
+            Item::Food
+        } else if value.eq_ignore_ascii_case("Stone") {
+            Item::Stone
+        } else if value.eq_ignore_ascii_case("Stick") {
+            Item::Stick
+        } else if value.eq_ignore_ascii_case("Wood") {
+            Item::Wood
+        } else if value.eq_ignore_ascii_case("House") {
+            Item::House
+        } else if value.eq_ignore_ascii_case("Tree") {
+            Item::Tree
+        } else if value.eq_ignore_ascii_case("Veggie") {
+            Item::Veggie
+        } else {
+            return Err(())
+        })
+    }
+}

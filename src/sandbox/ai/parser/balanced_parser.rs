@@ -94,7 +94,7 @@ where
         levels.push(Rc::clone(&building));
         let mut count = 0;
         loop {
-            if count == 10 {
+            if count == 100 {
                 panic!()
             }
             count += 1;

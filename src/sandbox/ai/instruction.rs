@@ -1,5 +1,7 @@
 use std::collections::BTreeSet;
 
+use qol::logy;
+
 use crate::sandbox::{
     ai::{
         cpu::{
@@ -7,8 +9,7 @@ use crate::sandbox::{
         },
         Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, InpulseId, StackItem, Status,
         ThreadName, TreePool,
-    },
-    World,
+    }, Item, World
 };
 
 ///
@@ -40,6 +41,7 @@ pub enum Instruction {
     //(Coord Coord -- Int)
     ForthDistance,
     ForthDiv,
+    ForthDrop,
     ForthDup,
     //(Coord ItemClass -- Option<ObjectId>) finds the neared item of ItemClass to ObjectId
     ForthFindNearest,
@@ -70,6 +72,11 @@ pub enum Instruction {
     //(_ -- (_ false or Int true))
     ForthSomeInt,
     ForthSwap,
+    ToDoIsEmpty,
+    ToDoRemoveEntitiesOfType,
+    // (coord coord -- ToDo) gets all entities in a TOS rectanle at NOS
+    ToDoGetEntities,
+
 }
 
 impl Instruction {
@@ -84,6 +91,9 @@ impl Instruction {
                 }
             }
             Instruction::ForthCall(token, _idx) => {
+                if token == "remove_entities_of_type" {
+                    logy!("debug","remove_entities_of_type was processed. contained:{}", bt.contains_key(token));
+                }
                 if !bt.contains_key(token) {
                     missing.insert(token.clone());
                 }
@@ -117,6 +127,10 @@ impl Instruction {
             | Instruction::ForthDup
             | Instruction::ForthSwap
             | Instruction::ForthEq
+            | Instruction::ForthDrop
+            | Instruction::ToDoGetEntities
+            | Instruction::ToDoIsEmpty
+            | Instruction::ToDoRemoveEntitiesOfType
             | Instruction::ForthIf(_) => (),
         }
         missing
@@ -138,9 +152,14 @@ impl Instruction {
             Instruction::Sequence(children) => tick_sequence(children, stack, return_stack, pc),
             Instruction::Use(_, _) => todo!(),
             Instruction::ForthAdd => {
-                let (nos, tos) = Self::get_two_ints(stack)?;
-                stack.push(StackItem::Int(nos + tos));
-                Self::next(Status::None, pc)
+                if let Ok((nos, tos)) = Self::get_two_ints(stack) {
+                    stack.push(StackItem::Int(nos + tos));
+                    Self::next(Status::None, pc)
+                } else {
+                    let (nos, tos) = Self::get_two_coords(stack)?;
+                    stack.push(StackItem::Coord{x:nos.0 + tos.0, y:nos.1 + tos.1});
+                    Self::next(Status::None, pc)
+                }
             }
             Instruction::ForthCall(token, idx) => {
                 *pc = Some((token.clone(), *idx));
@@ -167,6 +186,13 @@ impl Instruction {
             Instruction::ForthDiv => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
                 stack.push(StackItem::Int(nos / tos));
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthDrop => {
+                if stack.is_empty() {
+                    return Err("nothing on sack".into());
+                };
+                stack.pop();
                 Self::next(Status::None, pc)
             }
             Instruction::ForthDup => {
@@ -424,9 +450,14 @@ impl Instruction {
                 Self::next(Status::None, pc)
             }
             Instruction::ForthSub => {
-                let (nos, tos) = Self::get_two_ints(stack)?;
-                stack.push(StackItem::Int(nos - tos));
-                Self::next(Status::None, pc)
+                if let Ok((nos, tos)) = Self::get_two_ints(stack) {
+                    stack.push(StackItem::Int(nos - tos));
+                    Self::next(Status::None, pc)
+                } else {
+                    let (nos, tos) = Self::get_two_coords(stack)?;
+                    stack.push(StackItem::Coord{x:nos.0 - tos.0, y:nos.1 - tos.1});
+                    Self::next(Status::None, pc)
+                }
             }
             Instruction::ForthSwap => {
                 let Some(_) = stack.get(stack.len() - 2) else {
@@ -443,6 +474,56 @@ impl Instruction {
                 Self::next(Status::None, pc)
             }
             Instruction::ForthReturn => Self::exit(Status::None, return_stack, pc),
+            Instruction::ToDoIsEmpty => {
+                let Some(StackItem::Todo(x)) = stack.last() else {
+                    return Err("TOS wasn't a ToDo".to_owned());
+                };
+                stack.push(if x.is_empty(){StackItem::True}else{StackItem::False});
+                Self::next(Status::None, pc)
+            }
+            Instruction::ToDoGetEntities => {
+                let (nos, tos) = Self::get_two_coords(stack)?;
+                let Some((sb, map)) = world.get_spatial_bloom() else {
+                    return Err("world had no SpatailBloom".to_owned());
+                };
+                let mut x =Vec::new();
+                for y in sb.qurry(nos.0 as f32,nos.1 as f32, tos.0 as f32, tos.1 as f32) {
+                    let Some(thing) = map.get(&y) else {
+                        return Err(format!("SpatialBloom returned {y:?} but that id isn't mapped to any entities"))
+                    };
+                    x.push(thing.clone());
+                };
+                stack.push(StackItem::Todo(x));
+                Self::next(Status::None, pc)
+            }
+            Instruction::ToDoRemoveEntitiesOfType => {
+                let Some(StackItem::String(stack_string)) = stack.last() else {
+                    return Err("top of stack not a number".into());
+                };
+                let stack_str: &str = stack_string;
+                let Ok(item_type_from_stack) = stack_str.try_into() else {
+                    return Err(format!("couldn't convert {stack_str:?} to type"));
+                };
+
+                let Some(StackItem::Todo(_)) = stack.get(stack.len() - 2) else {
+                    return Err("next of stack not a number".into());
+                };
+                let Some(StackItem::String(_)) = stack.pop() else {
+                    unreachable!()
+                };
+                let Some(StackItem::Todo(entities)) = stack.last_mut() else {
+                    unreachable!()
+                };
+                
+                entities.retain(|id|{
+                    if let Some(this_items_type) = world.get_type(id) {
+                        !(this_items_type == &item_type_from_stack) 
+                    } else {
+                        true
+                    }
+                });
+                Self::next(Status::None, pc)
+            }
         }
     }
     pub fn correct(&mut self, prefix: &str) {
@@ -490,6 +571,10 @@ impl Instruction {
             | Instruction::ForthDup
             | Instruction::ForthSwap
             | Instruction::ForthEq
+            | Instruction::ForthDrop
+            | Instruction::ToDoGetEntities
+            | Instruction::ToDoIsEmpty
+            | Instruction::ToDoRemoveEntitiesOfType
             | Instruction::ForthIf(_) => (),
         }
     }
@@ -511,6 +596,21 @@ impl Instruction {
             *pc = None;
             return Ok(status);
         };
+    }
+    pub fn get_two_coords(stack: &mut Stack) -> Result<((i32,i32), (i32,i32)), String> {
+        let Some(StackItem::Coord{..}) = stack.last() else {
+            return Err("top of stack not a number".into());
+        };
+        let Some(StackItem::Coord{..}) = stack.get(stack.len() - 2) else {
+            return Err("next of stack not a number".into());
+        };
+        let Some(StackItem::Coord{x:tos_x, y:tos_y}) = stack.pop() else {
+            unreachable!()
+        };
+        let Some(StackItem::Coord{x:nos_x, y:nos_y}) = stack.pop() else {
+            unreachable!()
+        };
+        Ok(((nos_x, nos_y), (tos_x,tos_y)))
     }
     pub fn get_two_ints(stack: &mut Stack) -> Result<(i32, i32), String> {
         let Some(StackItem::Int(_)) = stack.last() else {

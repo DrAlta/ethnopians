@@ -1,0 +1,11 @@
+# Change Log
+
+Notable changes to the "Ethnopians" crate will be documented in this file.
+
+Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+
+## [0.1.0] - 2025-02-01
+
+### Fixed
+
+- `check_for_missing_threads_in_hermit_ai()` was overriding the BTreeSet for the task in `missing` instead of appending the missing tasks to the already detected missing tasks

@@ -16,6 +16,7 @@ pub enum StackItem {
     String(String),
     EntityId(EntityId),
     Option(Option<Box<StackItem>>),
+    Todo(Vec<EntityId>),
 }
 impl StackItem {
     pub fn some(value: StackItem) -> StackItem {
