@@ -1,8 +1,3 @@
-#[cfg(not(feature = "macroquad"))]
-mod vec2;
-#[cfg(not(feature = "macroquad"))]
-pub use vec2::{vec2, Vec2};
-
 mod action_id;
 pub use action_id::ActionId;
 mod actor_id;
