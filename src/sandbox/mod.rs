@@ -23,13 +23,13 @@
 //!
 //!
 
-pub const MAX_ENERGY: i16 = 100;
-pub mod ai;
-pub mod interaction;
+pub const MAX_ENERGY: i32 = 100;
+//pub mod ai;
+//pub mod interaction;
 
 mod acts;
 pub use acts::Acts;
-pub mod collision;
+//pub mod collision;
 mod command;
 pub use command::Command;
 pub mod forth;
@@ -44,9 +44,10 @@ pub use r#return::Return;
 
 mod sandbox;
 use sandbox::within_range;
+/*
 mod use_object;
 pub use use_object::UseObject;
-
+*/
 mod world;
 
 pub type EntityId = bevy::prelude::Entity;

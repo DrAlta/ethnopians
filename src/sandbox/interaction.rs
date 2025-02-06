@@ -1,4 +1,4 @@
-use super::{EntityId, Return, UseObject, World};
+use super::{EntityId, Return, UseObject};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub struct Interaction<Command> {

@@ -1,48 +1,76 @@
-use crate::sandbox::{within_range, EntityId, Item, Location, World, MAX_ENERGY};
+use bevy::prelude::*;
 
-use super::super::{Return, UseObject};
-use super::Command;
+use crate::{mate::Agent, sandbox::{within_range, world::{Energy, Size, Type}, EntityId, Item, Location, MAX_ENERGY}};
 
-impl UseObject<Command> for Command {
-    fn use_object(agent_id: EntityId, object_id: EntityId, world: &World) -> Return<Command> {
-        // get the agent
-        let Some(Item::Agent) = world.get_type(&agent_id) else {
-            return Return::ActionInvalid("Agent not found!".to_owned());
-        };
+use super::{Command, PosibleActionsResponce, PosibleActionsRequest};
 
-        // get object's location and check if it is in the agents's invetory/
-        // if not check if it's in range of the agent.
-        match world.get_location(&object_id) {
+#[derive(Event, Debug)]
+pub struct UseRequest {
+    pub agent_id: EntityId,
+    pub target_id: EntityId,
+}
+
+
+fn use_object_system(
+    mut query: Query<(
+        Entity,
+        &Type,
+        &Location,
+    )>,
+    use_requests: EventReader<UseRequest>,
+    posible_actions_requests: EventReader<PosibleActionsRequest>,
+    mut posible_actions_responce: EventWriter<PosibleActionsResponce>,
+) {
+}
+fn use_object(
+    query: &Query<(
+        Entity,
+        &Type,
+        &Location,
+        &Size,
+        Option<&Energy>,
+    )>,
+    agent_id: EntityId,
+    object_id: EntityId,
+) -> Option<Vec<Command>> {
+    // get the agent
+    let Ok((_, Type(Item::Agent), _, _, _)) = query.get(agent_id) else {
+        return None//Return::ActionInvalid("Agent not found!".to_owned());
+    };
+
+    // get object's location and check if it is in the agents's invetory/
+    // if not check if it's in range of the agent.
+    match query.get(object_id) {
             // the object is in an inventory, so check if it's the agents' inventory
-            Some(Location::Inventory(inventory)) => {
+            Ok((_, _, Location::Inventory(inventory), _, _)) => {
                 // is it the agents' inventory
                 if inventory != &agent_id {
-                    return Return::ActionInvalid("Object in someone else's inventory".to_owned());
+                    return None//Return::ActionInvalid("Object in someone else's inventory".to_owned());
                 }
             }
             // THe object is in the world, so check if it is in range of the agent
-            Some(Location::World {
+            Ok((_, _, Location::World {
                 x: object_x,
                 y: object_y,
-            }) => {
+            }, _, _)) => {
                 // get the agent's location in the world.
-                let Some(Location::World {
+                let Ok((_, _, Location::World {
                     x: agent_x,
                     y: agent_y,
-                }) = world.get_location(&agent_id)
+                }, _, _)) = query.get(agent_id)
                 else {
-                    return Return::ActionInvalid("Actor not in the world with object".to_owned());
+                    return None//Return::ActionInvalid("Actor not in the world with object".to_owned());
                 };
                 // check is they are within range
-                let (agent_center_x, agent_center_y) = if let Some(size) = world.get_size(&agent_id)
+                let (agent_center_x, agent_center_y) = if let Ok((_, _, _, size, _)) = query.get(agent_id)
                 {
-                    (agent_x + (size.0 * 0.5), agent_y + (size.1 * 0.5))
+                    (agent_x + (size.width as f32 * 0.5), agent_y + (size.height as f32 * 0.5))
                 } else {
                     (*agent_x, *agent_y)
                 };
                 let (object_center_x, object_center_y) =
-                    if let Some(size) = world.get_size(&agent_id) {
-                        (object_x + (size.0 * 0.5), object_y + (size.1 * 0.5))
+                    if let Ok((_, _, _, size, _)) = query.get(agent_id) {
+                        (object_x + (size.width as f32 * 0.5), object_y + (size.height as f32 * 0.5))
                     } else {
                         (*object_x, *object_y)
                     };
@@ -53,17 +81,17 @@ impl UseObject<Command> for Command {
                     object_center_y,
                     20.0,
                 ) {
-                    return Return::ActionInvalid("object is too far away!".to_owned());
+                    return None//Return::ActionInvalid("object is too far away!".to_owned());
                 };
             }
             // there is no location recorded for the object
-            None => {
-                return Return::ActionInvalid("object's location not found!".to_owned());
+            Err(_) => {
+                return None//Return::ActionInvalid("object's location not found!".to_owned());
             }
         }
         // get the object's type
-        let Some(object) = world.get_type(&object_id) else {
-            return Return::ActionInvalid("object's type not found!".to_owned());
+        let Ok((_, Type(object), _, _, _)) = query.get(object_id) else {
+            return None//Return::ActionInvalid("object's type not found!".to_owned());
         };
         // decide what to do based on the objects type
         match object {
@@ -75,11 +103,11 @@ impl UseObject<Command> for Command {
             Item::Wood => todo!(),
             // the objet was a house, agent will sleep in it to regain energy and maybe health
             Item::House => {
-                let Some(energy) = world.get_energy(&agent_id) else {
-                    return Return::ActionInvalid("agent doesn't have energy".to_owned());
+                let Ok((_, _, _, _, Some(Energy(energy)))) = query.get(agent_id) else {
+                    return None// Return::ActionInvalid("agent doesn't have energy".to_owned());
                 };
                 let excess = ((energy + 10) - MAX_ENERGY).max(0);
-                let rest: i16 = 10 - excess;
+                let rest: i32 = 10 - excess;
                 let mut ret = vec![Command::Rest {
                     agent_id,
                     ammount: rest,
@@ -91,21 +119,24 @@ impl UseObject<Command> for Command {
                         ammount: excess,
                     })
                 }
-                return Return::Commands(ret);
+                return Some(ret);
             }
             Item::Tree => {
-                let Some(_axe_idx) = world.type_iter().find_map(|(idx, obj)| {
+                let Some(_axe_idx) = query.iter().find_map(|(idx, Type(obj), _, _, _)| {
+                    let Ok((_,_,Location::Inventory(loc_id),_,_)) = query.get(idx) else{
+                        return None;
+                    };
                     if obj == &Item::Axe
-                        && Some(&Location::Inventory(agent_id)) == world.get_location(idx)
+                        && agent_id == *loc_id
                     {
                         Some(idx)
                     } else {
                         None
                     }
                 }) else {
-                    return Return::ActionInvalid("Agent doesn't have an axe!".to_owned());
+                    return None//Return::ActionInvalid("Agent doesn't have an axe!".to_owned());
                 };
-                return Return::Commands(vec![
+                return Some(vec![
                     Command::Remove(object_id),
                     Command::AddItem {
                         item: Item::Wood,
@@ -114,7 +145,7 @@ impl UseObject<Command> for Command {
                 ]);
             }
             Item::Veggie => {
-                return Return::Commands(vec![
+                return Some(vec![
                     Command::Remove(object_id),
                     Command::AddItem {
                         item: Item::Food,
@@ -124,29 +155,53 @@ impl UseObject<Command> for Command {
             }
         }
     }
-}
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
 
-    use crate::sandbox::interaction::get_interactions;
-
     use super::*;
+    #[derive(Event)]
+    struct AgentIdObjectId(EntityId, EntityId);
+
+    fn no_agent_test_system(query: Query<(
+        Entity,
+        &Type,
+        &Location,
+        &Size,
+        Option<&Energy>,
+    )>,
+    mut object_ids: EventReader<AgentIdObjectId>,
+    ){
+        for &AgentIdObjectId(agent_id, object_id) in object_ids.read() {
+            let x = use_object(&query, agent_id, object_id);
+
+            assert_eq!(x, None)
+//            assert_eq!(x, Return::ActionInvalid("Agent not found!".into()))
+        }
+
+    }
 
     #[test]
     pub fn no_agent_test() {
-        let acts = get_interactions::<Command>();
-        let world = World::new(
-            HashMap::new(),
-            HashMap::new(),
-            HashMap::new(),
-            HashMap::new(),
-            HashMap::from([(0, Item::Food)]),
-            HashMap::new(),
+        std::env::set_var("RUST_BACKTRACE", "1");
+        let mut app = App::new();
+        app.add_event::<AgentIdObjectId>();
+        app.add_systems(Update, no_agent_test_system);
+        let object_id = app
+            .world_mut()
+            .spawn(Type(Item::Food))
+            .id();
+        let mut events = app.world_mut().resource_mut::<Events<AgentIdObjectId>>();
+        events.send(
+            AgentIdObjectId(
+                Entity::from_raw(0), 
+                object_id
+            )
         );
-        let x = (acts[0].act)(42, 0, &world);
-        assert_eq!(x, Return::ActionInvalid("Agent not found!".into()))
+        app.update();
+
     }
+    /*
     #[test]
     pub fn someones_else_object_test() {
         let acts = get_interactions::<Command>();
@@ -235,4 +290,5 @@ mod tests {
         let x = (acts[0].act)(0, 42, &world);
         assert_eq!(x, Return::ActionInvalid("object's type not found!".into()))
     }
+    */
 }

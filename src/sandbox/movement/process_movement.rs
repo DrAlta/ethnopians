@@ -6,12 +6,12 @@ use broad_phase::{AARect, Entity, AABB};
 use qol::logy;
 
 use crate::{
-    sandbox::{world::{Movement, Size}, Command, EntityId, Location, Return},
+    sandbox::{world::{Movement, Size}, EntityId, Location},
     Vec2,
 };
 
 use super::{moveit, setup_avals_map, Prev};
-pub fn ai_system(
+pub fn process_movement(
     mut query: Query<(
         EntityId,
         Option<&Movement>, 
