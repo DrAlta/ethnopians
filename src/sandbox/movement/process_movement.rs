@@ -13,11 +13,12 @@ use crate::{
 use super::{moveit, setup_avals_map, Prev};
 pub fn ai_system(
     mut query: Query<(
-        EntityId, 
+        EntityId,
         Option<&Movement>, 
-        Option<&Location>,
+        Option<&mut Location>,
         &Size
     )>,
+    mut commands: Commands,
 ) {
     let max_step = 5.0;
     let time_step = 1.0;
@@ -63,43 +64,46 @@ pub fn ai_system(
             }
         )
         .collect();
-    Leaving_off_here_for_the_night
+
     let mut froms = HashMap::<EntityId, Entity>::new();
     #[allow(unused_mut)]
     let mut history = Vec::new();
     let mut last_froms = HashMap::<EntityId, (f32, f32)>::new();
     for step_number in 1..(number_of_substeps as usize + 1) {
         logy!("debug-process-movement", "processing step {step_number}");
-        let desired = world.movement_iter().filter_map(
+        let desired = query.iter().filter_map(
             |
                 (
                     unit_id,
-                    (
-                        (tx,ty),
-                        speed
-                    )
+                    movement_maybe,
+                    location_maybe,
+                    _,
                 )
             | {
-                if collisions.contains_key(unit_id) || rearendings.contains_key(unit_id) {
-                logy!("debug-process-movement", "this is an early out if this unit already has a collision which has been carried over since the last substep");
-                    return None;
-                }
-                let Some(Location::World { x, y }) = world.get_location(unit_id) else {
-                    logy!("debug-process-movement", "the unit doesn't have a location in the world");
-                    return None;
-                };
-                let step_dist = speed * time_substep * step_number as f32;
-                let target_vec= Vec2{x: *tx, y: *ty};
-                let origin_vec = Vec2{x:*x, y:*y};
+                if let Some(Movement{ target: Vec2{x: tx, y: ty}, speed}) = movement_maybe {
+                    if collisions.contains_key(&unit_id) || rearendings.contains_key(&unit_id) {
+                    logy!("debug-process-movement", "this is an early out if this unit already has a collision which has been carried over since the last substep");
+                        return None;
+                    }
+                    let Some(Location::World { x, y }) = location_maybe else {
+                        logy!("debug-process-movement", "the unit doesn't have a location in the world");
+                        return None;
+                    };
+                    let step_dist = speed * time_substep * step_number as f32;
+                    let target_vec= Vec2{x: *tx, y: *ty};
+                    let origin_vec = Vec2{x:*x, y:*y};
 
-                let delta = (target_vec - origin_vec).normalize() * step_dist;
-                if (target_vec - origin_vec).length_squared() < (step_dist * step_dist) + f32::EPSILON {
-                    logy!("debug-process-movement", " the unit is moving more that the distance to the target so returning the target");
-                    Some((unit_id.clone(), (target_vec.x, target_vec.y)))
+                    let delta = (target_vec - origin_vec).normalize() * step_dist;
+                    if (target_vec - origin_vec).length_squared() < (step_dist * step_dist) + f32::EPSILON {
+                        logy!("debug-process-movement", " the unit is moving more that the distance to the target so returning the target");
+                        Some((unit_id.clone(), (target_vec.x, target_vec.y)))
+                    } else {
+                        logy!("debug-process-movement", "the unit is moving less that the distance to the target so returning the origin + (direction_of_motion * distance_traveled)");
+                        let step = Vec2{x:*x, y:*y} + delta;
+                        Some((unit_id.clone(), (step.x, step.y)))
+                    }
                 } else {
-                    logy!("debug-process-movement", "the unit is moving less that the distance to the target so returning the origin + (direction_of_motion * distance_traveled)");
-                    let step = Vec2{x:*x, y:*y} + delta;
-                    Some((unit_id.clone(), (step.x, step.y)))
+                    None
                 }
             }
         )
@@ -107,10 +111,15 @@ pub fn ai_system(
 
         let (avals, map) = setup_avals_map(collisions, rearendings);
         [froms, collisions, rearendings] = if step_number == 1 {
-            moveit(desired, avals, map, world)
+            moveit(desired, avals, map, &query)
         } else {
             let prev = Previous {
-                sizes: world.raw_sizes(),
+                sizes: query
+                    .iter()
+                    .filter_map(
+                        |(id, _, _, Size{ width, height })| 
+                        Some((id, (*width as f32, *height  as f32)))
+                    ).collect(),
                 locations: &last_froms,
             };
             moveit(desired, avals, map, &prev)
@@ -123,36 +132,48 @@ pub fn ai_system(
         #[cfg(feature = "move_history")]
         history.push([froms.clone(), collisions.clone(), rearendings.clone()]);
     }
-    let mut commands = Vec::new();
+    let mut moves = Vec::new();
     for (unit_id, entity) in froms {
         let Entity::AARect(AARect { min_x, min_y, .. }) = entity else {
             continue;
         };
-        let Some(Location::World { x, y }) = world.get_location(&unit_id) else {
+        let Some((x, y)) = query.get_location(unit_id) else {
             continue;
         };
         if (min_x - x).abs() > f32::EPSILON || (min_y - y).abs() > f32::EPSILON {
-            commands.push(Command::SetLocation {
-                agent_id: unit_id,
-                loc: Location::World { x: min_x, y: min_y },
-            });
+            moves.push((
+                unit_id,
+                (min_x, min_y ),
+            ));
         }
     }
-    (Return::Commands(commands), history)
+    for (id, (x, y)) in moves {
+        let Ok((_,_, location_maybe, _))= query.get_mut(id) else {
+            continue
+        };
+        let new_loc = Location::World { x, y };
+        if let Some(mut location) = location_maybe {
+            let loc = location.as_mut();
+            *loc = new_loc;
+        } else {
+            commands.entity(id).insert(new_loc);
+        }
+
+    }
 }
 
 struct Previous<'a> {
-    pub sizes: &'a HashMap<EntityId, (f32, f32)>,
+    pub sizes: HashMap<EntityId, (f32, f32)>,
     pub locations: &'a HashMap<EntityId, (f32, f32)>,
 }
 impl<'a> Prev for Previous<'a> {
-    fn get_location(&self, id: &EntityId) -> Option<(f32, f32)> {
-        let (x, y) = self.locations.get(id)?;
+    fn get_location(&self, id: EntityId) -> Option<(f32, f32)> {
+        let (x, y) = self.locations.get(&id)?;
         Some((*x, *y))
     }
 
-    fn get_size(&self, id: &EntityId) -> Option<(f32, f32)> {
-        let (w, h) = self.sizes.get(id)?;
+    fn get_size(&self, id: EntityId) -> Option<(f32, f32)> {
+        let (w, h) = self.sizes.get(&id)?;
         Some((*w, *h))
     }
 }

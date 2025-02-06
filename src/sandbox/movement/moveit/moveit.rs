@@ -24,7 +24,7 @@ pub fn moveit<T: Prev>(
     prev: &T,
 ) -> [HashMap<EntityId, Entity>; 3] {
     for (unit_id, destination) in desired {
-        let Some(size) = prev.get_size(&unit_id) else {
+        let Some(size) = prev.get_size(unit_id) else {
             continue;
         };
         let q = map.qurry(
@@ -49,7 +49,7 @@ pub fn moveit<T: Prev>(
                             prev,
                         );
                     };
-                    if let Some((x, y)) = prev.get_location(&o2) {
+                    if let Some((x, y)) = prev.get_location(o2) {
                         logy!(
                             "trace-moveit",
                             "putting Rearended in at the original location"
@@ -83,7 +83,7 @@ pub fn moveit<T: Prev>(
             println!("here");
             logy!("trace-moveit", "the unit colided with something");
             dest_aval = Avalibility::Collision(unit_id.clone());
-            if let Some((x, y)) = prev.get_location(&unit_id) {
+            if let Some((x, y)) = prev.get_location(unit_id) {
                 logy!(
                     "trace-moveit",
                     "putting Rearended in at the original location"
