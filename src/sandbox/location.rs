@@ -1,6 +1,8 @@
-use super::EntityId;
+use bevy::prelude::*;
 
-#[derive(Debug, PartialEq, PartialOrd, Clone)]
+use crate::sandbox::EntityId;
+
+#[derive(Component, Debug, PartialEq, PartialOrd, Clone)]
 pub enum Location {
     Inventory(EntityId),
     World { x: f32, y: f32 },

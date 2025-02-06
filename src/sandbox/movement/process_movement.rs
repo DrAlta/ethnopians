@@ -1,38 +1,69 @@
 use std::collections::HashMap;
 
+use bevy::prelude::*;
+
 use broad_phase::{AARect, Entity, AABB};
 use qol::logy;
 
 use crate::{
-    sandbox::{Command, EntityId, Location, Return, World},
+    sandbox::{world::{Movement, Size}, Command, EntityId, Location, Return},
     Vec2,
 };
 
 use super::{moveit, setup_avals_map, Prev};
+pub fn ai_system(
+    mut query: Query<(
+        EntityId, 
+        Option<&Movement>, 
+        Option<&Location>,
+        &Size
+    )>,
+) {
+    let max_step = 5.0;
+    let time_step = 1.0;
 
-pub fn process_movement(
-    max_step: f32,
-    time_step: f32,
-    world: &World,
-) -> (Return<Command>, Vec<[HashMap<EntityId, Entity>; 3]>) {
+
     #[cfg(feature = "move_history")]
     logy!("debug-process-movement", "Going tosaving histoy");
 
-    let number_of_substeps = world.movement_iter().fold(1_f32, |x, (_, (_, speed))| {
-        let step_dist = speed * time_step;
-        logy!(
-            "debug-process-movement",
-            "step_dist / max_step = {} / {} = {}",
-            step_dist,
-            max_step,
-            step_dist / max_step
-        );
-        x.max((step_dist / max_step).ceil())
+    let number_of_substeps = query.iter().fold(1_f32, |x, (_, movement_maybe, _, _)| {
+        if let Some(Movement{ target, speed }) = movement_maybe {
+            let step_dist = speed * time_step;
+            logy!(
+                "debug-process-movement",
+                "step_dist / max_step = {} / {} = {}",
+                step_dist,
+                max_step,
+                step_dist / max_step
+            );
+            x.max((step_dist / max_step).ceil())
+        } else {
+            x
+        }
     });
     let time_substep = time_step / number_of_substeps;
 
     let mut rearendings = HashMap::<EntityId, Entity>::new();
-    let mut collisions = HashMap::<EntityId, Entity>::new();
+    let mut collisions: HashMap::<EntityId, Entity> = query
+        .iter()
+        .filter_map(
+            |(
+                id, 
+                movement_maybe, 
+                location_maybe,
+                size
+            )| {
+                match (movement_maybe, location_maybe) {
+                    (None, Some(Location::World { x, y })) => {
+                        let entity = Entity::AARect(AARect { min_x: *x, min_y: *y, width: size.width as f32, height: size.height as f32 });
+                        Some((id, entity))
+                    },
+                    (_, _) => None,
+                }
+            }
+        )
+        .collect();
+    Leaving_off_here_for_the_night
     let mut froms = HashMap::<EntityId, Entity>::new();
     #[allow(unused_mut)]
     let mut history = Vec::new();
@@ -84,24 +115,6 @@ pub fn process_movement(
             };
             moveit(desired, avals, map, &prev)
         };
-        /*
-        for unit_id in collisions.keys() {
-            if let Some((_, entity)) = last_froms.iter().find(|&(k, _)|{
-                k == unit_id
-            }) {
-                rearendings.insert(unit_id.clone(), entity.clone());
-            } else if let (
-                Some(Location::World { x, y }),
-                Some((w,h))
-            ) = (
-                world.get_location(unit_id),
-                world.get_size(unit_id)
-            ) {
-                let readended_entity = Entity::AARect(AARect::new(*x, *y, *w, *h));
-                rearendings.insert(unit_id.clone(), readended_entity);
-            }
-        }
-        */
 
         last_froms = froms
             .iter()
@@ -111,18 +124,6 @@ pub fn process_movement(
         history.push([froms.clone(), collisions.clone(), rearendings.clone()]);
     }
     let mut commands = Vec::new();
-    /*
-    for (unit_id, entity) in rearendings {
-        let Entity::AARect(AARect{ min_x, min_y, .. }) = entity else {
-            continue;
-        };
-        let Some(Location::World { x, y }) = world.get_location(&unit_id) else {
-            continue;
-        };
-        if (min_x - x).abs() > f32::EPSILON || (min_y - y).abs() > f32::EPSILON {
-            commands.push(Command::SetLocation { agent_id: unit_id, loc: Location::World { x: min_x, y: min_y } });
-        }
-    }*/
     for (unit_id, entity) in froms {
         let Entity::AARect(AARect { min_x, min_y, .. }) = entity else {
             continue;

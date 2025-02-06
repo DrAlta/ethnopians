@@ -46,8 +46,8 @@ mod sandbox;
 use sandbox::within_range;
 mod use_object;
 pub use use_object::UseObject;
-mod world;
-pub use world::World;
 
-pub type EntityId = usize;
+mod world;
+
+pub type EntityId = bevy::prelude::Entity;
 pub type ItemClass = String;
