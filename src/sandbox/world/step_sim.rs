@@ -14,5 +14,6 @@ impl World {
                 self.execute_commands(movement_commands);
             }
         }
+        self.pop_spatial_bloom();
     }
 }
