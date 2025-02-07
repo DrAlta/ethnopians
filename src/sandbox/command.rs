@@ -1,9 +1,11 @@
 use bevy::prelude::*;
+mod foo;
 
 
 use crate::sandbox::{EntityId, Item, Location};
 
 mod use_object;
+pub use use_object::use_object_system;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub enum Command {

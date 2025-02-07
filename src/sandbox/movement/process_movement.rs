@@ -28,7 +28,7 @@ pub fn process_movement(
     logy!("debug-process-movement", "Going tosaving histoy");
 
     let number_of_substeps = query.iter().fold(1_f32, |x, (_, movement_maybe, _, _)| {
-        if let Some(Movement{ target, speed }) = movement_maybe {
+        if let Some(Movement{ target:_, speed }) = movement_maybe {
             let step_dist = speed * time_step;
             logy!(
                 "debug-process-movement",
