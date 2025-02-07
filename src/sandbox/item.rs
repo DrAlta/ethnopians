@@ -34,9 +34,8 @@ impl std::fmt::Display for Item {
 }
 
 impl TryFrom<&str> for Item {
-    
     type Error = ();
-    
+
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         Ok(if value.eq_ignore_ascii_case("Agent") {
             Item::Agent
@@ -57,7 +56,7 @@ impl TryFrom<&str> for Item {
         } else if value.eq_ignore_ascii_case("Veggie") {
             Item::Veggie
         } else {
-            return Err(())
+            return Err(());
         })
     }
 }

@@ -1,9 +1,11 @@
-use bevy::prelude::*;
-mod foo;
-
-
 use crate::sandbox::{EntityId, Item, Location};
 
+mod action_id;
+pub use action_id::ActionId;
+mod posible_actions_request;
+pub use posible_actions_request::PosibleActionsRequest;
+mod posible_actions_responce;
+pub use posible_actions_responce::PosibleActionsResponce;
 mod use_object;
 pub use use_object::use_object_system;
 
@@ -16,22 +18,4 @@ pub enum Command {
     Heal { agent_id: EntityId, ammount: i32 },
 
     SetLocation { agent_id: EntityId, loc: Location },
-}
-
-#[derive(Debug, PartialEq, PartialOrd, Clone)]
-pub enum ActionId {
-    UseObject,
-}
-
-
-#[derive(Event, Debug)]
-pub struct PosibleActionsRequest {
-    pub agent_id: EntityId,
-    pub target_id: EntityId,
-}
-#[derive(Event, Debug)]
-pub struct PosibleActionsResponce {
-    pub agent_id: EntityId,
-    pub target_id: EntityId,
-    pub action_id: ActionId,
 }

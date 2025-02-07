@@ -9,7 +9,6 @@ pub use types::{vec2, Vec2};
 #[cfg(feature = "bevy")]
 pub use bevy::math::{vec2, Vec2};
 
-
 #[cfg(feature = "macroquad")]
 pub use macroquad::math::{vec2, Vec2};
 

@@ -6,29 +6,26 @@ use broad_phase::{AARect, Entity, AABB};
 use qol::logy;
 
 use crate::{
-    sandbox::{world::{Movement, Size}, EntityId, Location},
+    sandbox::{
+        world::{Movement, Size},
+        EntityId, Location,
+    },
     Vec2,
 };
 
 use super::{moveit, setup_avals_map, Prev};
 pub fn process_movement(
-    mut query: Query<(
-        EntityId,
-        Option<&Movement>, 
-        Option<&mut Location>,
-        &Size
-    )>,
+    mut query: Query<(EntityId, Option<&Movement>, Option<&mut Location>, &Size)>,
     mut commands: Commands,
 ) {
     let max_step = 5.0;
     let time_step = 1.0;
 
-
     #[cfg(feature = "move_history")]
     logy!("debug-process-movement", "Going tosaving histoy");
 
     let number_of_substeps = query.iter().fold(1_f32, |x, (_, movement_maybe, _, _)| {
-        if let Some(Movement{ target:_, speed }) = movement_maybe {
+        if let Some(Movement { target: _, speed }) = movement_maybe {
             let step_dist = speed * time_step;
             logy!(
                 "debug-process-movement",
@@ -45,24 +42,22 @@ pub fn process_movement(
     let time_substep = time_step / number_of_substeps;
 
     let mut rearendings = HashMap::<EntityId, Entity>::new();
-    let mut collisions: HashMap::<EntityId, Entity> = query
+    let mut collisions: HashMap<EntityId, Entity> = query
         .iter()
-        .filter_map(
-            |(
-                id, 
-                movement_maybe, 
-                location_maybe,
-                size
-            )| {
-                match (movement_maybe, location_maybe) {
-                    (None, Some(Location::World { x, y })) => {
-                        let entity = Entity::AARect(AARect { min_x: *x, min_y: *y, width: size.width as f32, height: size.height as f32 });
-                        Some((id, entity))
-                    },
-                    (_, _) => None,
+        .filter_map(|(id, movement_maybe, location_maybe, size)| {
+            match (movement_maybe, location_maybe) {
+                (None, Some(Location::World { x, y })) => {
+                    let entity = Entity::AARect(AARect {
+                        min_x: *x,
+                        min_y: *y,
+                        width: size.width as f32,
+                        height: size.height as f32,
+                    });
+                    Some((id, entity))
                 }
+                (_, _) => None,
             }
-        )
+        })
         .collect();
 
     let mut froms = HashMap::<EntityId, Entity>::new();
@@ -116,10 +111,10 @@ pub fn process_movement(
             let prev = Previous {
                 sizes: query
                     .iter()
-                    .filter_map(
-                        |(id, _, _, Size{ width, height })| 
-                        Some((id, (*width as f32, *height  as f32)))
-                    ).collect(),
+                    .filter_map(|(id, _, _, Size { width, height })| {
+                        Some((id, (*width as f32, *height as f32)))
+                    })
+                    .collect(),
                 locations: &last_froms,
             };
             moveit(desired, avals, map, &prev)
@@ -141,15 +136,12 @@ pub fn process_movement(
             continue;
         };
         if (min_x - x).abs() > f32::EPSILON || (min_y - y).abs() > f32::EPSILON {
-            moves.push((
-                unit_id,
-                (min_x, min_y ),
-            ));
+            moves.push((unit_id, (min_x, min_y)));
         }
     }
     for (id, (x, y)) in moves {
-        let Ok((_,_, location_maybe, _))= query.get_mut(id) else {
-            continue
+        let Ok((_, _, location_maybe, _)) = query.get_mut(id) else {
+            continue;
         };
         let new_loc = Location::World { x, y };
         if let Some(mut location) = location_maybe {
@@ -158,7 +150,6 @@ pub fn process_movement(
         } else {
             commands.entity(id).insert(new_loc);
         }
-
     }
 }
 

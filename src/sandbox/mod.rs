@@ -27,11 +27,11 @@ pub const MAX_ENERGY: i32 = 100;
 //pub mod ai;
 //pub mod interaction;
 
+mod actions;
+pub use actions::{use_object_system, ActionId, Command};
 mod acts;
 pub use acts::Acts;
 //pub mod collision;
-mod command;
-pub use command::{Command, use_object_system};
 pub mod forth;
 mod item;
 pub use item::Item;
