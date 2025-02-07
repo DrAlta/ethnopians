@@ -3,11 +3,30 @@ use qol::logy;
 
 use crate::sandbox::{
     within_range,
-    world::{Energy, Size, Type},
+    world::{Energy, Hp, Size, Type},
     EntityId, Item, Location, MAX_ENERGY,
 };
 
-use super::{Command, PosibleActionsRequest, PosibleActionsResponce};
+use super::{PosibleActionsRequest, PosibleActionsResponce};
+
+#[derive(Debug, PartialEq, PartialOrd, Clone)]
+enum Command {
+    RemoveAndAddToInvetory{
+        remove:EntityId,
+        inventory: EntityId,
+        item: Item,
+    },
+    Heal{
+        agent_id: EntityId,
+        energy: i32,
+        hp: i32,
+    },
+    Rest {
+        agent_id: EntityId,
+        amount: i32
+    }
+}
+
 
 #[derive(Event, Debug)]
 pub struct UseRequest {
@@ -16,10 +35,11 @@ pub struct UseRequest {
 }
 
 pub fn use_object_system(
-    query: Query<(Entity, &Type, &Location, Option<&Size>, Option<&Energy>)>,
-    use_requests: EventReader<UseRequest>,
+    mut query: Query<(Entity, &Type, &Location, Option<&Size>, Option<&mut Energy>, Option<&mut Hp>)>,
+    mut use_requests: EventReader<UseRequest>,
     mut posible_actions_requests: EventReader<PosibleActionsRequest>,
     mut posible_actions_responce: EventWriter<PosibleActionsResponce>,
+    mut commands: Commands,
 ) {
     println!(
         "-----\nuse_system\n-----{:?} : {:?}",
@@ -47,14 +67,54 @@ pub fn use_object_system(
         }
         {}
     }
+    for UseRequest { agent_id, target_id } in use_requests.read()
+    {
+        match use_object(&query, *agent_id, *target_id) {
+            Ok(command) => {
+                match command {
+                    Command::RemoveAndAddToInvetory { remove, inventory, item } => {
+                        commands.entity(remove).despawn();
+                        commands.spawn((
+                            Type(item),
+                            Location::Inventory(inventory)
+                        ));
+                    },
+                    Command::Heal { agent_id, energy, hp } => {
+                        if let Ok((_, _, _, _, energy_maybe, hp_maybe)) = query.get_mut(agent_id) {
+                            if let Some(mut object_energy) = energy_maybe {
+                                let Energy(x) = object_energy.as_mut();
+                                *x += energy;
+                            }
+                            if let Some(mut object_hp) = hp_maybe {
+                                let Hp(x) = object_hp.as_mut();
+                                *x += hp;
+                            }
+                        }
+                    },
+                    Command::Rest { agent_id, amount } => {
+                        if let Ok((_, _, _, _, energy_maybe, _)) = query.get_mut(agent_id) {
+                            if let Some(mut object_energy) = energy_maybe {
+                                let Energy(x) = object_energy.as_mut();
+                                *x += amount;
+                            }
+                        }
+                    },
+                }
+            }
+            Err(err) => {
+                logy!("trace", "{err}");
+            }
+        }
+        {}
+    }
 }
 fn use_object(
-    query: &Query<(Entity, &Type, &Location, Option<&Size>, Option<&Energy>)>,
+    query: &Query<(Entity, &Type, &Location, Option<&Size>, Option<&mut Energy>, Option<&mut Hp>)>,
     agent_id: EntityId,
     object_id: EntityId,
-) -> Result<Vec<Command>, String> {
+) -> Result<Command, String> {
     // get the agent
-    let Ok((_, Type(Item::Agent), _, _, _)) = query.get(agent_id) else {
+    let Ok((_, Type(Item::Agent), _, _, _, _)) = query.get(agent_id) else {
         return Err("Agent not found!".to_owned());
     };
 
@@ -62,7 +122,7 @@ fn use_object(
     // if not check if it's in range of the agent.
     match query.get(object_id) {
         // the object is in an inventory, so check if it's the agents' inventory
-        Ok((_, _, Location::Inventory(inventory), _, _)) => {
+        Ok((_, _, Location::Inventory(inventory), _, _, _)) => {
             // is it the agents' inventory
             if inventory != &agent_id {
                 return Err("Object in someone else's inventory".to_owned());
@@ -78,6 +138,7 @@ fn use_object(
             },
             _,
             _,
+            _,
         )) => {
             // get the agent's location in the world.
             let Ok((
@@ -89,13 +150,14 @@ fn use_object(
                 },
                 _,
                 _,
+                _,
             )) = query.get(agent_id)
             else {
                 return Err("Actor not in the world with object".to_owned());
             };
             // check is they are within range
             let (agent_center_x, agent_center_y) =
-                if let Ok((_, _, _, Some(size), _)) = query.get(agent_id) {
+                if let Ok((_, _, _, Some(size), _, _)) = query.get(agent_id) {
                     (
                         agent_x + (size.width as f32 * 0.5),
                         agent_y + (size.height as f32 * 0.5),
@@ -104,7 +166,7 @@ fn use_object(
                     (*agent_x, *agent_y)
                 };
             let (object_center_x, object_center_y) =
-                if let Ok((_, _, _, Some(size), _)) = query.get(agent_id) {
+                if let Ok((_, _, _, Some(size), _, _)) = query.get(agent_id) {
                     (
                         object_x + (size.width as f32 * 0.5),
                         object_y + (size.height as f32 * 0.5),
@@ -128,7 +190,7 @@ fn use_object(
         }
     }
     // get the object's type
-    let Ok((_, Type(object), _, _, _)) = query.get(object_id) else {
+    let Ok((_, Type(object), _, _, _, _)) = query.get(object_id) else {
         return Err("object's type not found!".to_owned());
     };
     // decide what to do based on the objects type
@@ -141,27 +203,28 @@ fn use_object(
         Item::Wood => todo!(),
         // the objet was a house, agent will sleep in it to regain energy and maybe health
         Item::House => {
-            let Ok((_, _, _, _, Some(Energy(energy)))) = query.get(agent_id) else {
+            let Ok((_, _, _, _, Some(Energy(energy)), _)) = query.get(agent_id) else {
                 return Err("agent doesn't have energy".to_owned());
             };
             let excess = ((energy + 10) - MAX_ENERGY).max(0);
             let rest: i32 = 10 - excess;
-            let mut ret = vec![Command::Rest {
-                agent_id,
-                ammount: rest,
-            }];
 
-            if excess != 0 {
-                ret.push(Command::Heal {
+            return Ok(if excess != 0 {
+                Command::Heal {
                     agent_id,
-                    ammount: excess,
-                })
-            }
-            return Ok(ret);
+                    energy: rest,
+                    hp: excess,
+                }
+            } else {
+                Command::Rest {
+                    agent_id,
+                    amount: rest,
+                }
+            });
         }
         Item::Tree => {
-            let Some(_axe_idx) = query.iter().find_map(|(idx, Type(obj), _, _, _)| {
-                let Ok((_, _, Location::Inventory(loc_id), _, _)) = query.get(idx) else {
+            let Some(_axe_idx) = query.iter().find_map(|(idx, Type(obj), _, _, _, _)| {
+                let Ok((_, _, Location::Inventory(loc_id), _, _, _)) = query.get(idx) else {
                     return None;
                 };
                 if obj == &Item::Axe && agent_id == *loc_id {
@@ -172,22 +235,16 @@ fn use_object(
             }) else {
                 return Err("Agent doesn't have an axe!".to_owned());
             };
-            return Ok(vec![
-                Command::Remove(object_id),
-                Command::AddItem {
-                    item: Item::Wood,
-                    loc: Location::Inventory(agent_id),
-                },
-            ]);
+            return Ok(Command::RemoveAndAddToInvetory { 
+                remove: object_id, 
+                inventory: agent_id, 
+                item: Item::Wood });
         }
         Item::Veggie => {
-            return Ok(vec![
-                Command::Remove(object_id),
-                Command::AddItem {
-                    item: Item::Food,
-                    loc: Location::Inventory(agent_id),
-                },
-            ])
+            return Ok(Command::RemoveAndAddToInvetory { 
+                remove: object_id, 
+                inventory: agent_id, 
+                item: Item::Food });
         }
     }
 }

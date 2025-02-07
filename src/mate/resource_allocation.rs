@@ -6,7 +6,7 @@ type AgentId = usize;
 /// in the ideal situation the portial og what we give a mate will be propotinal to what we invested
 /// so we compare the actual share to the black slate to account for the change of the mates value
 /// this also add response of not investing in investing in someone who we aren't effective in investing in
-/// and also makes us more responsive to the reletive ammount of attention given us as if they are giving more that the other then the share will get a boost which then couses us to invest more into them whou should couse us to give them more
+/// and also makes us more responsive to the reletive amount of attention given us as if they are giving more that the other then the share will get a boost which then couses us to invest more into them whou should couse us to give them more
 pub fn compute_investment(
     values: &HashMap<AgentId, Number>,
     recieved: &HashMap<AgentId, Number>,
