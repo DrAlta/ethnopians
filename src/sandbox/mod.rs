@@ -31,6 +31,7 @@ mod actions;
 pub use actions::{use_object_system, ActionId};
 mod acts;
 pub use acts::Acts;
+pub mod change_request;
 //pub mod collision;
 pub mod forth;
 mod item;
@@ -48,7 +49,7 @@ use sandbox::within_range;
 mod use_object;
 pub use use_object::UseObject;
 */
-mod world;
+pub mod world;
 
 pub type EntityId = bevy::prelude::Entity;
 pub type ItemClass = String;

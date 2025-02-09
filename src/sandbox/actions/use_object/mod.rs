@@ -1,5 +1,3 @@
-mod command;
-pub use command::Command;
 mod use_object;
 use use_object::use_object;
 mod use_object_system;
