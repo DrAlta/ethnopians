@@ -4,9 +4,14 @@ use bevy::prelude::*;
 use qol::logy;
 
 use crate::sandbox::{
-    actions::{use_object::{use_object, UseRequest}, PosibleActionsRequest, PosibleActionsResponce}, change_request::ChangeRequest, world::{Energy, Size, Type}, ActionId, Location
+    actions::{
+        use_object::{use_object, UseRequest},
+        ActionId, PosibleActionsRequest, PosibleActionsResponce,
+    },
+    change_request::ChangeRequest,
+    world::{Energy, Size, Type},
+    Location,
 };
-
 
 pub fn use_object_system(
     query: Query<(Entity, &Type, &Location, Option<&Size>, Option<&Energy>)>,
@@ -16,8 +21,12 @@ pub fn use_object_system(
     mut commands: Commands,
 ) {
     logy!("trace-use-object", "entering use_object_syetem");
-    let salt =0 ;
-    for UseRequest { agent_id, target_id } in use_requests.read() {
+    let salt = 0;
+    for UseRequest {
+        agent_id,
+        target_id,
+    } in use_requests.read()
+    {
         let mut s = DefaultHasher::new();
         salt.hash(&mut s);
         "Use".hash(&mut s);
@@ -28,10 +37,17 @@ pub fn use_object_system(
         match use_object(&query, *agent_id, *target_id) {
             Ok((contentious_entities, changes)) => {
                 logy!("trace-use-object", "{agent_id:?} used {target_id:?}");
-                commands.send_event(ChangeRequest{hash, contentious_entities, changes});
+                commands.send_event(ChangeRequest {
+                    hash,
+                    contentious_entities,
+                    changes,
+                });
             }
             Err(_err) => {
-                logy!("trace-use-object", "{agent_id:?} failed toto use {target_id:?} because:{_err}");
+                logy!(
+                    "trace-use-object",
+                    "{agent_id:?} failed toto use {target_id:?} because:{_err}"
+                );
             }
         }
         {}
@@ -43,7 +59,10 @@ pub fn use_object_system(
     {
         match use_object(&query, *agent_id, *target_id) {
             Ok(_) => {
-                logy!("trace-use-object", "sending respone that {agent_id:?} is able to use {target_id:?}");
+                logy!(
+                    "trace-use-object",
+                    "sending respone that {agent_id:?} is able to use {target_id:?}"
+                );
                 posible_actions_responce.send(PosibleActionsResponce {
                     agent_id: *agent_id,
                     target_id: *target_id,
@@ -51,7 +70,10 @@ pub fn use_object_system(
                 });
             }
             Err(_err) => {
-                logy!("trace-use-object", "{agent_id:?} is unable to use {target_id:?} because:{_err}");
+                logy!(
+                    "trace-use-object",
+                    "{agent_id:?} is unable to use {target_id:?} because:{_err}"
+                );
             }
         }
         {}

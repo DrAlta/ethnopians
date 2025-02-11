@@ -17,7 +17,7 @@ pub fn derive_change_structs(input: TokenStream) -> TokenStream {
                     Fields::Unnamed(fields) => {
                         let types = fields.unnamed.iter().map(|field| &field.ty);
                         quote! {
-                            #[derive(Debug,bevy::prelude::Event, PartialEq)]
+                            #[derive(Debug, Clone, bevy::prelude::Event, PartialEq)]
                             pub struct #struct_name(#(#types),*);
                         }
                     },
@@ -28,7 +28,7 @@ pub fn derive_change_structs(input: TokenStream) -> TokenStream {
                             quote! { pub #name: #ty }
                         });
                         quote! {
-                            #[derive(Debug,bevy::prelude::Event, PartialEq)]
+                            #[derive(Debug, Clone, bevy::prelude::Event, PartialEq)]
                             pub struct #struct_name {
                                 #(#named_fields),*
                             }

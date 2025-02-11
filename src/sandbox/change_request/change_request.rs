@@ -2,8 +2,7 @@ use std::collections::BTreeSet;
 
 use bevy::prelude::*;
 
-use crate::sandbox::{EntityId, change_request::Changes};
-
+use crate::sandbox::{change_request::Changes, EntityId};
 
 #[derive(Debug, Event, PartialEq)]
 pub struct ChangeRequest {

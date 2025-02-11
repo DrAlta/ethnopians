@@ -27,8 +27,7 @@ pub const MAX_ENERGY: i32 = 100;
 //pub mod ai;
 //pub mod interaction;
 
-mod actions;
-pub use actions::{use_object_system, ActionId};
+pub mod actions;
 mod acts;
 pub use acts::Acts;
 pub mod change_request;
@@ -38,6 +37,7 @@ mod item;
 pub use item::Item;
 mod location;
 pub use location::Location;
+pub mod inventory;
 mod movement;
 pub use movement::{process_movement, Prev};
 mod r#return;

@@ -1,5 +1,5 @@
 mod use_object;
-use use_object::use_object;
+pub use use_object::use_object;
 mod use_object_system;
 pub use use_object_system::use_object_system;
 mod use_request;

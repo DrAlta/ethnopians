@@ -9,14 +9,11 @@ use crate::sandbox::{
     EntityId, Item, Location, MAX_ENERGY,
 };
 
-
-
-
 pub fn use_object(
     query: &Query<(Entity, &Type, &Location, Option<&Size>, Option<&Energy>)>,
     agent_id: EntityId,
     object_id: EntityId,
-) -> Result<(BTreeSet::<EntityId>, Vec<Changes>), String> {
+) -> Result<(BTreeSet<EntityId>, Vec<Changes>), String> {
     // get the agent
     let Ok((_, Type(Item::Agent), _, _, _)) = query.get(agent_id) else {
         return Err("Agent not found!".to_owned());
@@ -33,18 +30,27 @@ pub fn use_object(
             }
         }
         // THe object is in the world, so check if it is in range of the agent
-        Ok(( _, _, 
+        Ok((
+            _,
+            _,
             Location::World {
                 x: object_x,
                 y: object_y,
             },
-            _, _ )) => {
+            _,
+            _,
+        )) => {
             // get the agent's location in the world.
-            let Ok(( _, _,
+            let Ok((
+                _,
+                _,
                 Location::World {
                     x: agent_x,
                     y: agent_y,
-                }, _, _ )) = query.get(agent_id)
+                },
+                _,
+                _,
+            )) = query.get(agent_id)
             else {
                 return Err("Actor not in the world with object".to_owned());
             };
@@ -102,11 +108,17 @@ pub fn use_object(
             let excess = ((energy + 10) - MAX_ENERGY).max(0);
             let rest: i32 = 10 - excess;
 
-            let mut changes = vec![Changes::Energy{entity_id: agent_id, delta: rest}];
+            let mut changes = vec![Changes::Energy {
+                entity_id: agent_id,
+                delta: rest,
+            }];
             if excess != 0 {
-                changes.push(Changes::Hp{entity_id: agent_id, delta: excess})
+                changes.push(Changes::Hp {
+                    entity_id: agent_id,
+                    delta: excess,
+                })
             };
-            return Ok((BTreeSet::new(), changes))
+            return Ok((BTreeSet::new(), changes));
         }
         Item::Tree => {
             let Some(_axe_idx) = query.iter().find_map(|(idx, Type(obj), _, _, _)| {
@@ -123,14 +135,20 @@ pub fn use_object(
             };
             let changes = vec![
                 Changes::Despawn(object_id),
-                Changes::SpawnLocationType{location: Location::Inventory(agent_id), tyep: Item::Wood}
+                Changes::SpawnLocationType {
+                    location: Location::Inventory(agent_id),
+                    tyep: Item::Wood,
+                },
             ];
             return Ok((BTreeSet::from([object_id]), changes));
         }
         Item::Veggie => {
             let changes = vec![
                 Changes::Despawn(object_id),
-                Changes::SpawnLocationType{location: Location::Inventory(agent_id), tyep: Item::Food}
+                Changes::SpawnLocationType {
+                    location: Location::Inventory(agent_id),
+                    tyep: Item::Food,
+                },
             ];
             return Ok((BTreeSet::from([object_id]), changes));
         }

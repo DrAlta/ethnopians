@@ -5,7 +5,7 @@
 
 use bevy::prelude::*;
 
-use crate::sandbox::Item;
+pub use crate::sandbox::Item;
 
 #[derive(Component, Debug)]
 pub struct Energy(pub i32);

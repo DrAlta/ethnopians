@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::sandbox::{ActionId, EntityId};
+use crate::sandbox::{actions::ActionId, EntityId};
 
 #[derive(Event, Debug, PartialEq, Eq)]
 pub struct PosibleActionsResponce {

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::sandbox::{
-    actions::{PosibleActionsRequest, PosibleActionsResponce, use_object::UseRequest},
+    actions::{use_object::UseRequest, ActionId, PosibleActionsRequest, PosibleActionsResponce},
     world::Type,
     EntityId, Item, Location,
 };
@@ -194,7 +194,7 @@ pub fn use_test() {
         Some(&PosibleActionsResponce {
             agent_id,
             target_id,
-            action_id: crate::sandbox::ActionId::UseObject
+            action_id: ActionId::UseObject
         })
     );
 }
