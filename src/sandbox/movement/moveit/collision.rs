@@ -1,6 +1,6 @@
 use std::collections::{BTreeSet, HashMap};
 
-use broad_phase::{AARect, Entity, EntityId as SpatialID, SpatialBloom};
+use crate::util::{AARect, SpatialId, SweepAndPrune};
 
 use crate::sandbox::{EntityId, Prev};
 
@@ -8,8 +8,8 @@ use super::Avalibility;
 
 pub fn collision<T: Prev>(
     mut todo: BTreeSet<EntityId>,
-    aval: &mut HashMap<SpatialID, Avalibility>,
-    map: &mut SpatialBloom,
+    aval: &mut HashMap<SpatialId, Avalibility>,
+    map: &mut SweepAndPrune,
     prev: &T,
 ) {
     loop {
@@ -47,12 +47,12 @@ pub fn collision<T: Prev>(
             }
         }
         if add_rearended {
-            let k = map.insert(Entity::AARect(AARect::new(
+            let k = map.insert(AARect::new(
                 x.clone(),
                 y.clone(),
                 size.0,
                 size.1,
-            )));
+            ));
             aval.insert(k, Avalibility::RearEnded(unit_id.clone()));
         }
     }

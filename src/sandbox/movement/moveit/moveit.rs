@@ -1,12 +1,11 @@
 use std::collections::{BTreeSet, HashMap};
 
-use broad_phase::{AARect, Entity, EntityId as SpatialId, SpatialBloom};
+use crate::{util::{AARect, SpatialId, SweepAndPrune}, Number};
 use qol::logy;
 
 use crate::sandbox::EntityId;
 
 use super::{collision, Avalibility, Prev};
-
 //   1 2
 // C R R
 // 1 1 2
@@ -18,11 +17,11 @@ use super::{collision, Avalibility, Prev};
 /// then when you detect a collicon add the a new `Avalibility::Collision(colliding_object)`
 /// for when it wanted to move and a `Avalibility::RearEnded` for the unit's corrent rectangle  
 pub fn moveit<T: Prev>(
-    desired: HashMap<EntityId, (f32, f32)>,
+    desired: HashMap<EntityId, (Number, Number)>,
     mut avals: HashMap<SpatialId, Avalibility>,
-    mut map: SpatialBloom,
+    mut map: SweepAndPrune,
     prev: &T,
-) -> [HashMap<EntityId, Entity>; 3] {
+) -> [HashMap<EntityId, AARect>; 3] {
     for (unit_id, destination) in desired {
         let Some(size) = prev.get_size(unit_id) else {
             continue;
@@ -55,16 +54,16 @@ pub fn moveit<T: Prev>(
                             "putting Rearended in at the original location"
                         );
                         let rearend_cell_id =
-                            map.insert(Entity::AARect(AARect::new(x, y, size.0, size.1)));
+                            map.insert(AARect::new(x, y, size.0, size.1));
                         avals.insert(rearend_cell_id, Avalibility::RearEnded(o2));
                     }
 
-                    let new_cell_id = map.insert(Entity::AARect(AARect::new(
+                    let new_cell_id = map.insert(AARect::new(
                         destination.0,
                         destination.1,
                         size.0,
                         size.1,
-                    )));
+                    ));
                     avals.insert(new_cell_id, Avalibility::Collision(unit_id.clone()));
                     blocked = true;
                 }
@@ -88,18 +87,18 @@ pub fn moveit<T: Prev>(
                     "trace-moveit",
                     "putting Rearended in at the original location"
                 );
-                let rearend_cell_id = map.insert(Entity::AARect(AARect::new(x, y, size.0, size.1)));
+                let rearend_cell_id = map.insert(AARect::new(x, y, size.0, size.1));
                 avals.insert(rearend_cell_id, Avalibility::RearEnded(unit_id));
             }
         } else {
             dest_aval = Avalibility::From(unit_id);
         }
-        let dest_cell_id = map.insert(Entity::AARect(AARect::new(
+        let dest_cell_id = map.insert(AARect::new(
             destination.0,
             destination.1,
             size.0,
             size.1,
-        )));
+        ));
         avals.insert(dest_cell_id, dest_aval);
     }
     let mut from = HashMap::new();

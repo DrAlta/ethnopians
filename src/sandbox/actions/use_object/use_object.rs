@@ -2,12 +2,12 @@ use std::collections::BTreeSet;
 
 use bevy::prelude::*;
 
-use crate::sandbox::{
+use crate::{sandbox::{
     change_request::Changes,
     within_range,
     world::{Energy, Size, Type},
     EntityId, Item, Location, MAX_ENERGY,
-};
+}, Number};
 
 pub fn use_object(
     query: &Query<(Entity, &Type, &Location, Option<&Size>, Option<&Energy>)>,
@@ -58,8 +58,8 @@ pub fn use_object(
             let (agent_center_x, agent_center_y) =
                 if let Ok((_, _, _, Some(size), _)) = query.get(agent_id) {
                     (
-                        agent_x + (size.width as f32 * 0.5),
-                        agent_y + (size.height as f32 * 0.5),
+                        agent_x + (size.width as Number * 0.5),
+                        agent_y + (size.height as Number * 0.5),
                     )
                 } else {
                     (*agent_x, *agent_y)
@@ -67,8 +67,8 @@ pub fn use_object(
             let (object_center_x, object_center_y) =
                 if let Ok((_, _, _, Some(size), _)) = query.get(agent_id) {
                     (
-                        object_x + (size.width as f32 * 0.5),
-                        object_y + (size.height as f32 * 0.5),
+                        object_x + (size.width as Number * 0.5),
+                        object_y + (size.height as Number * 0.5),
                     )
                 } else {
                     (*object_x, *object_y)

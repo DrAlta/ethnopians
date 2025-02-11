@@ -3,9 +3,10 @@
 //mod world;
 //pub use world::World;
 
-use bevy::prelude::*;
+use bevy::prelude::Component;
 
 pub use crate::sandbox::Item;
+use crate::{Number, Vec2};
 
 #[derive(Component, Debug)]
 pub struct Energy(pub i32);
@@ -25,5 +26,5 @@ pub struct Type(pub Item);
 #[derive(Component, Debug)]
 pub struct Movement {
     pub target: Vec2,
-    pub speed: f32,
+    pub speed: Number,
 }

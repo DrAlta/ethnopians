@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 
-use crate::sandbox::EntityId;
+use crate::{sandbox::EntityId, Number};
 
 #[derive(Component, Debug, PartialEq, PartialOrd, Clone)]
 pub enum Location {
     Inventory(EntityId),
-    World { x: f32, y: f32 },
+    World { x: Number, y: Number },
 }

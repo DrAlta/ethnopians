@@ -8,3 +8,5 @@ mod steering;
 pub use steering::{radians_to_u8, u8_to_radians, Steering};
 mod time_index;
 pub use time_index::TimeIndex;
+mod vec2;
+pub use vec2::{vec2, Vec2};

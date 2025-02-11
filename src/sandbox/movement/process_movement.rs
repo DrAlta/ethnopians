@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 
-use bevy::prelude::*;
+use bevy::prelude::{Commands, Query};
 
-use broad_phase::{AARect, Entity, AABB};
+use crate::{util::AARect, Number};
+
 use qol::logy;
 
 use crate::{
@@ -24,7 +25,7 @@ pub fn process_movement(
     #[cfg(feature = "move_history")]
     logy!("debug-process-movement", "Going tosaving histoy");
 
-    let number_of_substeps = query.iter().fold(1_f32, |x, (_, movement_maybe, _, _)| {
+    let number_of_substeps = query.iter().fold(1.0, |x, (_, movement_maybe, _, _)| {
         if let Some(Movement { target: _, speed }) = movement_maybe {
             let step_dist = speed * time_step;
             logy!(
@@ -34,25 +35,25 @@ pub fn process_movement(
                 max_step,
                 step_dist / max_step
             );
-            x.max((step_dist / max_step).ceil())
+            Number::max(x, (step_dist / max_step).ceil())
         } else {
             x
         }
     });
     let time_substep = time_step / number_of_substeps;
 
-    let mut rearendings = HashMap::<EntityId, Entity>::new();
-    let mut collisions: HashMap<EntityId, Entity> = query
+    let mut rearendings = HashMap::<EntityId, AARect>::new();
+    let mut collisions: HashMap<EntityId, AARect> = query
         .iter()
         .filter_map(|(id, movement_maybe, location_maybe, size)| {
             match (movement_maybe, location_maybe) {
                 (None, Some(Location::World { x, y })) => {
-                    let entity = Entity::AARect(AARect {
+                    let entity = AARect {
                         min_x: *x,
                         min_y: *y,
-                        width: size.width as f32,
-                        height: size.height as f32,
-                    });
+                        width: size.width as Number,
+                        height: size.height as Number,
+                    };
                     Some((id, entity))
                 }
                 (_, _) => None,
@@ -60,10 +61,10 @@ pub fn process_movement(
         })
         .collect();
 
-    let mut froms = HashMap::<EntityId, Entity>::new();
+    let mut froms = HashMap::<EntityId, AARect>::new();
     #[allow(unused_mut)]
     let mut history = Vec::new();
-    let mut last_froms = HashMap::<EntityId, (f32, f32)>::new();
+    let mut last_froms = HashMap::<EntityId, (Number, Number)>::new();
     for step_number in 1..(number_of_substeps as usize + 1) {
         logy!("debug-process-movement", "processing step {step_number}");
         let desired = query.iter().filter_map(
@@ -84,12 +85,12 @@ pub fn process_movement(
                         logy!("debug-process-movement", "the unit doesn't have a location in the world");
                         return None;
                     };
-                    let step_dist = speed * time_substep * step_number as f32;
+                    let step_dist = speed * time_substep * step_number as Number;
                     let target_vec= Vec2{x: *tx, y: *ty};
                     let origin_vec = Vec2{x:*x, y:*y};
 
                     let delta = (target_vec - origin_vec).normalize() * step_dist;
-                    if (target_vec - origin_vec).length_squared() < (step_dist * step_dist) + f32::EPSILON {
+                    if (target_vec - origin_vec).length_squared() < (step_dist * step_dist) + Number::EPSILON {
                         logy!("debug-process-movement", " the unit is moving more that the distance to the target so returning the target");
                         Some((unit_id.clone(), (target_vec.x, target_vec.y)))
                     } else {
@@ -112,7 +113,7 @@ pub fn process_movement(
                 sizes: query
                     .iter()
                     .filter_map(|(id, _, _, Size { width, height })| {
-                        Some((id, (*width as f32, *height as f32)))
+                        Some((id, (*width as Number, *height as Number)))
                     })
                     .collect(),
                 locations: &last_froms,
@@ -129,13 +130,11 @@ pub fn process_movement(
     }
     let mut moves = Vec::new();
     for (unit_id, entity) in froms {
-        let Entity::AARect(AARect { min_x, min_y, .. }) = entity else {
-            continue;
-        };
+        let AARect { min_x, min_y, .. } = entity;
         let Some((x, y)) = query.get_location(unit_id) else {
             continue;
         };
-        if (min_x - x).abs() > f32::EPSILON || (min_y - y).abs() > f32::EPSILON {
+        if (min_x - x).abs() > Number::EPSILON || (min_y - y).abs() > Number::EPSILON {
             moves.push((unit_id, (min_x, min_y)));
         }
     }
@@ -154,16 +153,16 @@ pub fn process_movement(
 }
 
 struct Previous<'a> {
-    pub sizes: HashMap<EntityId, (f32, f32)>,
-    pub locations: &'a HashMap<EntityId, (f32, f32)>,
+    pub sizes: HashMap<EntityId, (Number, Number)>,
+    pub locations: &'a HashMap<EntityId, (Number, Number)>,
 }
 impl<'a> Prev for Previous<'a> {
-    fn get_location(&self, id: EntityId) -> Option<(f32, f32)> {
+    fn get_location(&self, id: EntityId) -> Option<(Number, Number)> {
         let (x, y) = self.locations.get(&id)?;
         Some((*x, *y))
     }
 
-    fn get_size(&self, id: EntityId) -> Option<(f32, f32)> {
+    fn get_size(&self, id: EntityId) -> Option<(Number, Number)> {
         let (w, h) = self.sizes.get(&id)?;
         Some((*w, *h))
     }
