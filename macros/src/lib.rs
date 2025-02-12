@@ -1,4 +1,5 @@
 extern crate proc_macro;
+
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, Data, DeriveInput, Fields};
@@ -62,12 +63,22 @@ pub fn derive_change_structs(input: TokenStream) -> TokenStream {
                         quote! { Self::#variant_name }
                     },
                 };
-                let args = match &variant.fields {
-                    Fields::Unnamed(_) => {
-                        quote! { #(#field_names),* }
+                
+                let doda = match &variant.fields {
+                    Fields::Named(_) => {
+                        quote! { #(let #field_names = #field_names.clone();)* }
                     },
+                    | Fields::Unnamed(_) => {
+                        quote! {}
+                    },
+                    Fields::Unit => quote! {},
+                };
+                let args = match &variant.fields {
                     Fields::Named(_) => {
                         quote! { #(#field_names),* }
+                    },
+                    | Fields::Unnamed(_) => {
+                        quote! { #(#field_names.clone()),* }
                     },
                     Fields::Unit => quote! {},
                 };
@@ -78,7 +89,8 @@ pub fn derive_change_structs(input: TokenStream) -> TokenStream {
                     Fields::Named(..) => {
                         quote! {
                             #pattern => {
-                                let event = #struct_name{#args};
+                                #doda
+                                let event = #struct_name {#args };
                                 commands.send_event(event);
                             }
                         }
@@ -108,7 +120,7 @@ pub fn derive_change_structs(input: TokenStream) -> TokenStream {
                 #(#struct_definitions)*
 
                 impl Dispatch for #name {
-                    fn dispatch(self, commands: &mut Commands) {
+                    fn dispatch(&self, commands: &mut Commands) {
                         match self {
                             #(#dispatch_impl),*
                         }
