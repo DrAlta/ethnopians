@@ -1,12 +1,10 @@
 use std::collections::HashMap;
 
-use crate::sandbox::{
+use crate::sandbox::
     ai::{
         cpu::{ProgramCounter, ReturnStack, Stack, StackItem},
         Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, Status, Thread,
-    },
-    World,
-};
+    };
 
 pub struct CPU {
     pub pc: ProgramCounter,
@@ -30,7 +28,6 @@ impl CPU {
         &mut self,
         bt: &HashMap<ExecutionToken, Thread>,
         blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
-        world: &World,
     ) -> Result<Status, String> {
         let Some((token, idx)) = &self.pc else {
             return Err("program halted".into());
@@ -47,7 +44,6 @@ impl CPU {
             &mut self.return_stack,
             &mut self.pc,
             blackboard,
-            world,
         )
     }
 }

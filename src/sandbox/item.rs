@@ -32,7 +32,14 @@ impl std::fmt::Display for Item {
         )
     }
 }
+impl TryFrom<String> for Item {
+    type Error = ();
 
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        let str: &str = &value;
+        str.try_into()
+    }
+}
 impl TryFrom<&str> for Item {
     type Error = ();
 

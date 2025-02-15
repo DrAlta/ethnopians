@@ -2,14 +2,13 @@ use std::collections::BTreeSet;
 
 use qol::logy;
 
-use crate::sandbox::{
+use crate::sandbox::
     ai::{
         cpu::{
             tick_action, tick_selector, tick_sequence, Prayer, ProgramCounter, ReturnStack, Stack,
         },
         Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, InpulseId, StackItem, Status,
         ThreadName, TreePool,
-    }, World
 };
 
 ///
@@ -141,7 +140,6 @@ impl Instruction {
         return_stack: &mut ReturnStack,
         pc: &mut ProgramCounter,
         blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
-        world: &World,
     ) -> Prayer {
         match self {
             Instruction::Action(action_id) => tick_action(action_id, stack, return_stack, pc),
@@ -211,6 +209,7 @@ impl Instruction {
                 }
                 Self::next(Status::None, pc)
             }
+            // ForthFindNearest should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::ForthFindNearest => {
                 let Some(StackItem::String(_)) = stack.last() else {
                     return Err("tos wasn't a sting".to_owned());
@@ -218,12 +217,24 @@ impl Instruction {
                 let Some(StackItem::Coord { .. }) = stack.get(stack.len() - 2) else {
                     return Err("nos wasn't an coord".to_owned());
                 };
-                let Some(StackItem::String(item_class)) = stack.pop() else {
+                let Some(StackItem::String(item_class_string)) = stack.pop() else {
                     unreachable!()
                 };
                 let Some(StackItem::Coord { x, y }) = stack.pop() else {
                     unreachable!()
                 };
+                let Ok(item_class) = item_class_string.try_into() else {
+                    return Err("item class was not valid".to_owned())
+                };
+                Self::next(
+                    Status::FindNearest{
+                        x, 
+                        y, 
+                        item_class,
+                    }, 
+                    pc
+                )
+                /* this the old pre bevy impl
                 match world.find_nearest(
                     crate::Vec2 {
                         x: x as f32,
@@ -240,7 +251,10 @@ impl Instruction {
                         Self::next(Status::None, pc)
                     }
                 }
+                */
             }
+            // ForthGetEnergy should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
+
             Instruction::ForthGetEnergy => {
                 let Some(StackItem::String(_)) = stack.last() else {
                     return Err("tos wasn't a sting".to_owned());
@@ -249,16 +263,19 @@ impl Instruction {
                     unreachable!()
                 };
                 let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(&key) else {
-                    stack.push(StackItem::none());
-                    return Self::next(Status::None, pc);
+                    return Err(format!("{key} not found in blackboard"))
                 };
+                return Self::next(Status::GetEnergy(entity_id.clone()), pc);
+                /* this is the pre bevy impl
                 let Some(energy) = world.get_energy(entity_id) else {
                     stack.push(StackItem::none());
                     return Self::next(Status::None, pc);
                 };
                 stack.push(StackItem::some(StackItem::Int(*energy as i32)));
                 Self::next(Status::None, pc)
+                */
             }
+            // ForthGetLocation should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::ForthGetLocation => {
                 let Some(StackItem::EntityId(_)) = stack.last() else {
                     return Err("tos wasn't an EntityId".to_owned());
@@ -266,6 +283,8 @@ impl Instruction {
                 let Some(StackItem::EntityId(entity_id)) = stack.pop() else {
                     unreachable!()
                 };
+                Self::next(Status::GetLocation(entity_id.clone()), pc)
+                /* this is the pre bevy impl
                 match world.get_location(&entity_id) {
                     Some(crate::sandbox::Location::World { x, y }) => {
                         stack.push(StackItem::some(StackItem::Coord {
@@ -279,7 +298,9 @@ impl Instruction {
                         Self::next(Status::None, pc)
                     }
                 }
+                */
             }
+            // ForthGetHP should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::ForthGetHP => {
                 let Some(StackItem::String(_)) = stack.last() else {
                     return Err("tos wasn't a sting".to_owned());
@@ -288,15 +309,17 @@ impl Instruction {
                     unreachable!()
                 };
                 let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(&key) else {
-                    stack.push(StackItem::none());
-                    return Self::next(Status::None, pc);
+                    return Err(format!("{key} not found in blackboard"))
                 };
+                Self::next(Status::GetHp(entity_id.clone()), pc)
+                /* this is the pre bevy impl
                 let Some(hp) = world.get_hp(entity_id) else {
                     stack.push(StackItem::none());
                     return Self::next(Status::None, pc);
                 };
                 stack.push(StackItem::some(StackItem::Int(*hp as i32)));
                 Self::next(Status::None, pc)
+                */
             }
             Instruction::ForthGE => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
@@ -481,8 +504,12 @@ impl Instruction {
                 stack.push(if x.is_empty(){StackItem::True}else{StackItem::False});
                 Self::next(Status::None, pc)
             }
+            // ToDoGetEntities should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
+
             Instruction::ToDoGetEntities => {
-                let (nos, tos) = Self::get_two_coords(stack)?;
+                let ((min_x, min_y), (max_x, max_y)) = Self::get_two_coords(stack)?;
+                Self::next(Status::GetEntities { min_x, min_y, max_x, max_y }, pc)
+                /* pre bevy impl
                 let Some((sb, map)) = world.get_spatial_bloom() else {
                     return Err("world had no SpatailBloom".to_owned());
                 };
@@ -495,6 +522,7 @@ impl Instruction {
                 };
                 stack.push(StackItem::Todo(x));
                 Self::next(Status::None, pc)
+                */
             }
             Instruction::ToDoRemoveEntitiesOfType => {
                 let Some(StackItem::String(stack_string)) = stack.last() else {
@@ -504,7 +532,9 @@ impl Instruction {
                 let Ok(item_type_from_stack) = stack_str.try_into() else {
                     return Err(format!("couldn't convert {stack_str:?} to type"));
                 };
+                Self::next(Status::RemoveEntitiesOfType(item_type_from_stack), pc)
 
+                /* pre bevy impl
                 let Some(StackItem::Todo(_)) = stack.get(stack.len() - 2) else {
                     return Err("next of stack not a number".into());
                 };
@@ -523,6 +553,7 @@ impl Instruction {
                     }
                 });
                 Self::next(Status::None, pc)
+                */
             }
         }
     }

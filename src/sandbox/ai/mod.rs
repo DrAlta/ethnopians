@@ -42,25 +42,19 @@ pub type ItemId = String;
 
 #[cfg(test)]
 mod tests {
-    use crate::sandbox::{
-        ai::{get_hermit_behavoir_tree, Blackboard, Status, CPU},
-        World,
-    };
+    use crate::sandbox::
+        ai::{get_hermit_behavoir_tree, Blackboard, CPU};
 
     #[test]
     fn hermit_ai_run_test() {
-        let world = World::new_empty();
         let mut blackboard = Blackboard::new();
 
         let bt = get_hermit_behavoir_tree();
         let mut cpu = CPU::load("hermit".to_owned());
         loop {
-            match cpu.step(&bt, &mut blackboard, &world) {
+            match cpu.step(&bt, &mut blackboard) {
                 Ok(status) => match status {
-                    Status::Success => todo!(),
-                    Status::Failure => todo!(),
-                    Status::Running(_inpulse_id) => todo!(),
-                    Status::None => todo!(),
+                    _ => todo!(),
                 },
                 Err(_) => todo!(),
             }
