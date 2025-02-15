@@ -1,11 +1,13 @@
+use std::collections::HashMap;
+
 use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
 };
 
-use crate::sandbox::ai::parser::{behavior_tree_parser::Thingie, forth_parser, space_parser};
+use crate::sandbox::ai::{parser::{behavior_tree_parser::Thingie, forth_parser, space_parser}, Instruction};
 
 pub fn forth_tree_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
-    let (tail, (_, _, _, _, (body, used), _, _)) = tuple((
+    let (tail, (_, _, _, _, (mut i, db), _, _)) = tuple((
         tag("forth"),
         space_parser,
         char('{'),
@@ -14,7 +16,18 @@ pub fn forth_tree_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a s
         space_parser,
         char('}'),
     ))(input)?;
-    Ok((tail, Thingie::Tree(body, used)))
+//    Ok((tail, Thingie::Tree(body, used)))
+//vvv new vvv
+    let thread_name = "_0";
+    let mut hash = HashMap::new();
+    for (k, mut v) in db.into_iter() {
+        v.iter_mut().for_each(|x| x.correct(thread_name));
+        assert_eq!(hash.insert(format!("{k}"), v), None,);
+    }
+    i.iter_mut().for_each(|x| x.correct(thread_name));
+    hash.insert(thread_name.to_owned(), i);
+    Ok((tail, Thingie::Tree(vec![Instruction::ForthTree(thread_name.to_owned())], hash)))
+
 }
 #[cfg(test)]
 mod tests {

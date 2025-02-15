@@ -42,6 +42,8 @@ pub type ItemId = String;
 
 #[cfg(test)]
 mod tests {
+    use qol::logy;
+
     use crate::sandbox::
         ai::{get_hermit_behavoir_tree, Blackboard, CPU};
 
@@ -52,11 +54,21 @@ mod tests {
         let bt = get_hermit_behavoir_tree();
         let mut cpu = CPU::load("hermit".to_owned());
         loop {
+            logy!("debug", "{:?}\n executing {:?}", cpu.stack, cpu.pc);
             match cpu.step(&bt, &mut blackboard) {
                 Ok(status) => match status {
-                    _ => todo!(),
+                    super::Status::Success => todo!(),
+                    super::Status::Failure => todo!(),
+                    super::Status::FindNearest { ../*x, y, item_class*/ } => todo!(),
+                    super::Status::GetEnergy(_entity) => todo!(),
+                    super::Status::GetLocation(_entity) => todo!(),
+                    super::Status::GetHp(_entity) => todo!(),
+                    super::Status::GetEntities { ../*min_x, min_y, max_x, max_y*/ } => todo!(),
+                    super::Status::RemoveEntitiesOfType(_item) => todo!(),
+                    super::Status::Running(_inpulse_id) => todo!(),
+                    super::Status::None => (),
                 },
-                Err(_) => todo!(),
+                Err(err) => panic!("{err}"),
             }
         }
     }

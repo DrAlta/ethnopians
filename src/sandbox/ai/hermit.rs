@@ -1,5 +1,3 @@
-use qol::logy;
-
 use crate::sandbox::ai::{parser::file_parser, TreePool};
 
 pub fn get_hermit_behavoir_tree() -> TreePool {
@@ -227,6 +225,7 @@ plant_veg = todo"#};
             then
         then
     then
+    drop
     lit(Failure)
     return
     
@@ -457,7 +456,7 @@ have_stick = sel{
         db.extend(new_db.into_iter());
     }
 
-    logy!("debug", "{:?}", db.get("check_if_clear_for_garden"));
+//    logy!("debug", "{:?}", db.get("check_if_clear_for_garden"));
     db
 }
 
@@ -465,7 +464,7 @@ have_stick = sel{
 mod tests {
     use std::collections::HashMap;
 
-    use qol::InsertOrInsert;
+    use qol::{InsertOrInsert, logy};
 
     use crate::sandbox::ai::{parser::named_tree_parser, Instruction, StackItem};
 
@@ -493,7 +492,7 @@ mod tests {
 */
     #[test]
     fn hermit_test() {
-        let input = "dont_need_to_eat = forth {
+        let input = "footest = forth {
     lit(\"self\")
     get_energy
     some_int
@@ -514,7 +513,7 @@ mod tests {
         assert_eq!(
             body,
             TreePool::from([(
-                "dont_need_to_eat".to_owned(),
+                "footest".to_owned(),
                 vec![
                     Instruction::ForthLit(StackItem::String("self".to_owned())),
                     Instruction::ForthGetEnergy,
@@ -545,7 +544,7 @@ mod tests {
             }
         }
         for (a, b) in &missing {
-            println!("{a}:{b:?}");
+            logy!("log", "{a} is missing: {b:?}");
         }
         assert_eq!(missing, HashMap::new())
     }

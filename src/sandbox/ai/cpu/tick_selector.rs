@@ -10,6 +10,9 @@ pub fn tick_selector(
     return_stack: &mut ReturnStack,
     pc: &mut ProgramCounter,
 ) -> Result<Status, String> {
+    logy!("trace-tick-selector", "executing Selector:{stack:?}");
+    logy!("trace-tick-selector", "{return_stack:?}");
+
     let Some(tos) = stack.pop() else {
         return Err("Nothing on stack when checking result of child".into());
     };
@@ -35,6 +38,7 @@ pub fn tick_selector(
     logy!("trace-tick-selector", "Doing main body of Selector tick");
 
     let Some(StackItem::Selector(idx)) = stack.pop() else {
+        logy!("debug", "{stack:#?}");
         return Err("Selector state not found on stack".into());
     };
     match (idx >= children.len(), tos) {

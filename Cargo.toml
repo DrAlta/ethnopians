@@ -33,13 +33,14 @@ opt-level = 1
 opt-level = 3
 
 [features]
-default = ["defaults", "sandbox"]
-defaults = ["move_history", "debug", "error", "todo", "trace"]
+default = ["trace-tick-selector", "defaults", "sandbox"]
+defaults = ["log", "move_history", "debug", "error", "todo", "trace"]
 sandbox = ["bevy"]
 bevy = ["dep:bevy"]
 debug = []
 debug-process-movement = []
 error = []
+log = []
 todo = []
 trace = ["trace-behavior-tree", "trace-tick"]
 trace-behavior-tree = []

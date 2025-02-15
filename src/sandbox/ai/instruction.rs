@@ -34,6 +34,7 @@ pub enum Instruction {
     Sequence(Vec<ExecutionToken>),
     // takes two Blackboard keys that points to ItemClass
     Use(BlackboardKey, BlackboardKey),
+    ForthTree(ExecutionToken),
     //--------------------------------------------------------------------------
     ForthAdd,
     ForthCall(ThreadName, usize),
@@ -131,6 +132,12 @@ impl Instruction {
             | Instruction::ToDoIsEmpty
             | Instruction::ToDoRemoveEntitiesOfType
             | Instruction::ForthIf(_) => (),
+            Instruction::ForthTree(token) => {
+                if !bt.contains_key(token) {
+                    missing.insert(token.clone());
+                }
+
+            },
         }
         missing
     }
@@ -141,6 +148,7 @@ impl Instruction {
         pc: &mut ProgramCounter,
         blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
     ) -> Prayer {
+        logy!("debug", "ticking:{self:?}");
         match self {
             Instruction::Action(action_id) => tick_action(action_id, stack, return_stack, pc),
             Instruction::Combine(_, _) => todo!(),
@@ -555,6 +563,14 @@ impl Instruction {
                 Self::next(Status::None, pc)
                 */
             }
+            Instruction::ForthTree(token) => {
+                let Some(StackItem::Init) = stack.last() else {
+                    return Err("top was not init".to_owned())
+                };
+                stack.pop();
+                *pc = Some((token.clone(), 0));
+                Ok(Status::None)
+            },
         }
     }
     pub fn correct(&mut self, prefix: &str) {
@@ -568,6 +584,12 @@ impl Instruction {
                 });
             }
             Instruction::ForthCall(token, ..) => {
+                if token.starts_with('_') {
+                    let y = format!("{prefix}{token}");
+                    *token = y
+                };
+            }
+            Instruction::ForthTree(token) => {
                 if token.starts_with('_') {
                     let y = format!("{prefix}{token}");
                     *token = y

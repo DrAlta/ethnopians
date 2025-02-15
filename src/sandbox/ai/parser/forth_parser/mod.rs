@@ -9,6 +9,8 @@ pub use comparison::{
 };
 mod distance_parser;
 pub use distance_parser::distance_parser;
+mod drop_parser;
+pub use drop_parser::drop_parser;
 mod dup_parser;
 pub use dup_parser::dup_parser;
 mod forth_parser;

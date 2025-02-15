@@ -14,6 +14,8 @@ use crate::sandbox::ai::{
     Instruction, Thread, TreePool,
 };
 
+use super::drop_parser;
+
 pub fn forth_threadette_parser_2<'a>(
     input: &'a str,
 ) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
@@ -51,6 +53,7 @@ pub fn forth_threadette_parser_2<'a>(
         if_parser,
         return_parser,
         //stack manip
+        drop_parser,
         dup_parser,
         swap_parser,
         // actions
