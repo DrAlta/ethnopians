@@ -24,14 +24,11 @@ pub fn change_request_system(
         changes,
     } in requests.read()
     {
-        if change_requests
-            .insert(hash.clone(), (contentious_entities, changes))
-            .is_some()
-        {
+        if change_requests.contains_key(hash) {
             collisions.push(hash.clone());
-            change_requests.remove(hash);
             conflicts.send(ChangeCollision { hash: hash.clone() });
         } else {
+            change_requests.insert(hash.clone(), (contentious_entities, changes));
             for &contentious in contentious_entities {
                 change_requests_by_contentous_entities.push_or_insert(contentious, hash.clone());
             }
@@ -45,9 +42,6 @@ pub fn change_request_system(
 
     for (request_hash, &(contentious_entities, changes)) in &change_requests {
         if collisions.contains(request_hash) {
-            conflicts.send(ChangeConflict {
-                hash: request_hash.clone(),
-            });
             continue;
         }
         let mut cleared = true;
