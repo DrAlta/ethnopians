@@ -43,50 +43,28 @@ pub fn derive_change_structs(input: TokenStream) -> TokenStream {
             });
             let dispatch_impl = data_enum.variants.iter().map(|variant| {
                 let variant_name = &variant.ident;
-                let field_names: Vec<_>;
                 let struct_name = syn::Ident::new(&format!("Change{}", variant_name), variant_name.span());
-                let pattern = match &variant.fields {
+                match &variant.fields {
                     Fields::Unnamed(fields) => {
-                        field_names= (0..fields.unnamed.len())
+                        let field_names: Vec<_> = (0..fields.unnamed.len())
                             .map(|i| syn::Ident::new(&format!("field_{i}"), variant_name.span()))
                             .collect();
-                        quote! { Self::#variant_name(#(#field_names),*) }
+                        let args = quote! { #(#field_names.clone()),* };
+                        let pattern = quote! { Self::#variant_name(#(#field_names),*) };
+                        quote! {
+                            #pattern => {
+                                let event = #struct_name(#args);
+                                commands.send_event(event);
+                            }
+                        }
                     },
                     Fields::Named(fields) => {
-                        field_names = fields.named.iter()
+                        let field_names: Vec<_> = fields.named.iter()
                             .map(|field| field.ident.as_ref().unwrap().clone())
                             .collect();
-                        quote! { Self::#variant_name { #(#field_names),* } }
-                    },
-                    Fields::Unit => {
-                        field_names = Vec::new();
-                        quote! { Self::#variant_name }
-                    },
-                };
-                
-                let doda = match &variant.fields {
-                    Fields::Named(_) => {
-                        quote! { #(let #field_names = #field_names.clone();)* }
-                    },
-                    | Fields::Unnamed(_) => {
-                        quote! {}
-                    },
-                    Fields::Unit => quote! {},
-                };
-                let args = match &variant.fields {
-                    Fields::Named(_) => {
-                        quote! { #(#field_names),* }
-                    },
-                    | Fields::Unnamed(_) => {
-                        quote! { #(#field_names.clone()),* }
-                    },
-                    Fields::Unit => quote! {},
-                };
-// Todo: Chad wrote this and it only had the code in the unnamed case
-// and I didn't boather folding this into the match case above 
-// I should do it int furute thou
-                match &variant.fields {
-                    Fields::Named(..) => {
+                        let doda = quote! { #(let #field_names = #field_names.clone();)* }; 
+                        let pattern = quote! { Self::#variant_name { #(#field_names),* } };
+                        let args = quote! { #(#field_names),* };
                         quote! {
                             #pattern => {
                                 #doda
@@ -94,25 +72,15 @@ pub fn derive_change_structs(input: TokenStream) -> TokenStream {
                                 commands.send_event(event);
                             }
                         }
-        
-                    },
-                    Fields::Unnamed(..) => {
-                        quote! {
-                            #pattern => {
-                                let event = #struct_name(#args);
-                                commands.send_event(event);
-                            }
-                        }
-        
                     },
                     Fields::Unit => {
+                        let pattern = quote! { Self::#variant_name };
                         quote! {
                             #pattern => {
                                 let event = #struct_name;
                                 commands.send_event(event);
                             }
                         }
-        
                     },
                 }
             });
