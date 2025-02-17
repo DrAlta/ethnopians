@@ -512,22 +512,28 @@ mod tests {
         assert_eq!(tail, "");
         assert_eq!(
             body,
-            TreePool::from([(
-                "footest".to_owned(),
-                vec![
-                    Instruction::ForthLit(StackItem::String("self".to_owned())),
-                    Instruction::ForthGetEnergy,
-                    Instruction::ForthSomeInt,
-                    Instruction::ForthIf(5),
-                    Instruction::ForthLit(StackItem::Int(5)),
-                    Instruction::ForthGT,
-                    Instruction::ForthIf(2),
-                    Instruction::ForthLit(StackItem::Success),
-                    Instruction::ForthReturn,
-                    Instruction::ForthLit(StackItem::Failure),
-                    Instruction::ForthReturn,
-                ]
-            )])
+            TreePool::from([
+                (
+                    "footest".to_owned(),
+                    vec![Instruction::ForthTree("footest_0".to_owned())]
+                ),
+                (
+                    "footest_0".to_owned(),
+                    vec![
+                        Instruction::ForthLit(StackItem::String("self".to_owned())),
+                        Instruction::ForthGetEnergy,
+                        Instruction::ForthSomeInt,
+                        Instruction::ForthIf(5),
+                        Instruction::ForthLit(StackItem::Int(5)),
+                        Instruction::ForthGT,
+                        Instruction::ForthIf(2),
+                        Instruction::ForthLit(StackItem::Success),
+                        Instruction::ForthReturn,
+                        Instruction::ForthLit(StackItem::Failure),
+                        Instruction::ForthReturn,
+                    ]
+                )
+            ])
         );
     }
 

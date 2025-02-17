@@ -44,25 +44,50 @@ pub type ItemId = String;
 mod tests {
     use qol::logy;
 
-    use crate::sandbox::
-        ai::{get_hermit_behavoir_tree, Blackboard, CPU};
+    use crate::sandbox::{
+        ai::{get_hermit_behavoir_tree, CPU, Blackboard, BlackboardValue, StackItem, Variable}, EntityId, };
 
     #[test]
     fn hermit_ai_run_test() {
         let mut blackboard = Blackboard::new();
+        blackboard.insert(
+            "self".to_owned(), 
+            Variable::Chit(
+                BlackboardValue::EntityId(
+                    EntityId::from_raw(0)
+                )
+            )
+        );
+        blackboard.insert(
+            "food".to_owned(), 
+            Variable::Chit(
+                BlackboardValue::String("Veggie".to_owned())
+            )
+        );
 
         let bt = get_hermit_behavoir_tree();
+        logy!("debug", "\n\n\n{:?}\n\n\n", bt.get("sat_hunger_2_1_1_1").unwrap());
         let mut cpu = CPU::load("hermit".to_owned());
         loop {
-            logy!("debug", "{:?}\n executing {:?}", cpu.stack, cpu.pc);
+            logy!("debug", "\n\nexecuting {:?}\n stack: {:?}", cpu.pc, cpu.stack);
             match cpu.step(&bt, &mut blackboard) {
                 Ok(status) => match status {
-                    super::Status::Success => todo!(),
+                    super::Status::Success => {
+                        logy!("trace", "hermit ai succeeded\n{cpu:?}");
+                        break
+                    },
                     super::Status::Failure => todo!(),
                     super::Status::FindNearest { ../*x, y, item_class*/ } => todo!(),
-                    super::Status::GetEnergy(_entity) => todo!(),
+                    super::Status::GetEnergy(entity) => {
+                        logy!("trace", "giving dummy value for GetEnergy on {entity}");
+                        cpu.stack.push(StackItem::some(StackItem::Int(5)));
+                    },
                     super::Status::GetLocation(_entity) => todo!(),
                     super::Status::GetHp(_entity) => todo!(),
+                    super::Status::GetIsInventoryGE { agent, item_class, amount } => {
+                        logy!("trace", "giving dummy value for if {agent} has GE {amount} of {item_class:?}");
+                        cpu.stack.push(StackItem::Success);
+                    },
                     super::Status::GetEntities { ../*min_x, min_y, max_x, max_y*/ } => todo!(),
                     super::Status::RemoveEntitiesOfType(_item) => todo!(),
                     super::Status::Running(_inpulse_id) => todo!(),

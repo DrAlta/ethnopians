@@ -6,6 +6,7 @@ use crate::sandbox::
         Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, Status, Thread,
     };
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct CPU {
     pub pc: ProgramCounter,
     pub stack: Stack,

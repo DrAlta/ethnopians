@@ -24,6 +24,12 @@ pub enum Status {
     // "what is the Hp of the specfified entity" 
     /// to be put on the stack
     GetHp(EntityId),
+    // takes a Blackboard key that points to an ItemClass and u8 of the number to compare to
+    GetIsInventoryGE{
+        agent: EntityId,
+        item_class: Item, 
+        amount: u8
+    },
     GetEntities{
         min_x: i32,
         min_y: i32,

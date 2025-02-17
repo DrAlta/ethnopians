@@ -148,12 +148,37 @@ impl Instruction {
         pc: &mut ProgramCounter,
         blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
     ) -> Prayer {
-        logy!("debug", "ticking:{self:?}");
+        logy!("debug", "\nticking:{self:?}");
         match self {
             Instruction::Action(action_id) => tick_action(action_id, stack, return_stack, pc),
             Instruction::Combine(_, _) => todo!(),
             Instruction::Eat(_) => todo!(),
-            Instruction::InventoryGE(_, _) => todo!(),
+            Instruction::InventoryGE(key, amount) => {
+                let Some(StackItem::Init) = stack.last() else {
+                return Err("tos was not an Init".to_owned());
+                };
+                stack.pop();
+                let Some(&BlackboardValue::EntityId(agent)) = blackboard.get("self") else {
+                    return Err(format!("self not found in blackboard"))
+                };
+                let Some(BlackboardValue::String(item_class_string)) = blackboard.get(key) else {
+                    return Err(format!("{key} not found in blackboard"))
+                };
+
+                let item_class_str: &str = &item_class_string; 
+                let Ok(item_class) = item_class_str.try_into() else {
+                    return Err(format!("{item_class_string} is not a valid item class"))
+                };
+
+                let Some(parent_token) = return_stack.pop() else {
+                    return Err("nothing to return to".to_owned());
+                };
+                // return to calling fuction
+                *pc = Some(parent_token);
+                return Ok(
+                    Status::GetIsInventoryGE { agent, item_class, amount: *amount },
+                );
+            },
             Instruction::Selector(children) => tick_selector(children, stack, return_stack, pc),
             Instruction::Sequence(children) => tick_sequence(children, stack, return_stack, pc),
             Instruction::Use(_, _) => todo!(),
@@ -264,14 +289,11 @@ impl Instruction {
             // ForthGetEnergy should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
 
             Instruction::ForthGetEnergy => {
-                let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos wasn't a sting".to_owned());
+                let Some(StackItem::EntityId(_)) = stack.last() else {
+                    return Err("tos wasn't an EntityId".to_owned());
                 };
-                let Some(StackItem::String(key)) = stack.pop() else {
+                let Some(StackItem::EntityId(entity_id)) = stack.pop() else {
                     unreachable!()
-                };
-                let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(&key) else {
-                    return Err(format!("{key} not found in blackboard"))
                 };
                 return Self::next(Status::GetEnergy(entity_id.clone()), pc);
                 /* this is the pre bevy impl
@@ -358,6 +380,9 @@ impl Instruction {
                         BlackboardValue::EntityId(y) => {
                             Some(Box::new(StackItem::EntityId(y.clone())))
                         }
+                        BlackboardValue::String(a) => {
+                            Some(Box::new(StackItem::String(a.clone())))
+                        },
                     }),
                     None => StackItem::Option(None),
                 });

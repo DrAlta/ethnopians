@@ -31,7 +31,7 @@ pub fn forth_tree_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a s
 }
 #[cfg(test)]
 mod tests {
-    use crate::sandbox::ai::{Instruction, StackItem, TreePool};
+    use crate::sandbox::ai::{Instruction, StackItem};
 
     use super::*;
 
@@ -60,10 +60,10 @@ mod tests {
             panic!("parser didn't return a THingie::Tree")
         };
         assert_eq!(tail, "");
-        assert_eq!(used, TreePool::new());
+       assert_eq!(body, vec![Instruction::ForthTree("_0".to_owned())]);
         assert_eq!(
-            body,
-            vec![
+            used.get("_0").unwrap(),
+            &vec![
                 Instruction::ForthLit(StackItem::String("self".to_owned())),
                 Instruction::ForthGetEnergy,
                 Instruction::ForthIsInt,
