@@ -9,7 +9,8 @@ use crate::sandbox::ai::{
             go_to_parser, gt_parser, if_parser, is_int_parser, le_parser, lit_parser, lt_parser,
             mul_parser, rem_parser, return_parser, some_coord_parser, some_entity_id_parser,
             some_int_parser, sub_parser, swap_parser, take_parser,
-        }, ident_parser,
+        },
+        ident_parser,
     },
     Instruction, Thread, TreePool,
 };
@@ -77,22 +78,22 @@ pub fn forth_threadette_parser<'a>(
             match x {
                 "then" => {
                     logy!("error", "we shouldn't find a 'then'");
-                    return Err(())
+                    return Err(());
                 }
-                "if"
-                | "lit" => {
-                    return Err(())
-                }
-                _ => ()
+                "if" | "lit" => return Err(()),
+                _ => (),
             };
             let a = forth_threadette_parser_2(x);
             if let Ok(("", b)) = a {
-                return Ok::<(Thread, TreePool), ()>(b)
+                return Ok::<(Thread, TreePool), ()>(b);
             } else {
-                Ok((vec![Instruction::ForthCall(x.to_owned(), 0)], TreePool::new()))
+                Ok((
+                    vec![Instruction::ForthCall(x.to_owned(), 0)],
+                    TreePool::new(),
+                ))
             }
         }),
-        forth_threadette_parser_2
+        forth_threadette_parser_2,
     ))(input)
 }
 #[cfg(test)]
@@ -104,6 +105,9 @@ mod tests {
         let source = "get_entities";
         let (tail, (head, _pool)) = forth_threadette_parser(source).unwrap();
         assert_eq!(tail, "");
-        assert_eq!(head, vec![Instruction::ForthCall("get_entities".to_owned(), 0)])
+        assert_eq!(
+            head,
+            vec![Instruction::ForthCall("get_entities".to_owned(), 0)]
+        )
     }
 }

@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 
-use crate::sandbox::
-    ai::{
-        cpu::{ProgramCounter, ReturnStack, Stack, StackItem},
-        Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, Status, Thread,
-    };
+use crate::sandbox::ai::{
+    cpu::{ProgramCounter, ReturnStack, Stack, StackItem},
+    Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, Status, Thread,
+};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CPU {

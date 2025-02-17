@@ -25,12 +25,10 @@ pub fn lit_parser<'a>(
         alt((
             coord_parser,
             map_res(
-                recognize(
-                    tuple((
-                        opt(char('-')),
-                        many1(terminated(one_of("0123456789"), many0(char('_'))))
-                    ))
-                ),
+                recognize(tuple((
+                    opt(char('-')),
+                    many1(terminated(one_of("0123456789"), many0(char('_')))),
+                ))),
                 |out| {
                     let Ok(int) = i32::from_str_radix(&str::replace(out, "_", ""), 10) else {
                         return Err(());
@@ -63,25 +61,17 @@ pub fn lit_parser<'a>(
     Ok((tail, (vec![body], TreePool::new())))
 }
 
-pub fn coord_parser<'a>(
-    input: &'a str,
-) -> IResult<&'a str, Instruction, (&'a str, ErrorKind)> {
-    //let (tail, (_, _, _, _, body, _, _)) = 
+pub fn coord_parser<'a>(input: &'a str) -> IResult<&'a str, Instruction, (&'a str, ErrorKind)> {
+    //let (tail, (_, _, _, _, body, _, _)) =
     map_res(
         tuple((
-            tuple((
-                char('x'),
-                space_parser,
-                char(':'),
-            )),
+            tuple((char('x'), space_parser, char(':'))),
             space_parser,
             map_res(
-                recognize(
-                    tuple((
-                        opt(char('-')),
-                        many1(terminated(one_of("0123456789"), many0(char('_'))))
-                    ))
-                ),
+                recognize(tuple((
+                    opt(char('-')),
+                    many1(terminated(one_of("0123456789"), many0(char('_')))),
+                ))),
                 |out| {
                     let Ok(int) = i32::from_str_radix(&str::replace(out, "_", ""), 10) else {
                         return Err(());
@@ -92,19 +82,13 @@ pub fn coord_parser<'a>(
             space_parser,
             char(','),
             space_parser,
-            tuple((
-                char('y'),
-                space_parser,
-                char(':'),
-            )),
+            tuple((char('y'), space_parser, char(':'))),
             space_parser,
             map_res(
-                recognize(
-                    tuple((
-                        opt(char('-')),
-                        many1(terminated(one_of("0123456789"), many0(char('_'))))
-                    ))
-                ),
+                recognize(tuple((
+                    opt(char('-')),
+                    many1(terminated(one_of("0123456789"), many0(char('_')))),
+                ))),
                 |out| {
                     let Ok(int) = i32::from_str_radix(&str::replace(out, "_", ""), 10) else {
                         return Err(());
@@ -113,12 +97,11 @@ pub fn coord_parser<'a>(
                 },
             ),
         )),
-        |(_,_,x,_,_,_,_,_,y)|{
-            Ok::<Instruction, ()>(Instruction::ForthLit(StackItem::Coord { x, y}))
-        }
+        |(_, _, x, _, _, _, _, _, y)| {
+            Ok::<Instruction, ()>(Instruction::ForthLit(StackItem::Coord { x, y }))
+        },
     )(input)
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -139,7 +122,10 @@ mod tests {
         let (tail, (body, used)) = lit_parser(input).unwrap();
         assert_eq!(tail, "");
         assert_eq!(used, TreePool::new());
-        assert_eq!(body, vec![Instruction::ForthLit(StackItem::Coord { x: -10, y: 5 })])
+        assert_eq!(
+            body,
+            vec![Instruction::ForthLit(StackItem::Coord { x: -10, y: 5 })]
+        )
     }
     #[test]
     fn success_test() {

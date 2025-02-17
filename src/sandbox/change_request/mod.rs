@@ -17,13 +17,13 @@
 //!         send_event_for_Change_to_happen
 //!     }
 //! ```
-mod action_conflict;
-pub use action_conflict::ActionConflict;
 mod change_request;
 pub use change_request::ChangeRequest;
 mod change_request_system;
 pub use change_request_system::change_request_system;
+mod change_conflict;
 pub mod change_systems;
+pub use change_conflict::ChangeConflict;
 mod changes;
 pub use changes::*;
 mod dispatch;

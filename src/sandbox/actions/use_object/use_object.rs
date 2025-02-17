@@ -2,12 +2,15 @@ use std::collections::BTreeSet;
 
 use bevy::prelude::*;
 
-use crate::{sandbox::{
-    change_request::Changes,
-    within_range,
-    world::{Energy, Size, Type},
-    EntityId, Item, Location, MAX_ENERGY,
-}, Number};
+use crate::{
+    sandbox::{
+        change_request::Changes,
+        within_range,
+        world::{Energy, Size, Type},
+        EntityId, Item, Location, MAX_ENERGY,
+    },
+    Number,
+};
 
 pub fn use_object(
     query: &Query<(Entity, &Type, &Location, Option<&Size>, Option<&Energy>)>,

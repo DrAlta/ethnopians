@@ -6,7 +6,6 @@ pub use types::{radians_to_u8, u8_to_radians, ActionId, ActorId, Desire, Steerin
 
 pub use types::{vec2, Vec2};
 
-
 pub mod behavior_tree;
 mod brothel;
 pub mod combat;

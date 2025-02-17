@@ -8,13 +8,17 @@ pub fn energy_request_system(
     mut requests: EventReader<ChangeEnergy>,
 ) {
     for ChangeEnergy { entity_id, delta } in requests.read() {
-
         let Ok(mut energy) = query.get_mut(*entity_id) else {
-            logy!("error", "there was no entity {entity_id:?} with an Energy to change");
+            logy!(
+                "error",
+                "there was no entity {entity_id:?} with an Energy to change"
+            );
             continue;
         };
-        logy!("trace-req-energy", "modifing Energy on entity {entity_id:?}");
+        logy!(
+            "trace-req-energy",
+            "modifing Energy on entity {entity_id:?}"
+        );
         energy.0 += delta;
     }
-
 }

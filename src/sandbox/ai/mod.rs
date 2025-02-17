@@ -45,31 +45,36 @@ mod tests {
     use qol::logy;
 
     use crate::sandbox::{
-        ai::{get_hermit_behavoir_tree, CPU, Blackboard, BlackboardValue, StackItem, Variable}, EntityId, };
+        ai::{get_hermit_behavoir_tree, Blackboard, BlackboardValue, StackItem, Variable, CPU},
+        EntityId,
+    };
 
     #[test]
     fn hermit_ai_run_test() {
         let mut blackboard = Blackboard::new();
         blackboard.insert(
-            "self".to_owned(), 
-            Variable::Chit(
-                BlackboardValue::EntityId(
-                    EntityId::from_raw(0)
-                )
-            )
+            "self".to_owned(),
+            Variable::Chit(BlackboardValue::EntityId(EntityId::from_raw(0))),
         );
         blackboard.insert(
-            "food".to_owned(), 
-            Variable::Chit(
-                BlackboardValue::String("Veggie".to_owned())
-            )
+            "food".to_owned(),
+            Variable::Chit(BlackboardValue::String("Veggie".to_owned())),
         );
 
         let bt = get_hermit_behavoir_tree();
-        logy!("debug", "\n\n\n{:?}\n\n\n", bt.get("sat_hunger_2_1_1_1").unwrap());
+        logy!(
+            "debug",
+            "\n\n\n{:?}\n\n\n",
+            bt.get("sat_hunger_2_1_1_1").unwrap()
+        );
         let mut cpu = CPU::load("hermit".to_owned());
         loop {
-            logy!("debug", "\n\nexecuting {:?}\n stack: {:?}", cpu.pc, cpu.stack);
+            logy!(
+                "debug",
+                "\n\nexecuting {:?}\n stack: {:?}",
+                cpu.pc,
+                cpu.stack
+            );
             match cpu.step(&bt, &mut blackboard) {
                 Ok(status) => match status {
                     super::Status::Success => {

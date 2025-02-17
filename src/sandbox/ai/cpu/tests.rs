@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use super::*;
-use crate::sandbox::
-    ai::{Blackboard, InpulseId, Instruction, Status, Thread, ThreadName, TreePool
+use crate::sandbox::ai::{
+    Blackboard, InpulseId, Instruction, Status, Thread, ThreadName, TreePool,
 };
 
 #[test]
@@ -157,10 +157,7 @@ fn step_test() {
     assert_eq!(&cpu.stack, &vec![StackItem::Success]);
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
     //step 13 the program has is holted
-    assert_eq!(
-        cpu.step(&bt, &mut blackboard),
-        Err("program halted".into())
-    );
+    assert_eq!(cpu.step(&bt, &mut blackboard), Err("program halted".into()));
     assert_eq!(&cpu.stack, &vec![StackItem::Success]);
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
 }

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use macros::Structs;
 
-use crate::sandbox::{EntityId, Item, Location, change_request::Dispatch};
+use crate::sandbox::{change_request::Dispatch, EntityId, Item, Location};
 
 //use super::dispatch::Dispatch2;
 
@@ -12,4 +12,3 @@ pub enum Changes {
     Hp { entity_id: EntityId, delta: i32 },
     SpawnLocationType { location: Location, tyep: Item },
 }
-

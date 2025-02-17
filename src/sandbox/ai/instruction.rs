@@ -2,13 +2,10 @@ use std::collections::BTreeSet;
 
 use qol::logy;
 
-use crate::sandbox::
-    ai::{
-        cpu::{
-            tick_action, tick_selector, tick_sequence, Prayer, ProgramCounter, ReturnStack, Stack,
-        },
-        Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, InpulseId, StackItem, Status,
-        ThreadName, TreePool,
+use crate::sandbox::ai::{
+    cpu::{tick_action, tick_selector, tick_sequence, Prayer, ProgramCounter, ReturnStack, Stack},
+    Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, InpulseId, StackItem, Status,
+    ThreadName, TreePool,
 };
 
 ///
@@ -76,7 +73,6 @@ pub enum Instruction {
     ToDoRemoveEntitiesOfType,
     // (coord coord -- ToDo) gets all entities in a TOS rectanle at NOS
     ToDoGetEntities,
-
 }
 
 impl Instruction {
@@ -92,7 +88,11 @@ impl Instruction {
             }
             Instruction::ForthCall(token, _idx) => {
                 if token == "remove_entities_of_type" {
-                    logy!("debug","remove_entities_of_type was processed. contained:{}", bt.contains_key(token));
+                    logy!(
+                        "debug",
+                        "remove_entities_of_type was processed. contained:{}",
+                        bt.contains_key(token)
+                    );
                 }
                 if !bt.contains_key(token) {
                     missing.insert(token.clone());
@@ -136,8 +136,7 @@ impl Instruction {
                 if !bt.contains_key(token) {
                     missing.insert(token.clone());
                 }
-
-            },
+            }
         }
         missing
     }
@@ -155,19 +154,19 @@ impl Instruction {
             Instruction::Eat(_) => todo!(),
             Instruction::InventoryGE(key, amount) => {
                 let Some(StackItem::Init) = stack.last() else {
-                return Err("tos was not an Init".to_owned());
+                    return Err("tos was not an Init".to_owned());
                 };
                 stack.pop();
                 let Some(&BlackboardValue::EntityId(agent)) = blackboard.get("self") else {
-                    return Err(format!("self not found in blackboard"))
+                    return Err(format!("self not found in blackboard"));
                 };
                 let Some(BlackboardValue::String(item_class_string)) = blackboard.get(key) else {
-                    return Err(format!("{key} not found in blackboard"))
+                    return Err(format!("{key} not found in blackboard"));
                 };
 
-                let item_class_str: &str = &item_class_string; 
+                let item_class_str: &str = &item_class_string;
                 let Ok(item_class) = item_class_str.try_into() else {
-                    return Err(format!("{item_class_string} is not a valid item class"))
+                    return Err(format!("{item_class_string} is not a valid item class"));
                 };
 
                 let Some(parent_token) = return_stack.pop() else {
@@ -175,10 +174,12 @@ impl Instruction {
                 };
                 // return to calling fuction
                 *pc = Some(parent_token);
-                return Ok(
-                    Status::GetIsInventoryGE { agent, item_class, amount: *amount },
-                );
-            },
+                return Ok(Status::GetIsInventoryGE {
+                    agent,
+                    item_class,
+                    amount: *amount,
+                });
+            }
             Instruction::Selector(children) => tick_selector(children, stack, return_stack, pc),
             Instruction::Sequence(children) => tick_sequence(children, stack, return_stack, pc),
             Instruction::Use(_, _) => todo!(),
@@ -188,7 +189,10 @@ impl Instruction {
                     Self::next(Status::None, pc)
                 } else {
                     let (nos, tos) = Self::get_two_coords(stack)?;
-                    stack.push(StackItem::Coord{x:nos.0 + tos.0, y:nos.1 + tos.1});
+                    stack.push(StackItem::Coord {
+                        x: nos.0 + tos.0,
+                        y: nos.1 + tos.1,
+                    });
                     Self::next(Status::None, pc)
                 }
             }
@@ -257,16 +261,9 @@ impl Instruction {
                     unreachable!()
                 };
                 let Ok(item_class) = item_class_string.try_into() else {
-                    return Err("item class was not valid".to_owned())
+                    return Err("item class was not valid".to_owned());
                 };
-                Self::next(
-                    Status::FindNearest{
-                        x, 
-                        y, 
-                        item_class,
-                    }, 
-                    pc
-                )
+                Self::next(Status::FindNearest { x, y, item_class }, pc)
                 /* this the old pre bevy impl
                 match world.find_nearest(
                     crate::Vec2 {
@@ -287,7 +284,6 @@ impl Instruction {
                 */
             }
             // ForthGetEnergy should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
-
             Instruction::ForthGetEnergy => {
                 let Some(StackItem::EntityId(_)) = stack.last() else {
                     return Err("tos wasn't an EntityId".to_owned());
@@ -339,7 +335,7 @@ impl Instruction {
                     unreachable!()
                 };
                 let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(&key) else {
-                    return Err(format!("{key} not found in blackboard"))
+                    return Err(format!("{key} not found in blackboard"));
                 };
                 Self::next(Status::GetHp(entity_id.clone()), pc)
                 /* this is the pre bevy impl
@@ -380,9 +376,7 @@ impl Instruction {
                         BlackboardValue::EntityId(y) => {
                             Some(Box::new(StackItem::EntityId(y.clone())))
                         }
-                        BlackboardValue::String(a) => {
-                            Some(Box::new(StackItem::String(a.clone())))
-                        },
+                        BlackboardValue::String(a) => Some(Box::new(StackItem::String(a.clone()))),
                     }),
                     None => StackItem::Option(None),
                 });
@@ -511,7 +505,10 @@ impl Instruction {
                     Self::next(Status::None, pc)
                 } else {
                     let (nos, tos) = Self::get_two_coords(stack)?;
-                    stack.push(StackItem::Coord{x:nos.0 - tos.0, y:nos.1 - tos.1});
+                    stack.push(StackItem::Coord {
+                        x: nos.0 - tos.0,
+                        y: nos.1 - tos.1,
+                    });
                     Self::next(Status::None, pc)
                 }
             }
@@ -534,14 +531,25 @@ impl Instruction {
                 let Some(StackItem::Todo(x)) = stack.last() else {
                     return Err("TOS wasn't a ToDo".to_owned());
                 };
-                stack.push(if x.is_empty(){StackItem::True}else{StackItem::False});
+                stack.push(if x.is_empty() {
+                    StackItem::True
+                } else {
+                    StackItem::False
+                });
                 Self::next(Status::None, pc)
             }
             // ToDoGetEntities should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
-
             Instruction::ToDoGetEntities => {
                 let ((min_x, min_y), (max_x, max_y)) = Self::get_two_coords(stack)?;
-                Self::next(Status::GetEntities { min_x, min_y, max_x, max_y }, pc)
+                Self::next(
+                    Status::GetEntities {
+                        min_x,
+                        min_y,
+                        max_x,
+                        max_y,
+                    },
+                    pc,
+                )
                 /* pre bevy impl
                 let Some((sb, map)) = world.get_spatial_bloom() else {
                     return Err("world had no SpatailBloom".to_owned());
@@ -577,10 +585,10 @@ impl Instruction {
                 let Some(StackItem::Todo(entities)) = stack.last_mut() else {
                     unreachable!()
                 };
-                
+
                 entities.retain(|id|{
                     if let Some(this_items_type) = world.get_type(id) {
-                        !(this_items_type == &item_type_from_stack) 
+                        !(this_items_type == &item_type_from_stack)
                     } else {
                         true
                     }
@@ -590,12 +598,12 @@ impl Instruction {
             }
             Instruction::ForthTree(token) => {
                 let Some(StackItem::Init) = stack.last() else {
-                    return Err("top was not init".to_owned())
+                    return Err("top was not init".to_owned());
                 };
                 stack.pop();
                 *pc = Some((token.clone(), 0));
                 Ok(Status::None)
-            },
+            }
         }
     }
     pub fn correct(&mut self, prefix: &str) {
@@ -675,20 +683,20 @@ impl Instruction {
             return Ok(status);
         };
     }
-    pub fn get_two_coords(stack: &mut Stack) -> Result<((i32,i32), (i32,i32)), String> {
-        let Some(StackItem::Coord{..}) = stack.last() else {
+    pub fn get_two_coords(stack: &mut Stack) -> Result<((i32, i32), (i32, i32)), String> {
+        let Some(StackItem::Coord { .. }) = stack.last() else {
             return Err("top of stack not a number".into());
         };
-        let Some(StackItem::Coord{..}) = stack.get(stack.len() - 2) else {
+        let Some(StackItem::Coord { .. }) = stack.get(stack.len() - 2) else {
             return Err("next of stack not a number".into());
         };
-        let Some(StackItem::Coord{x:tos_x, y:tos_y}) = stack.pop() else {
+        let Some(StackItem::Coord { x: tos_x, y: tos_y }) = stack.pop() else {
             unreachable!()
         };
-        let Some(StackItem::Coord{x:nos_x, y:nos_y}) = stack.pop() else {
+        let Some(StackItem::Coord { x: nos_x, y: nos_y }) = stack.pop() else {
             unreachable!()
         };
-        Ok(((nos_x, nos_y), (tos_x,tos_y)))
+        Ok(((nos_x, nos_y), (tos_x, tos_y)))
     }
     pub fn get_two_ints(stack: &mut Stack) -> Result<(i32, i32), String> {
         let Some(StackItem::Int(_)) = stack.last() else {

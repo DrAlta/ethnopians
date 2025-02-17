@@ -47,12 +47,7 @@ pub fn collision<T: Prev>(
             }
         }
         if add_rearended {
-            let k = map.insert(AARect::new(
-                x.clone(),
-                y.clone(),
-                size.0,
-                size.1,
-            ));
+            let k = map.insert(AARect::new(x.clone(), y.clone(), size.0, size.1));
             aval.insert(k, Avalibility::RearEnded(unit_id.clone()));
         }
     }

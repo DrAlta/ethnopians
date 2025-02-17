@@ -231,7 +231,6 @@ impl Add<f64> for Vec2 {
     }
 }
 
-
 impl AddAssign<f32> for Vec2 {
     #[inline]
     fn add_assign(&mut self, rhs: f32) {

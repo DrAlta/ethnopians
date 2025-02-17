@@ -1,7 +1,8 @@
 use crate::sandbox::ai::{parser::file_parser, TreePool};
 
 pub fn get_hermit_behavoir_tree() -> TreePool {
-    let test ={r#"get_my_home_location = forth {
+    let test = {
+        r#"get_my_home_location = forth {
         lit("self")
         get_blackboard
         some_entity_id
@@ -15,23 +16,27 @@ pub fn get_hermit_behavoir_tree() -> TreePool {
             then
         then
         return
-    }"#};
-    let root = {r#"hermit = sel{
+    }"#
+    };
+    let root = {
+        r#"hermit = sel{
     sat_hunger,
     sat_sleep,
     have_house,
     have_garden,
     harvest_veg,
     plant_veg
-}"#};
- /* in have_garden a gardern is (spacing * width) by (space * hiegth) plot with nothing but vegs and agents in it.
- first we try placing it at 
-      `my_home_location + home_height - ((spacing * width) / 2)`(x: -10, y: 5 )
- then `my_home_location + home_width - ((spacing * height) / 2)`(x: 5, y: -10 )
- then `my_home_location - (home_width + width * spacing) - ((spacing * height) / 2)`(x: -25, y: -10)
- then `my_home_location - home_height - ((spacing * width) / 2)`(x: -10, y -5 )
- */
-    let hermit = {r#"sat_hunger = selector{
+}"#
+    };
+    /* in have_garden a gardern is (spacing * width) by (space * hiegth) plot with nothing but vegs and agents in it.
+    first we try placing it at
+         `my_home_location + home_height - ((spacing * width) / 2)`(x: -10, y: 5 )
+    then `my_home_location + home_width - ((spacing * height) / 2)`(x: 5, y: -10 )
+    then `my_home_location - (home_width + width * spacing) - ((spacing * height) / 2)`(x: -25, y: -10)
+    then `my_home_location - home_height - ((spacing * width) / 2)`(x: -10, y -5 )
+    */
+    let hermit = {
+        r#"sat_hunger = selector{
     dont_need_to_eat,
     blackboard(food => veg) {
         seq{
@@ -207,9 +212,11 @@ have_garden = forth {
     return
 };
 harvest_veg = todo;
-plant_veg = todo"#};
-// vvv tasks used in hermit
-    let sat_hunger= {r#"dont_need_to_eat = forth {
+plant_veg = todo"#
+    };
+    // vvv tasks used in hermit
+    let sat_hunger = {
+        r#"dont_need_to_eat = forth {
     lit("self")
     get_blackboard
     some_entity_id
@@ -260,8 +267,10 @@ get_veg = selector {
             return
         }
     }
-}"#};
-    let have_house = {r#"is_house_in_range = forth{
+}"#
+    };
+    let have_house = {
+        r#"is_house_in_range = forth{
     lit("self")
     get_blackboard
     some_entity_id
@@ -294,15 +303,17 @@ get_veg = selector {
 have_2_wood =seq{
     have_2_wood_02,
     have_2_wood_02
-}"#};
-// have_garden check is their is a location of a garden in the blackboard, 
-// if not then it finds the agent's house 
-// then checks south, then west the east the north of the house for a spot that 
-// is clear of everything but veg and agents, 
-// when it finds one it sets that to the garden, 
-// else it tries to clear the spots in th same order 
-// and when it succeeds it sets the cleared spot to be the garden
-    let have_garden = {r#"get_my_home_location = forth {
+}"#
+    };
+    // have_garden check is their is a location of a garden in the blackboard,
+    // if not then it finds the agent's house
+    // then checks south, then west the east the north of the house for a spot that
+    // is clear of everything but veg and agents,
+    // when it finds one it sets that to the garden,
+    // else it tries to clear the spots in th same order
+    // and when it succeeds it sets the cleared spot to be the garden
+    let have_garden = {
+        r#"get_my_home_location = forth {
     lit("self")
     get_blackboard
     some_entity_id
@@ -326,16 +337,20 @@ check_if_clear_for_garden = forth{
     lit("agent")
     remove_entities_of_type
     is_empty
-}"#};
-// vvv tasks used in have_house
-    let have_2_wood = {r#"have_2_wood_02 = sel{
+}"#
+    };
+    // vvv tasks used in have_house
+    let have_2_wood = {
+        r#"have_2_wood_02 = sel{
     inventory_have_ge(wood, 2),
     have_axe,
     go_to_tree,
     use(axe, tree)
-}"#};
-// vvv tasks used in have_2_wood
-    let have_2_wood_02 = {r#"have_axe = sel{
+}"#
+    };
+    // vvv tasks used in have_2_wood
+    let have_2_wood_02 = {
+        r#"have_axe = sel{
     inventory_have_ge(axe, 1),
     seq{
         have_knife,
@@ -366,9 +381,11 @@ go_to_tree = forth {
     then
     lit(Failure)
     return
-}"#};
-// vvv tasks used un have_2_wood_02
-    let have_axe = {r#"have_knife = sel{
+}"#
+    };
+    // vvv tasks used un have_2_wood_02
+    let have_axe = {
+        r#"have_knife = sel{
     inventory_have_ge(knife, 1), 
     seq{
         have_2_stone,
@@ -381,12 +398,16 @@ have_stick = sel{
         go_to_tree,
         use(hands, tree)
     }
-}"#};
-    let have_knife = {r#"have_2_stone = seq{
+}"#
+    };
+    let have_knife = {
+        r#"have_2_stone = seq{
     have_2_stone_02,
     have_2_stone_02
-}"#};
-    let have_2_stone = {r#"have_2_stone_02 = sel{
+}"#
+    };
+    let have_2_stone = {
+        r#"have_2_stone_02 = sel{
     inventory_have_ge(stone, 2),
     forth {
         lit("self")
@@ -417,8 +438,9 @@ have_stick = sel{
         lit(Failure)
         return
     }
-}"#};
-// end tasks used in have_2_wood_02
+}"#
+    };
+    // end tasks used in have_2_wood_02
     /*
     eat_veg = forth {
         lit("self")
@@ -450,13 +472,16 @@ have_stick = sel{
         have_axe,
         have_knife,
         have_2_stone,
-    ].into_iter().enumerate() {
+    ]
+    .into_iter()
+    .enumerate()
+    {
         let (tail, new_db) = file_parser(source).unwrap();
         assert_eq!((tail, idx), ("", idx));
         db.extend(new_db.into_iter());
     }
 
-//    logy!("debug", "{:?}", db.get("check_if_clear_for_garden"));
+    //    logy!("debug", "{:?}", db.get("check_if_clear_for_garden"));
     db
 }
 
@@ -464,32 +489,32 @@ have_stick = sel{
 mod tests {
     use std::collections::HashMap;
 
-    use qol::{InsertOrInsert, logy};
+    use qol::{logy, InsertOrInsert};
 
     use crate::sandbox::ai::{parser::named_tree_parser, Instruction, StackItem};
 
     use super::*;
-/*
-    "self"
-    Some(self_id)
-    self_id, true
-    self_id
-    self_id, self_id
-    self_id, Some(hp)
-    self_id, hp, true
-    self_id, hp, 50
-    self_id, true
-    self_id, "house"
-    self_id, Some(house_id)
-    self_id, house_id, true
-    self_id, house_id, house_id,
-    self_id, house_id, Some(house_coord)
-    self_id, house_id, house_coord, true 
-    self_id, house_id, Success
-    self_id, house_id, Success, Success
-    self_id, house_id, true | if use
-    self_id, Success
-*/
+    /*
+        "self"
+        Some(self_id)
+        self_id, true
+        self_id
+        self_id, self_id
+        self_id, Some(hp)
+        self_id, hp, true
+        self_id, hp, 50
+        self_id, true
+        self_id, "house"
+        self_id, Some(house_id)
+        self_id, house_id, true
+        self_id, house_id, house_id,
+        self_id, house_id, Some(house_coord)
+        self_id, house_id, house_coord, true
+        self_id, house_id, Success
+        self_id, house_id, Success, Success
+        self_id, house_id, true | if use
+        self_id, Success
+    */
     #[test]
     fn hermit_test() {
         let input = "footest = forth {

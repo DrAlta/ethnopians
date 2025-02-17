@@ -1,7 +1,10 @@
-use crate::{sandbox::{
-    world::{Movement, Size},
-    EntityId, Location,
-}, Number};
+use crate::{
+    sandbox::{
+        world::{Movement, Size},
+        EntityId, Location,
+    },
+    Number,
+};
 use bevy::prelude::*;
 
 pub trait Prev {

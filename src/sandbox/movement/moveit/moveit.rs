@@ -1,6 +1,9 @@
 use std::collections::{BTreeSet, HashMap};
 
-use crate::{util::{AARect, SpatialId, SweepAndPrune}, Number};
+use crate::{
+    util::{AARect, SpatialId, SweepAndPrune},
+    Number,
+};
 use qol::logy;
 
 use crate::sandbox::EntityId;
@@ -53,17 +56,12 @@ pub fn moveit<T: Prev>(
                             "trace-moveit",
                             "putting Rearended in at the original location"
                         );
-                        let rearend_cell_id =
-                            map.insert(AARect::new(x, y, size.0, size.1));
+                        let rearend_cell_id = map.insert(AARect::new(x, y, size.0, size.1));
                         avals.insert(rearend_cell_id, Avalibility::RearEnded(o2));
                     }
 
-                    let new_cell_id = map.insert(AARect::new(
-                        destination.0,
-                        destination.1,
-                        size.0,
-                        size.1,
-                    ));
+                    let new_cell_id =
+                        map.insert(AARect::new(destination.0, destination.1, size.0, size.1));
                     avals.insert(new_cell_id, Avalibility::Collision(unit_id.clone()));
                     blocked = true;
                 }
@@ -93,12 +91,7 @@ pub fn moveit<T: Prev>(
         } else {
             dest_aval = Avalibility::From(unit_id);
         }
-        let dest_cell_id = map.insert(AARect::new(
-            destination.0,
-            destination.1,
-            size.0,
-            size.1,
-        ));
+        let dest_cell_id = map.insert(AARect::new(destination.0, destination.1, size.0, size.1));
         avals.insert(dest_cell_id, dest_aval);
     }
     let mut from = HashMap::new();
