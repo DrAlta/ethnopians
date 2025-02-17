@@ -4,25 +4,40 @@ use bevy::prelude::*;
 
 use qol::PushOrInsert;
 
-use crate::sandbox::change_request::{Changes, ChangeRequest, Dispatch};
+use crate::sandbox::change_request::{ActionConflict, Changes, ChangeRequest, Dispatch};
 
 type Hash = u64;
 
 pub fn change_request_system(
     mut requests: EventReader<ChangeRequest>,
+    mut conflicts: EventWriter<ActionConflict>,
     mut commands: Commands,
 ){
     let mut change_requests_by_contentous_entities =  HashMap::<Entity, Vec<Hash>>::new();
     let mut change_requests = BTreeMap::<Hash, (&BTreeSet<Entity>, &Vec<Changes>)>::new();
+    let mut collisions = Vec::new();
 
     for ChangeRequest { hash, contentious_entities, changes } in requests.read(){
         for &contentious in contentious_entities {
-            change_requests.insert(hash.clone(), (contentious_entities, changes));
+            if change_requests.insert(hash.clone(), (contentious_entities, changes)).is_some() {
+                collisions.push(hash.clone());
+            }
             change_requests_by_contentous_entities.push_or_insert(contentious, hash.clone());
         }
     }
 
+    // remove hash collision
+    for (_, vec) in change_requests_by_contentous_entities.iter_mut() {
+        vec.retain(|x|{
+            !collisions.contains(x)
+        });
+    }
+
     for (request_hash, &(contentious_entities, changes)) in &change_requests {
+        if collisions.contains(request_hash){
+            conflicts.send(ActionConflict { hash: request_hash.clone() });
+            continue;
+        }
         let mut cleared = true;
         for contentious in contentious_entities {
             if let Some(thing) = change_requests_by_contentous_entities.get_mut(contentious) {
@@ -34,6 +49,8 @@ pub fn change_request_system(
         }
         if cleared {
             changes.dispatch(&mut commands);
+        } else {
+            conflicts.send(ActionConflict { hash: request_hash.clone() });
         }
     }
     /*

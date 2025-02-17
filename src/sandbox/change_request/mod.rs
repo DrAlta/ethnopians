@@ -17,6 +17,8 @@
 //!         send_event_for_Change_to_happen
 //!     }
 //! ```
+mod action_conflict;
+pub use action_conflict::ActionConflict;
 mod change_request;
 pub use change_request::ChangeRequest;
 mod change_request_system;
