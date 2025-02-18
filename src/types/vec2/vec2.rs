@@ -18,7 +18,7 @@ impl Vec2 {
     pub fn distance(self, rhs: Self) -> Number {
         (self - rhs).length()
     }
-    pub fn dot(self, rhs: Self) -> Number {
+    pub fn dot(self, rhs: &Self) -> Number {
         (self.x * rhs.x) + (self.y * rhs.y)
     }
     pub fn length_squared(self) -> Number {

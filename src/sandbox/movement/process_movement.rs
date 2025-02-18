@@ -14,7 +14,9 @@ use crate::{
     },
     Vec2,
 };
-
+/// I changed it to go thou the query and build a 
+/// Hashmap<EntityId, Vec2> of the normalized direction of traval 
+/// then just look inot that to see who collides with who
 pub fn process_movement(
     mut query: Query<(EntityId, Option<&Movement>, Option<&mut Location>, &Size)>,
     mut collision_events: EventWriter<Collision>,
@@ -26,6 +28,21 @@ pub fn process_movement(
 
     #[cfg(feature = "move_history")]
     logy!("debug-process-movement", "Going tosaving histoy");
+
+    let normalize_dir_of_travel: HashMap<EntityId, (Vec2, Number)> = query.iter().filter_map(|x|{
+        let (
+            id, 
+            Some(Movement { target, speed }), 
+            Some(&Location::World { x, y }),
+            _
+        ) = x else {
+            return None
+        };
+        let dir = (target - &Vec2 { x, y }).normalize();
+
+        Some((id, (dir, *speed)))
+
+    }).collect();
 
     let number_of_substeps = query.iter().fold(1.0, |x, (_, movement_maybe, _, _)| {
         if let Some(Movement { target: _, speed }) = movement_maybe {
@@ -124,7 +141,35 @@ pub fn process_movement(
             };
             moveit(desired, avals, map, &prev)
         };
-        collies.append(&mut temp_collies);
+        temp_collies.into_iter().for_each(|(a,b)| {
+            match (normalize_dir_of_travel.get(&a), normalize_dir_of_travel.get(&b)){
+                (Some((a_dir, a_speed)), Some((b_dir, b_speed))) => {
+                    let  dot = a_dir.dot(b_dir);
+                    if dot * a_speed < *b_speed {
+                        //b ran into a
+                        collies.insert((b,a));
+                        collisions.remove(&a);
+                        rearendings.remove(&a);
+                    }
+                    if dot * b_speed < -a_speed {
+                        //a ran into b
+                        collies.insert((a,b));
+                        collisions.remove(&b);
+                        rearendings.remove(&b);
+                    }
+                },
+                (Some(_), None) => {
+                    collies.insert((a,b));
+                },
+                (None, Some(_)) => {
+                    collies.insert((b,a));
+                },
+                (None, None)=> {
+                    collies.insert((a,b));
+                    collies.insert((b,a));
+                }
+            }
+        });
 
         last_froms = froms
             .iter()
@@ -169,49 +214,10 @@ pub fn process_movement(
         }
     }
     logy!("trace", "{} collsions found", collies.len());
-    for (min_id, max_id) in collies {
-        
-        match (query.get(min_id), query.get(max_id) ){
-            (
-                Ok((
-                    _,
-                    Some(Movement { target:min_target, speed: min_speed}), 
-                    Some(Location::World { x: min_x, y: min_y }),
-                    _
-                )), 
-                Ok((
-                    _,
-                    Some(Movement { target: max_target, speed: max_speed}), 
-                    Some(Location::World { x: max_x, y: max_y }),
-                    _,
-                ))
-            ) => {
-                let min_dir = (min_target - &Vec2{x: *min_x, y: *min_y}).normalize();
-                let max_dir = (max_target - &Vec2{x: *max_x, y: *max_y}).normalize();
-
-                let mins_compenent_along_max = max_dir.dot(min_dir) * min_speed;
-                if mins_compenent_along_max < *max_speed {
-                    collision_events.send(Collision{ agent_id: max_id, collider_id: min_id });
-                    // remove the Movement component
-                    commands.entity(max_id).remove::<Movement>();    
-                }
-
-                let maxs_compenent_along_min = min_dir.dot(max_dir) * max_speed;
-                if maxs_compenent_along_min < *min_speed {
-                    collision_events.send(Collision{ agent_id: min_id, collider_id: max_id });
-                    // remove the Movement component
-                    commands.entity(min_id).remove::<Movement>();    
-                }
-            },
-            _ => {
-                collision_events.send(Collision{ agent_id: min_id, collider_id: max_id });
-                collision_events.send(Collision{ collider_id: min_id, agent_id: max_id });
-                // remove the Movement component
-                commands.entity(min_id).remove::<Movement>();
-                commands.entity(max_id).remove::<Movement>();
-            }
-        }
-
+    for (agent_id, collider_id) in collies {
+        collision_events.send(Collision{ agent_id, collider_id });
+        // remove the Movement component
+        commands.entity(agent_id).remove::<Movement>();
     }
 }
 
