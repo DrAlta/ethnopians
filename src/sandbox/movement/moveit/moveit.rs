@@ -106,8 +106,13 @@ pub fn moveit<T: Prev>(
                     blocked = true;
                 }
                 // If the area already has a collision or rear-ended status, movement is blocked.
-                Some(Avalibility::Collision(_)) |
-                Some(Avalibility::RearEnded(_)) => {
+                Some(Avalibility::Collision(other_id)) |
+                Some(Avalibility::RearEnded(other_id)) => {
+                    // Record the collision between the two entities.
+                    let min_id = unit_id.min(*other_id);
+                    let max_id = unit_id.max(*other_id);
+                    collisions.insert((min_id, max_id));
+                    
                     blocked = true;
                 }
                 // No availability status; proceed without blocking.

@@ -1,6 +1,6 @@
 use std::collections::{BTreeSet, HashMap};
 
-use bevy::prelude::{Commands, Query};
+use bevy::{ecs::event::EventWriter, prelude::{Commands, Query}};
 
 use crate::{util::AARect, Number};
 
@@ -9,14 +9,16 @@ use qol::logy;
 use crate::{
     sandbox::{
         world::{Movement, Size},
+        movement::{moveit, setup_avals_map, Collision, Prev, TravelCompleted},
         EntityId, Location,
     },
     Vec2,
 };
 
-use super::{moveit, setup_avals_map, Prev};
 pub fn process_movement(
     mut query: Query<(EntityId, Option<&Movement>, Option<&mut Location>, &Size)>,
+    mut collision_events: EventWriter<Collision>,
+    mut travel_completed_events: EventWriter<TravelCompleted>,
     mut commands: Commands,
 ) {
     let max_step = 5.0;
@@ -143,6 +145,18 @@ pub fn process_movement(
         }
     }
     for (id, (x, y)) in moves {
+        // see if the entity reached it's destication
+        if let Ok((_, Some(Movement { target, speed: _ }), _, _)) = query.get(id) {
+            println!("{}:{} == {}", x,y,target);
+            if (x - target.x).abs() <= 0.0001 && (y - target.y).abs() <= 0.0001 {
+                // it reached it's destination so...
+                // send the TravelComplated event
+                travel_completed_events.send(TravelCompleted{ entity_id: id });
+                // remove the Movement component
+                commands.entity(id).remove::<Movement>();
+            }
+        } 
+
         let Ok((_, _, location_maybe, _)) = query.get_mut(id) else {
             continue;
         };
@@ -153,6 +167,51 @@ pub fn process_movement(
         } else {
             commands.entity(id).insert(new_loc);
         }
+    }
+    logy!("trace", "{} collsions found", collies.len());
+    for (min_id, max_id) in collies {
+        
+        match (query.get(min_id), query.get(max_id) ){
+            (
+                Ok((
+                    _,
+                    Some(Movement { target:min_target, speed: min_speed}), 
+                    Some(Location::World { x: min_x, y: min_y }),
+                    _
+                )), 
+                Ok((
+                    _,
+                    Some(Movement { target: max_target, speed: max_speed}), 
+                    Some(Location::World { x: max_x, y: max_y }),
+                    _,
+                ))
+            ) => {
+                let min_dir = (min_target - &Vec2{x: *min_x, y: *min_y}).normalize();
+                let max_dir = (max_target - &Vec2{x: *max_x, y: *max_y}).normalize();
+
+                let mins_compenent_along_max = max_dir.dot(min_dir) * min_speed;
+                if mins_compenent_along_max < *max_speed {
+                    collision_events.send(Collision{ agent_id: max_id, collider_id: min_id });
+                    // remove the Movement component
+                    commands.entity(max_id).remove::<Movement>();    
+                }
+
+                let maxs_compenent_along_min = min_dir.dot(max_dir) * max_speed;
+                if maxs_compenent_along_min < *min_speed {
+                    collision_events.send(Collision{ agent_id: min_id, collider_id: max_id });
+                    // remove the Movement component
+                    commands.entity(min_id).remove::<Movement>();    
+                }
+            },
+            _ => {
+                collision_events.send(Collision{ agent_id: min_id, collider_id: max_id });
+                collision_events.send(Collision{ collider_id: min_id, agent_id: max_id });
+                // remove the Movement component
+                commands.entity(min_id).remove::<Movement>();
+                commands.entity(max_id).remove::<Movement>();
+            }
+        }
+
     }
 }
 

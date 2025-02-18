@@ -268,12 +268,18 @@ impl Add<Vec2> for f64 {
         }
     }
 }
-
-impl Sub<Vec2> for Vec2 {
-    type Output = Self;
+impl Sub for Vec2 {
+    type Output = Vec2;
     #[inline]
-    fn sub(self, rhs: Self) -> Self {
-        Self {
+    fn sub(self, rhs: Self) -> Vec2 {
+        (&self).sub(&rhs)
+    }
+}
+impl Sub for &Vec2 {
+    type Output = Vec2;
+    #[inline]
+    fn sub(self, rhs: Self) -> Vec2 {
+        Vec2 {
             x: self.x.sub(rhs.x),
             y: self.y.sub(rhs.y),
         }
