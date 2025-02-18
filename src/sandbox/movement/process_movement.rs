@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
 
 use bevy::prelude::{Commands, Query};
 
@@ -61,6 +61,7 @@ pub fn process_movement(
         })
         .collect();
 
+    let mut collies = BTreeSet::new();
     let mut froms = HashMap::<EntityId, AARect>::new();
     #[allow(unused_mut)]
     let mut history = Vec::new();
@@ -106,7 +107,8 @@ pub fn process_movement(
         .collect();
 
         let (avals, map) = setup_avals_map(collisions, rearendings);
-        [froms, collisions, rearendings] = if step_number == 1 {
+        let mut temp_collies;
+        ([froms, collisions, rearendings], temp_collies) = if step_number == 1 {
             moveit(desired, avals, map, &query)
         } else {
             let prev = Previous {
@@ -120,6 +122,7 @@ pub fn process_movement(
             };
             moveit(desired, avals, map, &prev)
         };
+        collies.append(&mut temp_collies);
 
         last_froms = froms
             .iter()
@@ -130,6 +133,7 @@ pub fn process_movement(
     }
     let mut moves = Vec::new();
     for (unit_id, entity) in froms {
+        // moving entities to ther new locations
         let AARect { min_x, min_y, .. } = entity;
         let Some((x, y)) = query.get_location(unit_id) else {
             continue;
