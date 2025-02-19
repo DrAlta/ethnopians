@@ -21,7 +21,7 @@ pub fn tick_selector(
         // this goes directly to the fist child
         stack.push(
         //    StackItem::Selector(1)
-            StackItem::try_from([("Selector", 1.into())]).unwrap()
+            StackItem::selector(1)
         );
         stack.push(StackItem::init());
         let Some(child_token) = children.first() else {
@@ -81,11 +81,7 @@ pub fn tick_selector(
                 .get(*idx as usize)
                 .expect("we already check they it was within range");
             stack.push(
-                StackItem::try_from(
-                    [
-                        ("Selector", (idx + 1).into())
-                    ]
-                ).unwrap()
+                StackItem::selector(idx + 1)
             );
             stack.push(StackItem::init());
             return_stack.push(pc.clone().unwrap());
@@ -112,7 +108,7 @@ mod tests {
             Ok(Status::None)
         );
         assert_eq!(stack, vec![
-            StackItem::try_from([("Selector", 1.into())]).unwrap(), 
+            StackItem::selector(1), 
             StackItem::init()
         ]);
         assert_eq!(rs, vec![("1".to_owned(), 0)]);

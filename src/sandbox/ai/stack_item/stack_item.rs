@@ -14,6 +14,20 @@ impl StackItem{
     pub fn init() -> StackItem {
         StackItem::String("Init".to_owned())
     }
+    pub fn selector(value: i32) -> Self {
+        StackItem::try_from(
+            [
+                ("Selector", value.into())
+            ]
+        ).unwrap()
+    }
+    pub fn sequence(value: i32) -> Self {
+        StackItem::try_from(
+            [
+                ("Sequence", value.into())
+            ]
+        ).unwrap()
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord,)]
