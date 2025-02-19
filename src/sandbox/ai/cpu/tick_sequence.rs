@@ -1,6 +1,6 @@
 use qol::logy;
 
-use crate::sandbox::ai::{ExecutionToken, StackItem, Status};
+use crate::sandbox::ai::{stack_item::TableInterior, ExecutionToken, StackItem, Status};
 
 use super::{ProgramCounter, ReturnStack, Stack};
 
@@ -14,10 +14,10 @@ pub fn tick_sequence(
         return Err("Nothing on stack when checking result of child".into());
     };
 
-    if if let StackItem::String(x)/*Init*/ = tos {x == "Init"} else {false} {
+    if if let StackItem::String(x)/*Init*/ = &tos {x == "Init"} else {false} {
         // this runs the first child
-        stack.push(StackItem::Sequence(1));
-        stack.push(StackItem::Init);
+        stack.push(StackItem::sequence(1));
+        stack.push(StackItem::init());
         let Some(child_token) = children.first() else {
             return Err("failed to get first child".into());
         };
@@ -33,12 +33,20 @@ pub fn tick_sequence(
     };
     logy!("trace-tick-sequence", "Doing main body of Sequence tick");
 
-    let Some(StackItem::Sequence(idx)) = stack.pop() else {
+    let Some(StackItem::Table(x)) = stack.pop() else {
+        logy!("debug", "{stack:#?}");
         return Err("Sequence state not found on stack".into());
     };
-    match (idx >= children.len(), tos) {
-        (_, StackItem::Failure) => {
-            stack.push(StackItem::Failure);
+    let TableInterior { map, parents: _ } = x.as_ref();
+    let map2 = map.borrow();
+    let Some(StackItem::Int(idx)) = map2.get(&StackItem::String("Sequence".to_owned())) else {
+        logy!("debug", "{map:#?}");
+        return Err("Sequence state not found on stack".into());
+    };
+
+    match (*idx as usize >= children.len(), tos) {
+        (_, StackItem::String(x)) if x == "Failure" => {
+            stack.push(StackItem::failure());
             if let Some(parent_token) = return_stack.pop() {
                 // return to calling fuction
                 *pc = Some(parent_token);
@@ -49,8 +57,8 @@ pub fn tick_sequence(
                 return Ok(Status::Failure);
             };
         }
-        (true, StackItem::Success) => {
-            stack.push(StackItem::Success);
+        (true, StackItem::String(x)) if x == "Success" => {
+            stack.push(StackItem::success());
             if let Some(parent_token) = return_stack.pop() {
                 // return to calling fuction
                 *pc = Some(parent_token);
@@ -61,12 +69,12 @@ pub fn tick_sequence(
                 return Ok(Status::Success);
             };
         }
-        (false, StackItem::Success) => {
+        (false, StackItem::String(x)) if x == "Success" => {
             let child_token = children
-                .get(idx)
+                .get(*idx as usize)
                 .expect("we already check they it was within range");
-            stack.push(StackItem::Sequence(idx + 1));
-            stack.push(StackItem::Init);
+            stack.push(StackItem::sequence(idx + 1));
+            stack.push(StackItem::init());
             return_stack.push(pc.clone().unwrap());
             *pc = Some((child_token.clone(), 0));
             return Ok(Status::None);
@@ -80,7 +88,7 @@ mod tests {
 
     #[test]
     pub fn sequence_init_test() {
-        let mut stack = vec![StackItem::Init];
+        let mut stack = vec![StackItem::init()];
         let mut rs = Vec::new();
         let mut pc = Some(("1".to_owned(), 0));
 
@@ -90,13 +98,13 @@ mod tests {
             tick_sequence(&children, &mut stack, &mut rs, &mut pc),
             Ok(Status::None)
         );
-        assert_eq!(stack, vec![StackItem::Sequence(1), StackItem::Init]);
+        assert_eq!(stack, vec![StackItem::sequence(1), StackItem::init()]);
         assert_eq!(rs, vec![("1".to_owned(), 0)]);
         assert_eq!(pc, Some(("42".to_owned(), 0)));
     }
     #[test]
     pub fn sequence_step_test() {
-        let mut stack = vec![StackItem::Sequence(0), StackItem::Success];
+        let mut stack = vec![StackItem::sequence(0), StackItem::success()];
         let mut rs = Vec::new();
         let mut pc = Some(("1".to_owned(), 0));
 
@@ -106,13 +114,13 @@ mod tests {
             tick_sequence(&children, &mut stack, &mut rs, &mut pc),
             Ok(Status::None)
         );
-        assert_eq!(stack, vec![StackItem::Sequence(1), StackItem::Init]);
+        assert_eq!(stack, vec![StackItem::sequence(1), StackItem::init()]);
         assert_eq!(rs, vec![("1".to_owned(), 0)]);
         assert_eq!(pc, Some(("42".to_owned(), 0)));
     }
     #[test]
     pub fn sequence_success_test() {
-        let mut stack = vec![StackItem::Sequence(2), StackItem::Success];
+        let mut stack = vec![StackItem::sequence(2), StackItem::success()];
         let mut rs = Vec::new();
         let mut pc = Some(("1".to_owned(), 0));
 
@@ -122,13 +130,13 @@ mod tests {
             tick_sequence(&children, &mut stack, &mut rs, &mut pc),
             Ok(Status::Success)
         );
-        assert_eq!(stack, vec![StackItem::Success]);
+        assert_eq!(stack, vec![StackItem::success()]);
         assert_eq!(rs, ReturnStack::new());
         assert_eq!(pc, None);
     }
     #[test]
     pub fn sequence_fail_test() {
-        let mut stack = vec![StackItem::Sequence(0), StackItem::Failure];
+        let mut stack = vec![StackItem::sequence(0), StackItem::failure()];
         let mut rs = Vec::new();
         let mut pc = Some(("1".to_owned(), 0));
 
@@ -138,7 +146,7 @@ mod tests {
             tick_sequence(&children, &mut stack, &mut rs, &mut pc),
             Ok(Status::Failure)
         );
-        assert_eq!(stack, vec![StackItem::Failure]);
+        assert_eq!(stack, vec![StackItem::failure()]);
         assert_eq!(rs, ReturnStack::new());
         assert_eq!(pc, None);
     }
