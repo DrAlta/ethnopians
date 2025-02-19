@@ -39,7 +39,7 @@ mod location;
 pub use location::Location;
 pub mod inventory;
 mod movement;
-pub use movement::{process_movement, Prev, Collision, TravelCompleted};
+pub use movement::{process_movement, Collision, Prev, TravelCompleted};
 mod r#return;
 pub use r#return::Return;
 

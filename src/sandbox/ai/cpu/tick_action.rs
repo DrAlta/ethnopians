@@ -12,7 +12,6 @@ pub fn tick_action(
         return Err("Nothing on stack when checking result of child".into());
     };
     match tos {
-        
         StackItem::String(x) if x == "Success" => {
             stack.push(StackItem::success());
             if let Some(parent_token) = return_stack.pop() {

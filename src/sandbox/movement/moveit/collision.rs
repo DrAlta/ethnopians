@@ -19,7 +19,7 @@ pub fn collision<T: Prev>(
     aval: &mut HashMap<SpatialId, Avalibility>,
     map: &mut SweepAndPrune,
     prev: &T,
-    collisions: &mut BTreeSet<(EntityId,EntityId)>,
+    collisions: &mut BTreeSet<(EntityId, EntityId)>,
 ) {
     loop {
         // Attempt to retrieve and remove the first entity from the 'todo' set.
@@ -70,8 +70,7 @@ pub fn collision<T: Prev>(
                     continue;
                 }
                 // Ignore if the area already has a 'Collision' or 'RearEnded' status.
-                Some(Avalibility::Collision(_)) |
-                Some(Avalibility::RearEnded(_)) => (),
+                Some(Avalibility::Collision(_)) | Some(Avalibility::RearEnded(_)) => (),
                 // No availability status; do nothing.
                 None => (),
             }

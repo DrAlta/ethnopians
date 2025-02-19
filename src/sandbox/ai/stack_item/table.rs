@@ -6,7 +6,7 @@ use std::rc::{Rc, Weak};
 use crate::sandbox::ai::StackItem as Value;
 
 // ParentTables is the type in the RefCell of TableInterior's parents proporty
-pub (super) type ParentTables = Vec<Weak<TableInterior>>;
+pub(super) type ParentTables = Vec<Weak<TableInterior>>;
 
 // TableInterior is the type that the Value::Table has in its Rc
 #[derive(Debug)]

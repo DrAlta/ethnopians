@@ -1,6 +1,8 @@
 use qol::logy;
 
-use crate::sandbox::ai::{stack_item::TableInterior, ExecutionToken, Instruction, StackItem, Status};
+use crate::sandbox::ai::{
+    stack_item::TableInterior, ExecutionToken, Instruction, StackItem, Status,
+};
 
 use super::{ProgramCounter, ReturnStack, Stack};
 
@@ -20,8 +22,8 @@ pub fn tick_selector(
     if StackItem::init() == tos {
         // this goes directly to the fist child
         stack.push(
-        //    StackItem::Selector(1)
-            StackItem::selector(1)
+            //    StackItem::Selector(1)
+            StackItem::selector(1),
         );
         stack.push(StackItem::init());
         let Some(child_token) = children.first() else {
@@ -80,9 +82,7 @@ pub fn tick_selector(
             let child_token: &ExecutionToken = children
                 .get(*idx as usize)
                 .expect("we already check they it was within range");
-            stack.push(
-                StackItem::selector(idx + 1)
-            );
+            stack.push(StackItem::selector(idx + 1));
             stack.push(StackItem::init());
             return_stack.push(pc.clone().unwrap());
             *pc = Some((child_token.clone(), 0));
@@ -107,10 +107,7 @@ mod tests {
             tick_selector(&children, &mut stack, &mut rs, &mut pc),
             Ok(Status::None)
         );
-        assert_eq!(stack, vec![
-            StackItem::selector(1), 
-            StackItem::init()
-        ]);
+        assert_eq!(stack, vec![StackItem::selector(1), StackItem::init()]);
         assert_eq!(rs, vec![("1".to_owned(), 0)]);
         assert_eq!(pc, Some(("42".to_owned(), 0)));
     }

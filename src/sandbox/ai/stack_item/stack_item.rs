@@ -4,8 +4,8 @@ use crate::sandbox::EntityId;
 
 use super::table::{ParentTables, TableInterior};
 
-impl StackItem{
-    pub fn success()->StackItem{ 
+impl StackItem {
+    pub fn success() -> StackItem {
         StackItem::String("Success".to_owned())
     }
     pub fn failure() -> StackItem {
@@ -15,22 +15,14 @@ impl StackItem{
         StackItem::String("Init".to_owned())
     }
     pub fn selector(value: i32) -> Self {
-        StackItem::try_from(
-            [
-                ("Selector", value.into())
-            ]
-        ).unwrap()
+        StackItem::try_from([("Selector", value.into())]).unwrap()
     }
     pub fn sequence(value: i32) -> Self {
-        StackItem::try_from(
-            [
-                ("Sequence", value.into())
-            ]
-        ).unwrap()
+        StackItem::try_from([("Sequence", value.into())]).unwrap()
     }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord,)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum StackItem {
     /*
     //Behaior states
@@ -46,13 +38,11 @@ pub enum StackItem {
     False,
     Coord { x: i32, y: i32 },
     EntityId(EntityId),
-//    Todo(Vec<EntityId>),
+    //    Todo(Vec<EntityId>),
     // vvv sure to keep these vvvv
     Option(Option<Box<StackItem>>),
     String(String),
     Table(Rc<TableInterior>),
-
-
 }
 impl Clone for StackItem {
     fn clone(&self) -> Self {
@@ -66,7 +56,10 @@ impl Clone for StackItem {
             StackItem::Int(x) => StackItem::Int(x.clone()),
             StackItem::True => StackItem::True,
             StackItem::False => StackItem::True,
-            StackItem::Coord { x, y } =>  StackItem::Coord { x: x.clone(), y: y.clone() },
+            StackItem::Coord { x, y } => StackItem::Coord {
+                x: x.clone(),
+                y: y.clone(),
+            },
             StackItem::String(x) => StackItem::String(x.clone()),
             StackItem::EntityId(entity) => StackItem::EntityId(entity.clone()),
             StackItem::Option(stack_item) => StackItem::Option(stack_item.clone()),
@@ -77,17 +70,17 @@ impl std::fmt::Display for StackItem {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             StackItem::Table(rc) => {
-                        let inner_map = rc.map.borrow_mut();
-                        let mut table_iter = inner_map.iter();
-                        write!(f, "{{",)?;
-                        if let Some(first) = table_iter.next() {
-                            write!(f, "{}: {}", first.0, first.1)?;
-                            for (key, value) in table_iter {
-                                write!(f, ", {}: {}", key, value)?;
-                            }
-                        }
-                        write!(f, "}}")
+                let inner_map = rc.map.borrow_mut();
+                let mut table_iter = inner_map.iter();
+                write!(f, "{{",)?;
+                if let Some(first) = table_iter.next() {
+                    write!(f, "{}: {}", first.0, first.1)?;
+                    for (key, value) in table_iter {
+                        write!(f, ", {}: {}", key, value)?;
                     }
+                }
+                write!(f, "}}")
+            }
             /*
             StackItem::Sequence(x) => write!(f, "SequenceState({x})"),
             StackItem::Selector(x) => write!(f, "SelectorState({x})"),
@@ -101,13 +94,11 @@ impl std::fmt::Display for StackItem {
             StackItem::Coord { x, y } => write!(f, "Coord[{x}:{y}]"),
             StackItem::String(x) => write!(f, "{x}"),
             StackItem::EntityId(x) => write!(f, "{x}"),
-            StackItem::Option(stack_item) => {
-                match stack_item {
-                    Some(x) => write!(f, "Some({x})"),
-                    None => write!(f, "None"),
-                }
+            StackItem::Option(stack_item) => match stack_item {
+                Some(x) => write!(f, "Some({x})"),
+                None => write!(f, "None"),
             },
-//            StackItem::Todo(items) => todo!(),
+            //            StackItem::Todo(items) => todo!(),
         }
     }
 }
@@ -115,8 +106,8 @@ impl std::hash::Hash for StackItem {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         match self {
             StackItem::Table(rc) => {
-                        rc.hash(state);
-                    }
+                rc.hash(state);
+            }
             /*
             StackItem::Sequence(x) => x.hash(state),
             StackItem::Selector(x) => x.hash(state),
@@ -127,11 +118,11 @@ impl std::hash::Hash for StackItem {
             StackItem::Int(x) => x.hash(state),
             StackItem::True => true.hash(state),
             StackItem::False => false.hash(state),
-            StackItem::Coord { x, y } => (x,y).hash(state),
+            StackItem::Coord { x, y } => (x, y).hash(state),
             StackItem::String(x) => x.hash(state),
             StackItem::EntityId(x) => x.hash(state),
             StackItem::Option(x) => x.hash(state),
-//            StackItem::Todo(items) => todo!(),
+            //            StackItem::Todo(items) => todo!(),
         }
     }
 }
@@ -149,10 +140,9 @@ impl StackItem {
             parents: RefCell::new(ParentTables::new()),
         }))
     }
-    
 }
 
-impl StackItem{
+impl StackItem {
     pub fn same(&self, other: &Self) -> bool {
         if let (StackItem::Table(self_rc), StackItem::Table(other_rc)) = (self, other) {
             return Rc::ptr_eq(&self_rc, &other_rc);
@@ -184,13 +174,12 @@ impl StackItem{
             _ => Err("ForthKind::StuffeeNotTable".to_owned()),
         }
     }
-
 }
 
-impl<const N: usize> TryFrom<[(StackItem, StackItem);N]> for StackItem{
+impl<const N: usize> TryFrom<[(StackItem, StackItem); N]> for StackItem {
     type Error = String;
 
-    fn try_from(value: [(StackItem, StackItem);N]) -> Result<StackItem, Self::Error> {
+    fn try_from(value: [(StackItem, StackItem); N]) -> Result<StackItem, Self::Error> {
         let mut ret = StackItem::new_table();
         for (key, stuffing) in value.into_iter() {
             ret.stuff(stuffing, key)?
@@ -198,10 +187,10 @@ impl<const N: usize> TryFrom<[(StackItem, StackItem);N]> for StackItem{
         Ok(ret)
     }
 }
-impl<const N: usize> TryFrom<[(&str, StackItem);N]> for StackItem{
+impl<const N: usize> TryFrom<[(&str, StackItem); N]> for StackItem {
     type Error = String;
 
-    fn try_from(value: [(&str, StackItem);N]) -> Result<StackItem, Self::Error> {
+    fn try_from(value: [(&str, StackItem); N]) -> Result<StackItem, Self::Error> {
         let mut ret = StackItem::new_table();
         for (key, stuffing) in value.into_iter() {
             ret.stuff(stuffing, Self::String(key.to_owned()))?
@@ -210,7 +199,7 @@ impl<const N: usize> TryFrom<[(&str, StackItem);N]> for StackItem{
     }
 }
 
-impl From<i32> for StackItem{
+impl From<i32> for StackItem {
     fn from(value: i32) -> Self {
         Self::Int(value)
     }

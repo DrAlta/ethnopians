@@ -65,7 +65,7 @@ impl DeepDeepCopy for Value {
                 }
                 dolly_the_clone
             }
-            x@ _ => x.clone()
+            x @ _ => x.clone(),
         }
     }
 }

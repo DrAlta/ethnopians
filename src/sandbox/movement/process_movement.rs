@@ -1,6 +1,9 @@
 use std::collections::{BTreeSet, HashMap};
 
-use bevy::{ecs::event::EventWriter, prelude::{Commands, Query}};
+use bevy::{
+    ecs::event::EventWriter,
+    prelude::{Commands, Query},
+};
 
 use crate::{util::AARect, Number};
 
@@ -8,14 +11,14 @@ use qol::logy;
 
 use crate::{
     sandbox::{
-        world::{Movement, Size},
         movement::{moveit, setup_avals_map, Collision, Prev, TravelCompleted},
+        world::{Movement, Size},
         EntityId, Location,
     },
     Vec2,
 };
-/// I changed it to go thou the query and build a 
-/// Hashmap<EntityId, Vec2> of the normalized direction of traval 
+/// I changed it to go thou the query and build a
+/// Hashmap<EntityId, Vec2> of the normalized direction of traval
 /// then just look inot that to see who collides with who
 pub fn process_movement(
     mut query: Query<(EntityId, Option<&Movement>, Option<&mut Location>, &Size)>,
@@ -29,20 +32,18 @@ pub fn process_movement(
     #[cfg(feature = "move_history")]
     logy!("debug-process-movement", "Going tosaving histoy");
 
-    let normalize_dir_of_travel: HashMap<EntityId, (Vec2, Number)> = query.iter().filter_map(|x|{
-        let (
-            id, 
-            Some(Movement { target, speed }), 
-            Some(&Location::World { x, y }),
-            _
-        ) = x else {
-            return None
-        };
-        let dir = (target - &Vec2 { x, y }).normalize();
+    let normalize_dir_of_travel: HashMap<EntityId, (Vec2, Number)> = query
+        .iter()
+        .filter_map(|x| {
+            let (id, Some(Movement { target, speed }), Some(&Location::World { x, y }), _) = x
+            else {
+                return None;
+            };
+            let dir = (target - &Vec2 { x, y }).normalize();
 
-        Some((id, (dir, *speed)))
-
-    }).collect();
+            Some((id, (dir, *speed)))
+        })
+        .collect();
 
     let number_of_substeps = query.iter().fold(1.0, |x, (_, movement_maybe, _, _)| {
         if let Some(Movement { target: _, speed }) = movement_maybe {
@@ -154,7 +155,6 @@ pub fn process_movement(
                             collies.insert((b,a));
                             collisions.remove(&a);
                             rearendings.remove(&a);
-                            
                         },
                         (false, true) => {
                             //b is still so a ran into b
@@ -173,7 +173,7 @@ pub fn process_movement(
                                    //b ran into a
                                    collies.insert((b,a));
                                    collisions.remove(&a);
-                                   rearendings.remove(&a);                                   
+                                   rearendings.remove(&a);
                                 },
                                 // they aren't moving at right angle to each other and the component of A's speed in B's direction is equal to B's speed
                                 (false, _, std::cmp::Ordering::Equal) |
@@ -229,15 +229,15 @@ pub fn process_movement(
     for (id, (x, y)) in moves {
         // see if the entity reached it's destication
         if let Ok((_, Some(Movement { target, speed: _ }), _, _)) = query.get(id) {
-            println!("{}:{} == {}", x,y,target);
+            println!("{}:{} == {}", x, y, target);
             if (x - target.x).abs() <= 0.0001 && (y - target.y).abs() <= 0.0001 {
                 // it reached it's destination so...
                 // send the TravelComplated event
-                travel_completed_events.send(TravelCompleted{ entity_id: id });
+                travel_completed_events.send(TravelCompleted { entity_id: id });
                 // remove the Movement component
                 commands.entity(id).remove::<Movement>();
             }
-        } 
+        }
 
         let Ok((_, _, location_maybe, _)) = query.get_mut(id) else {
             continue;
@@ -252,7 +252,10 @@ pub fn process_movement(
     }
     logy!("trace", "{} collsions found", collies.len());
     for (agent_id, collider_id) in collies {
-        collision_events.send(Collision{ agent_id, collider_id });
+        collision_events.send(Collision {
+            agent_id,
+            collider_id,
+        });
         // remove the Movement component
         commands.entity(agent_id).remove::<Movement>();
     }

@@ -39,9 +39,12 @@ pub fn moveit<T: Prev>(
     mut avals: HashMap<SpatialId, Avalibility>,
     mut map: SweepAndPrune,
     prev: &T,
-) -> ([HashMap<EntityId, AARect>; 3], BTreeSet<(EntityId, EntityId)>) {
+) -> (
+    [HashMap<EntityId, AARect>; 3],
+    BTreeSet<(EntityId, EntityId)>,
+) {
     // Set to keep track of unique collision pairs between entities.
-    let mut collisions= BTreeSet::new();
+    let mut collisions = BTreeSet::new();
 
     // Iterate over each entity and its desired destination.
     for (unit_id, destination) in desired {
@@ -106,13 +109,12 @@ pub fn moveit<T: Prev>(
                     blocked = true;
                 }
                 // If the area already has a collision or rear-ended status, movement is blocked.
-                Some(Avalibility::Collision(other_id)) |
-                Some(Avalibility::RearEnded(other_id)) => {
+                Some(Avalibility::Collision(other_id)) | Some(Avalibility::RearEnded(other_id)) => {
                     // Record the collision between the two entities.
                     let min_id = unit_id.min(*other_id);
                     let max_id = unit_id.max(*other_id);
                     collisions.insert((min_id, max_id));
-                    
+
                     blocked = true;
                 }
                 // No availability status; proceed without blocking.
