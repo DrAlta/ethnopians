@@ -36,16 +36,16 @@ fn step_test() {
     let mut cpu = CPU::load(selector.clone());
     //step 1 selectpr does its init and sets the cpu up to call its first child, sequence.
     assert_eq!(cpu.step(&bt, &mut blackboard), Ok(Status::None));
-    assert_eq!(&cpu.stack, &vec![StackItem::Selector(1), StackItem::Init]);
+    assert_eq!(&cpu.stack, &vec![StackItem::selector(1), StackItem::init()]);
     assert_eq!(&cpu.return_stack, &vec![(selector.clone(), 0)]);
     //step 2 sequence intalized and set the cpu up to call its first child, action1
     assert_eq!(cpu.step(&bt, &mut blackboard), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
         &vec![
-            StackItem::Selector(1),
-            StackItem::Sequence(1),
-            StackItem::Init
+            StackItem::selector(1),
+            StackItem::sequence(1),
+            StackItem::init()
         ]
     );
     assert_eq!(
@@ -60,9 +60,9 @@ fn step_test() {
     assert_eq!(
         &cpu.stack,
         &vec![
-            StackItem::Selector(1),
-            StackItem::Sequence(1),
-            StackItem::Success
+            StackItem::selector(1),
+            StackItem::sequence(1),
+            StackItem::success()
         ]
     );
     assert_eq!(
@@ -75,9 +75,9 @@ fn step_test() {
     assert_eq!(
         &cpu.stack,
         &vec![
-            StackItem::Selector(1),
-            StackItem::Sequence(1),
-            StackItem::Success
+            StackItem::selector(1),
+            StackItem::sequence(1),
+            StackItem::success()
         ]
     );
     assert_eq!(&cpu.return_stack, &vec![(selector.clone(), 0)]);
@@ -86,9 +86,9 @@ fn step_test() {
     assert_eq!(
         &cpu.stack,
         &vec![
-            StackItem::Selector(1),
-            StackItem::Sequence(2),
-            StackItem::Init
+            StackItem::selector(1),
+            StackItem::sequence(2),
+            StackItem::init()
         ]
     );
     assert_eq!(&cpu.pc, &Some((action2, 0)));
@@ -104,9 +104,9 @@ fn step_test() {
     assert_eq!(
         &cpu.stack,
         &vec![
-            StackItem::Selector(1),
-            StackItem::Sequence(2),
-            StackItem::Failure
+            StackItem::selector(1),
+            StackItem::sequence(2),
+            StackItem::failure()
         ]
     );
     assert_eq!(
@@ -118,9 +118,9 @@ fn step_test() {
     assert_eq!(
         &cpu.stack,
         &vec![
-            StackItem::Selector(1),
-            StackItem::Sequence(2),
-            StackItem::Failure
+            StackItem::selector(1),
+            StackItem::sequence(2),
+            StackItem::failure()
         ]
     );
     assert_eq!(&cpu.return_stack, &vec![(selector.clone(), 0)]);
@@ -128,12 +128,12 @@ fn step_test() {
     assert_eq!(cpu.step(&bt, &mut blackboard), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
-        &vec![StackItem::Selector(1), StackItem::Failure]
+        &vec![StackItem::selector(1), StackItem::failure()]
     );
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
     //step 9 selector sees it's first child has returned failure so puts it's new state and then init on the stack and set up the cpu to run it's second child, action3
     assert_eq!(cpu.step(&bt, &mut blackboard), Ok(Status::None));
-    assert_eq!(&cpu.stack, &vec![StackItem::Selector(2), StackItem::Init]);
+    assert_eq!(&cpu.stack, &vec![StackItem::selector(2), StackItem::init()]);
     assert_eq!(&cpu.return_stack, &vec![(selector.clone(), 0)]);
     //step 10 action3 sees init and puts Success on tha stack and prays Running(3)
     assert_eq!(
@@ -142,23 +142,23 @@ fn step_test() {
     );
     assert_eq!(
         &cpu.stack,
-        &vec![StackItem::Selector(2), StackItem::Success]
+        &vec![StackItem::selector(2), StackItem::success()]
     );
     assert_eq!(&cpu.return_stack, &vec![(selector, 0)]);
     //step 11 action3 sees the success on the stack and returns it to the calling function
     assert_eq!(cpu.step(&bt, &mut blackboard), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
-        &vec![StackItem::Selector(2), StackItem::Success]
+        &vec![StackItem::selector(2), StackItem::success()]
     );
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
     //step 12 selection sees its it's child return success then seens its' has no calling function so holts execution and prays Success
     assert_eq!(cpu.step(&bt, &mut blackboard), Ok(Status::Success));
-    assert_eq!(&cpu.stack, &vec![StackItem::Success]);
+    assert_eq!(&cpu.stack, &vec![StackItem::success()]);
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
     //step 13 the program has is holted
     assert_eq!(cpu.step(&bt, &mut blackboard), Err("program halted".into()));
-    assert_eq!(&cpu.stack, &vec![StackItem::Success]);
+    assert_eq!(&cpu.stack, &vec![StackItem::success()]);
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
 }
 
