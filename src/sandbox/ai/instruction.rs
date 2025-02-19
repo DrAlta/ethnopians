@@ -90,7 +90,7 @@ impl Instruction {
                 if token == "remove_entities_of_type" {
                     logy!(
                         "debug",
-                        "remove_entities_of_type was processed. contained:{}",
+                        "call to remove_entities_of_type was processed. contained:{}",
                         bt.contains_key(token)
                     );
                 }

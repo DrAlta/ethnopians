@@ -15,7 +15,7 @@ pub struct CPU {
 impl CPU {
     pub fn load(token: ExecutionToken) -> Self {
         let pc = Some((token.clone(), 0));
-        let stack = vec![StackItem::Init];
+        let stack = vec![StackItem::init()];
         let return_stack = Vec::new();
 
         Self {

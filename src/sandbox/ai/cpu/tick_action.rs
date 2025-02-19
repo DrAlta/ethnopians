@@ -12,8 +12,9 @@ pub fn tick_action(
         return Err("Nothing on stack when checking result of child".into());
     };
     match tos {
-        StackItem::Success => {
-            stack.push(StackItem::Success);
+        
+        StackItem::String(x) if x == "Success" => {
+            stack.push(StackItem::success());
             if let Some(parent_token) = return_stack.pop() {
                 // return to calling fuction
                 *pc = Some(parent_token);
@@ -24,8 +25,8 @@ pub fn tick_action(
                 return Ok(Status::Success);
             };
         }
-        StackItem::Failure => {
-            stack.push(StackItem::Failure);
+        StackItem::String(x) if x == "Failure" => {
+            stack.push(StackItem::failure());
             if let Some(parent_token) = return_stack.pop() {
                 // return to calling fuction
                 *pc = Some(parent_token);
@@ -36,11 +37,11 @@ pub fn tick_action(
                 return Ok(Status::Failure);
             };
         }
-        StackItem::Init => {
+        StackItem::String(x) if x == "Init" => {
             let x = if action_id == &InpulseId::Act2 {
-                StackItem::Failure
+                StackItem::failure()
             } else {
-                StackItem::Success
+                StackItem::success()
             };
             stack.push(x);
             return Ok(Status::Running(action_id.clone()));

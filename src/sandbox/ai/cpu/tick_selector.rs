@@ -1,6 +1,6 @@
 use qol::logy;
 
-use crate::sandbox::ai::{ExecutionToken, Instruction, StackItem, Status};
+use crate::sandbox::ai::{stack_item::TableInterior, ExecutionToken, Instruction, StackItem, Status};
 
 use super::{ProgramCounter, ReturnStack, Stack};
 
@@ -17,10 +17,13 @@ pub fn tick_selector(
         return Err("Nothing on stack when checking result of child".into());
     };
 
-    if StackItem::Init == tos {
+    if StackItem::init() == tos {
         // this goes directly to the fist child
-        stack.push(StackItem::Selector(1));
-        stack.push(StackItem::Init);
+        stack.push(
+        //    StackItem::Selector(1)
+            StackItem::try_from([("Selector", 1.into())]).unwrap()
+        );
+        stack.push(StackItem::init());
         let Some(child_token) = children.first() else {
             return Err("failed to get first child".into());
         };
@@ -37,14 +40,21 @@ pub fn tick_selector(
     };
     logy!("trace-tick-selector", "Doing main body of Selector tick");
 
-    let Some(StackItem::Selector(idx)) = stack.pop() else {
+    let Some(StackItem::Table(x)) = stack.pop() else {
         logy!("debug", "{stack:#?}");
         return Err("Selector state not found on stack".into());
     };
-    match (idx >= children.len(), tos) {
+    let TableInterior { map, parents: _ } = x.as_ref();
+    let map2 = map.borrow();
+    let Some(StackItem::Int(idx)) = map2.get(&StackItem::String("Selector".to_owned())) else {
+        logy!("debug", "{map:#?}");
+        return Err("Selector state not found on stack".into());
+    };
+
+    match (*idx as usize >= children.len(), tos) {
         // if we had a success then we succeed
-        (_, StackItem::Success) => {
-            stack.push(StackItem::Success);
+        (_, StackItem::String(x)) if x == "Success" => {
+            stack.push(StackItem::success());
             let status = if pc.is_none() {
                 Status::None
             } else {
@@ -52,9 +62,9 @@ pub fn tick_selector(
             };
             Instruction::exit(status, return_stack, pc)
         }
-        (true, StackItem::Failure) => {
+        (true, StackItem::String(x)) if x == "Failure" => {
             // if we reached the end without a Success then we fail
-            stack.push(StackItem::Failure);
+            stack.push(StackItem::failure());
             if let Some(parent_token) = return_stack.pop() {
                 // return to calling fuction
                 *pc = Some(parent_token);
@@ -66,12 +76,18 @@ pub fn tick_selector(
             };
         }
         // if we haven't reached the end and received a Failure then try the next child
-        (false, StackItem::Failure) => {
-            let child_token = children
-                .get(idx)
+        (false, StackItem::String(x)) if x == "Failure" => {
+            let child_token: &ExecutionToken = children
+                .get(*idx as usize)
                 .expect("we already check they it was within range");
-            stack.push(StackItem::Selector(idx + 1));
-            stack.push(StackItem::Init);
+            stack.push(
+                StackItem::try_from(
+                    [
+                        ("Selector", (idx + 1).into())
+                    ]
+                ).unwrap()
+            );
+            stack.push(StackItem::init());
             return_stack.push(pc.clone().unwrap());
             *pc = Some((child_token.clone(), 0));
             return Ok(Status::None);
@@ -85,7 +101,7 @@ mod tests {
 
     #[test]
     pub fn selector_init_test() {
-        let mut stack = vec![StackItem::Init];
+        let mut stack = vec![StackItem::init()];
         let mut rs = Vec::new();
         let mut pc = Some(("1".to_owned(), 0));
 
@@ -95,7 +111,10 @@ mod tests {
             tick_selector(&children, &mut stack, &mut rs, &mut pc),
             Ok(Status::None)
         );
-        assert_eq!(stack, vec![StackItem::Selector(1), StackItem::Init]);
+        assert_eq!(stack, vec![
+            StackItem::try_from([("Selector", 1.into())]).unwrap(), 
+            StackItem::init()
+        ]);
         assert_eq!(rs, vec![("1".to_owned(), 0)]);
         assert_eq!(pc, Some(("42".to_owned(), 0)));
     }

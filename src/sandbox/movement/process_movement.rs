@@ -126,7 +126,7 @@ pub fn process_movement(
         .collect();
 
         let (avals, map) = setup_avals_map(collisions, rearendings);
-        let mut temp_collies;
+        let temp_collies;
         ([froms, collisions, rearendings], temp_collies) = if step_number == 1 {
             moveit(desired, avals, map, &query)
         } else {
@@ -144,18 +144,55 @@ pub fn process_movement(
         temp_collies.into_iter().for_each(|(a,b)| {
             match (normalize_dir_of_travel.get(&a), normalize_dir_of_travel.get(&b)){
                 (Some((a_dir, a_speed)), Some((b_dir, b_speed))) => {
-                    let  dot = a_dir.dot(b_dir);
-                    if dot * a_speed < *b_speed {
-                        //b ran into a
-                        collies.insert((b,a));
-                        collisions.remove(&a);
-                        rearendings.remove(&a);
-                    }
-                    if dot * b_speed < -a_speed {
-                        //a ran into b
-                        collies.insert((a,b));
-                        collisions.remove(&b);
-                        rearendings.remove(&b);
+                    match (a_speed.abs() < 0.0001, b_speed.abs() < 0.0001) {
+                        (true, true) => {
+                            collies.insert((a,b));
+                            collies.insert((b,a));
+                        },
+                        (true, false) => {
+                            //a is stiall do b ran into a
+                            collies.insert((b,a));
+                            collisions.remove(&a);
+                            rearendings.remove(&a);
+                            
+                        },
+                        (false, true) => {
+                            //b is still so a ran into b
+                            collies.insert((a,b));
+                            collisions.remove(&b);
+                            rearendings.remove(&b);
+                        },
+                        (false, false) => {
+                            let  dot = a_dir.dot(b_dir);
+
+                            match(dot.abs() < 0.0001, a_speed.abs().total_cmp(&b_speed.abs()), (dot * a_speed).total_cmp(b_speed)){
+                                // they aren't moving at right angle to each other and the component of A's speed in B's direction is less that B's speed
+                                (false, _, std::cmp::Ordering::Less) |
+                                // or they are moving at right able and A's speed is less that B's speed
+                                (true, std::cmp::Ordering::Less, _) => {
+                                   //b ran into a
+                                   collies.insert((b,a));
+                                   collisions.remove(&a);
+                                   rearendings.remove(&a);                                   
+                                },
+                                // they aren't moving at right angle to each other and the component of A's speed in B's direction is equal to B's speed
+                                (false, _, std::cmp::Ordering::Equal) |
+                                // or they are moving at right able and A's speed is equal B's speed
+                                (true, std::cmp::Ordering::Equal, _) => {
+                                    collies.insert((a,b));
+                                    collies.insert((b,a));
+                                },
+                                // they aren't moving at right angle to each other and the component of A's speed in B's direction is greater that B's speed
+                                (false, _, std::cmp::Ordering::Greater) |
+                                // or they are moving at right able and A's speed is greater than B's speed
+                                (true, std::cmp::Ordering::Greater, _) => {
+                                    //a ran into b
+                                    collies.insert((a,b));
+                                    collisions.remove(&b);
+                                    rearendings.remove(&b);
+                                },
+                            }
+                        },
                     }
                 },
                 (Some(_), None) => {
