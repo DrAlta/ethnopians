@@ -91,7 +91,7 @@ mod tests {
                     super::Status::GetHp(_entity) => todo!(),
                     super::Status::GetIsInventoryGE { agent, item_class, amount } => {
                         logy!("trace", "giving dummy value for if {agent} has GE {amount} of {item_class:?}");
-                        cpu.stack.push(StackItem::Success);
+                        cpu.stack.push(StackItem::success());
                     },
                     super::Status::GetEntities { ../*min_x, min_y, max_x, max_y*/ } => todo!(),
                     super::Status::RemoveEntitiesOfType(_item) => todo!(),

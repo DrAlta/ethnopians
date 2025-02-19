@@ -68,8 +68,8 @@ impl Clone for StackItem {
             StackItem::False => StackItem::True,
             StackItem::Coord { x, y } =>  StackItem::Coord { x: x.clone(), y: y.clone() },
             StackItem::String(x) => StackItem::String(x.clone()),
-            StackItem::EntityId(entity) => todo!(),
-            StackItem::Option(stack_item) => todo!(),
+            StackItem::EntityId(entity) => StackItem::EntityId(entity.clone()),
+            StackItem::Option(stack_item) => StackItem::Option(stack_item.clone()),
         }
     }
 }

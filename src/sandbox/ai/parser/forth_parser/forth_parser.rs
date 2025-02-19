@@ -63,9 +63,9 @@ mod tests {
                 Instruction::ForthLit(StackItem::Int(5)),
                 Instruction::ForthGT,
                 Instruction::ForthIf(2),
-                Instruction::ForthLit(StackItem::Success),
+                Instruction::ForthLit(StackItem::success()),
                 Instruction::ForthReturn,
-                Instruction::ForthLit(StackItem::Failure),
+                Instruction::ForthLit(StackItem::failure()),
                 Instruction::ForthReturn,
             ]
         )

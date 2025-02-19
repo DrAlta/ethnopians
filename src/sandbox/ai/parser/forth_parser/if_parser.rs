@@ -47,7 +47,7 @@ mod tests {
             body,
             vec![
                 Instruction::ForthIf(2),
-                Instruction::ForthLit(StackItem::Success),
+                Instruction::ForthLit(StackItem::success()),
                 Instruction::ForthReturn,
             ]
         )

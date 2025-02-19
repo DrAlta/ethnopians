@@ -37,13 +37,13 @@ pub fn lit_parser<'a>(
                 },
             ),
             map_res(tag_no_case("Success"), |_| {
-                Ok::<Instruction, ()>(Instruction::ForthLit(StackItem::Success))
+                Ok::<Instruction, ()>(Instruction::ForthLit(StackItem::success()))
             }),
             map_res(tag_no_case("failure"), |_| {
-                Ok::<Instruction, ()>(Instruction::ForthLit(StackItem::Failure))
+                Ok::<Instruction, ()>(Instruction::ForthLit(StackItem::failure()))
             }),
             map_res(tag_no_case("init"), |_| {
-                Ok::<Instruction, ()>(Instruction::ForthLit(StackItem::Init))
+                Ok::<Instruction, ()>(Instruction::ForthLit(StackItem::init()))
             }),
             map_res(tag_no_case("true"), |_| {
                 Ok::<Instruction, ()>(Instruction::ForthLit(StackItem::True))
@@ -133,7 +133,7 @@ mod tests {
         let (tail, (body, used)) = lit_parser(input).unwrap();
         assert_eq!(tail, "");
         assert_eq!(used, TreePool::new());
-        assert_eq!(body, vec![Instruction::ForthLit(StackItem::Success)])
+        assert_eq!(body, vec![Instruction::ForthLit(StackItem::success())])
     }
     #[test]
     fn int_test() {

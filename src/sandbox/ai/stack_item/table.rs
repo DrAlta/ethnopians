@@ -10,7 +10,7 @@ pub (super) type ParentTables = Vec<Weak<TableInterior>>;
 
 // TableInterior is the type that the Value::Table has in its Rc
 #[derive(Debug)]
-pub (in crate::sandbox)struct TableInterior {
+pub struct TableInterior {
     //map holds the key, value pairs of the table
     pub map: RefCell<BTreeMap<Value, Value>>,
     //parents holds the list of TableInteriors that hold this table.
