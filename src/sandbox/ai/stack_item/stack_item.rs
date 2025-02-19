@@ -9,7 +9,7 @@ impl StackItem{
         StackItem::String("Success".to_owned())
     }
     pub fn failure() -> StackItem {
-        StackItem::String("FAILURE".to_owned())
+        StackItem::String("Failure".to_owned())
     }
     pub fn init() -> StackItem {
         StackItem::String("Init".to_owned())
