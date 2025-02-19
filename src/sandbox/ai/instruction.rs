@@ -69,7 +69,7 @@ pub enum Instruction {
     //(_ -- (_ false or Int true))
     ForthSomeInt,
     ForthSwap,
-    ToDoIsEmpty,
+    ForthIsEmpty,
     ToDoRemoveEntitiesOfType,
     // (coord coord -- ToDo) gets all entities in a TOS rectanle at NOS
     ToDoGetEntities,
@@ -128,8 +128,8 @@ impl Instruction {
             | Instruction::ForthSwap
             | Instruction::ForthEq
             | Instruction::ForthDrop
+            | Instruction::ForthIsEmpty
             | Instruction::ToDoGetEntities
-            | Instruction::ToDoIsEmpty
             | Instruction::ToDoRemoveEntitiesOfType
             | Instruction::ForthIf(_) => (),
             Instruction::ForthTree(token) => {
@@ -153,7 +153,10 @@ impl Instruction {
             Instruction::Combine(_, _) => todo!(),
             Instruction::Eat(_) => todo!(),
             Instruction::InventoryGE(key, amount) => {
-                let Some(StackItem::Init) = stack.last() else {
+                let Some(StackItem::String(x)) = stack.last() else {
+                    return Err("tos was not an Init".to_owned());
+                };
+                if x != "Init" {
                     return Err("tos was not an Init".to_owned());
                 };
                 stack.pop();
@@ -480,6 +483,18 @@ impl Instruction {
                 stack.push(StackItem::True);
                 Self::next(Status::None, pc)
             }
+            Instruction::ForthIsEmpty => {
+                let Some(StackItem::Table(x)) = stack.last() else {
+                    return Err("TOS wasn't a table".to_owned());
+                };
+                let map_empty_ka = x.map.borrow().is_empty();
+                stack.push(if map_empty_ka {
+                    StackItem::True
+                } else {
+                    StackItem::False
+                });
+                Self::next(Status::None, pc)
+            }
             Instruction::ForthSomeInt => {
                 let Some(StackItem::Option(Some(x))) = stack.last() else {
                     stack.push(StackItem::False);
@@ -527,17 +542,6 @@ impl Instruction {
                 Self::next(Status::None, pc)
             }
             Instruction::ForthReturn => Self::exit(Status::None, return_stack, pc),
-            Instruction::ToDoIsEmpty => {
-                let Some(StackItem::Todo(x)) = stack.last() else {
-                    return Err("TOS wasn't a ToDo".to_owned());
-                };
-                stack.push(if x.is_empty() {
-                    StackItem::True
-                } else {
-                    StackItem::False
-                });
-                Self::next(Status::None, pc)
-            }
             // ToDoGetEntities should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::ToDoGetEntities => {
                 let ((min_x, min_y), (max_x, max_y)) = Self::get_two_coords(stack)?;
@@ -597,7 +601,10 @@ impl Instruction {
                 */
             }
             Instruction::ForthTree(token) => {
-                let Some(StackItem::Init) = stack.last() else {
+                let Some(StackItem::String(x)) = stack.last() else {
+                    return Err("top was not init".to_owned());
+                };
+                if x != "Init" {
                     return Err("top was not init".to_owned());
                 };
                 stack.pop();
@@ -658,8 +665,8 @@ impl Instruction {
             | Instruction::ForthSwap
             | Instruction::ForthEq
             | Instruction::ForthDrop
+            | Instruction::ForthIsEmpty
             | Instruction::ToDoGetEntities
-            | Instruction::ToDoIsEmpty
             | Instruction::ToDoRemoveEntitiesOfType
             | Instruction::ForthIf(_) => (),
         }
