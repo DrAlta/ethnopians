@@ -1,6 +1,6 @@
 use qol::logy;
 
-use crate::sandbox::ai::{stack_item::TableInterior, ExecutionToken, StackItem, Status};
+use crate::sandbox::ai::{stack_item::{TableGet, TableInterior}, ExecutionToken, StackItem, Status};
 
 use super::{ProgramCounter, ReturnStack, Stack};
 
@@ -39,7 +39,7 @@ pub fn tick_sequence(
     };
     let TableInterior { map, parents: _ } = x.as_ref();
     let map2 = map.borrow();
-    let Some(StackItem::Int(idx)) = map2.get(&StackItem::String("Sequence".to_owned())) else {
+    let Some(StackItem::Int(idx)) = map2.table_get("Sequence") else {
         logy!("debug", "{map:#?}");
         return Err("Sequence state not found on stack".into());
     };

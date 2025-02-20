@@ -51,50 +51,22 @@ impl TableInterior {
             }
         })
     }
-    /*        pub fn stuff(&mut self, stuffing: Value, key: Value) -> Result<(), ForthErr> {
-    //                    match (self, stuffing) {
-                        match stuffing {
-                            Value::Table(stuffing_rc) => {
-                                if self.has_ancester(&stuffing_rc) {
-                                     Err(ForthErr::CyclesNotAllowed)
-                                } else {
-                                    stuffing_rc
-                                        .parents
-                                        .borrow_mut()
-                                        .push(Rc::downgrade(&Rc::new(self)));
-                                    self
-                                        .map
-                                        .borrow_mut()
-                                        .insert(key, Value::Table(stuffing_rc));
-                                    Ok(())
-                                }
-                            }
-                            _ => {
-                                self.map.borrow_mut().insert(key, value);
-                                Ok(())
-                            }
-                        }
-
-            }
-    */
 }
-/*
-fn test(){
-    let map = RefCell::new(BTreeMap::from([
-        (Value::String("child".to_owned()), Value::Int(2))
-    ]));
-    let parentsss = RefCell::new(Vec::new());
-    let table = Value::Table(Rc::new(TableInterior{ map, parents:parentsss }));
 
-    match table{
-        Value::Table(x)  if matches!({
-            if let TableInterior { map, parents } = x.as_ref() {
-                let x = map.borrow().get(&Value::String("Sel".to_owned()));
-                None
-            } else {
-                None
-            }
-        }, Some(thing)) => {thing;},
-        _=> ()
+
+
+pub trait TableGet<T>{
+    fn table_get(&self, k: T) -> Option<&Value>;
+}
+
+impl TableGet<&Value> for BTreeMap<Value, Value>{
+    fn table_get(&self, k: &Value) -> Option<&Value> {
+        self.get(k)
     }
-}*/
+}
+impl<T: Into<Value>> TableGet<T> for BTreeMap<Value, Value>{
+    fn table_get(&self, k: T) -> Option<&Value> {
+        let k2: Value = k.into();
+        self.get(&k2)
+    }
+}
