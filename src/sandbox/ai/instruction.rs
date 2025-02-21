@@ -70,9 +70,9 @@ pub enum Instruction {
     ForthSomeInt,
     ForthSwap,
     ForthIsEmpty,
-    ToDoRemoveEntitiesOfType,
-    // (coord coord -- ToDo) gets all entities in a TOS rectanle at NOS
-    ToDoGetEntities,
+    ForthRemoveEntitiesOfType,
+    // (coord coord -- Table) gets all entities in a TOS rectanle at NOS
+    ForthGetEntities,
 }
 
 impl Instruction {
@@ -129,8 +129,8 @@ impl Instruction {
             | Instruction::ForthEq
             | Instruction::ForthDrop
             | Instruction::ForthIsEmpty
-            | Instruction::ToDoGetEntities
-            | Instruction::ToDoRemoveEntitiesOfType
+            | Instruction::ForthGetEntities
+            | Instruction::ForthRemoveEntitiesOfType
             | Instruction::ForthIf(_) => (),
             Instruction::ForthTree(token) => {
                 if !bt.contains_key(token) {
@@ -543,7 +543,7 @@ impl Instruction {
             }
             Instruction::ForthReturn => Self::exit(Status::None, return_stack, pc),
             // ToDoGetEntities should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
-            Instruction::ToDoGetEntities => {
+            Instruction::ForthGetEntities => {
                 let ((min_x, min_y), (max_x, max_y)) = Self::get_two_coords(stack)?;
                 Self::next(
                     Status::GetEntities {
@@ -569,7 +569,7 @@ impl Instruction {
                 Self::next(Status::None, pc)
                 */
             }
-            Instruction::ToDoRemoveEntitiesOfType => {
+            Instruction::ForthRemoveEntitiesOfType => {
                 let Some(StackItem::String(stack_string)) = stack.last() else {
                     return Err("top of stack not a number".into());
                 };
@@ -666,8 +666,8 @@ impl Instruction {
             | Instruction::ForthEq
             | Instruction::ForthDrop
             | Instruction::ForthIsEmpty
-            | Instruction::ToDoGetEntities
-            | Instruction::ToDoRemoveEntitiesOfType
+            | Instruction::ForthGetEntities
+            | Instruction::ForthRemoveEntitiesOfType
             | Instruction::ForthIf(_) => (),
         }
     }

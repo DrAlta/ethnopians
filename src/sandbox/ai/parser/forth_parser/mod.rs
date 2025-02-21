@@ -19,7 +19,7 @@ mod forth_threadette_parser;
 pub use forth_threadette_parser::forth_threadette_parser;
 mod getters;
 pub use getters::{
-    find_nearest_parser, get_blackboard, get_energy_parser, get_hp_parser, get_location_parser,
+    find_nearest_parser, get_blackboard, get_energy_parser, get_entities_parser, get_hp_parser, get_location_parser, remove_entities_of_type_parser
 };
 mod if_parser;
 pub use if_parser::if_parser;

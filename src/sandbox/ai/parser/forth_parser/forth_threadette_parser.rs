@@ -5,9 +5,9 @@ use crate::sandbox::ai::{
     parser::{
         forth_parser::{
             add_parser, distance_parser, div_parser, dup_parser, eq_parser, find_nearest_parser,
-            ge_parser, get_blackboard, get_energy_parser, get_hp_parser, get_location_parser,
+            ge_parser, get_blackboard, get_entities_parser, get_energy_parser, get_hp_parser, get_location_parser,
             go_to_parser, gt_parser, if_parser, is_int_parser, le_parser, lit_parser, lt_parser,
-            mul_parser, rem_parser, return_parser, some_coord_parser, some_entity_id_parser,
+            mul_parser, rem_parser, remove_entities_of_type_parser, return_parser, some_coord_parser, some_entity_id_parser,
             some_int_parser, sub_parser, swap_parser, take_parser,
         },
         ident_parser,
@@ -21,6 +21,7 @@ pub fn forth_threadette_parser_2<'a>(
     input: &'a str,
 ) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
     alt((
+        remove_entities_of_type_parser,
         lit_parser,
         //calc
         distance_parser,
@@ -34,6 +35,7 @@ pub fn forth_threadette_parser_2<'a>(
         alt((
             find_nearest_parser,
             get_blackboard,
+            get_entities_parser,
             get_energy_parser,
             get_hp_parser,
             get_location_parser,
@@ -87,6 +89,7 @@ pub fn forth_threadette_parser<'a>(
             if let Ok(("", b)) = a {
                 return Ok::<(Thread, TreePool), ()>(b);
             } else {
+                logy!("debug", "got was {a:?}");
                 Ok((
                     vec![Instruction::ForthCall(x.to_owned(), 0)],
                     TreePool::new(),
@@ -102,12 +105,23 @@ mod tests {
 
     #[test]
     fn call_test() {
-        let source = "get_entities";
+        let source = "gfoo";
         let (tail, (head, _pool)) = forth_threadette_parser(source).unwrap();
         assert_eq!(tail, "");
         assert_eq!(
             head,
-            vec![Instruction::ForthCall("get_entities".to_owned(), 0)]
+            vec![Instruction::ForthCall("gfoo".to_owned(), 0)]
         )
     }
+    #[test]
+    fn remove_entities_of_type_test() {
+        let source = "remove_entities_of_type";
+        let (tail, (head, _pool)) = forth_threadette_parser(source).unwrap();
+        assert_eq!(tail, "");
+        assert_eq!(
+            head,
+            vec![Instruction::ForthRemoveEntitiesOfType]
+        )
+    }
+
 }
