@@ -13,7 +13,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn call_test() {
+    fn remove_entities_of_type_test() {
         let source = "remove_entities_of_type";
         let (tail, (head, _pool)) = remove_entities_of_type_parser(source).unwrap();
         assert_eq!(tail, "");

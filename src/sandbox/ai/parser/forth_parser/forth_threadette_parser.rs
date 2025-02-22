@@ -1,4 +1,4 @@
-use nom::{branch::alt, combinator::map_res, error::ErrorKind, IResult};
+use nom::{branch::alt, combinator::{eof, map_res}, error::ErrorKind, sequence::tuple, IResult};
 use qol::logy;
 
 use crate::sandbox::ai::{
@@ -21,7 +21,7 @@ pub fn forth_threadette_parser_2<'a>(
     input: &'a str,
 ) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
     alt((
-        remove_entities_of_type_parser,
+        remove_entities_of_type_parser,// this needs to be before `rem_parser`  
         lit_parser,
         //calc
         distance_parser,
@@ -85,11 +85,14 @@ pub fn forth_threadette_parser<'a>(
                 "if" | "lit" => return Err(()),
                 _ => (),
             };
-            let a = forth_threadette_parser_2(x);
-            if let Ok(("", b)) = a {
+            let a = tuple((
+                forth_threadette_parser_2,
+                eof
+            ))(x);
+            if let Ok(("", (b, _))) = a {
                 return Ok::<(Thread, TreePool), ()>(b);
             } else {
-                logy!("debug", "got was {a:?}");
+                logy!("trace-parser-threadette", "got was {a:?}");
                 Ok((
                     vec![Instruction::ForthCall(x.to_owned(), 0)],
                     TreePool::new(),
