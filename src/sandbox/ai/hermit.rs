@@ -364,6 +364,10 @@ clear_for_garden_02 = forth{
         jump(clear_for_garden_02)
     then
     return
+};
+set_garden = forth {
+        lit("garden")
+        set_blackboard
 }
 "#};
     // vvv tasks used in have_house

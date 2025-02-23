@@ -1,7 +1,7 @@
 use qol::logy;
 
 use crate::sandbox::ai::{
-    stack_item::{TableGet, TableInterior}, ExecutionToken, Instruction, StackItem, Status,
+    TableGet, TableInterior, ExecutionToken, Instruction, StackItem, Status,
 };
 
 use super::{ProgramCounter, ReturnStack, Stack};
