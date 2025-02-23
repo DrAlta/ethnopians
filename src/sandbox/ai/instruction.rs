@@ -43,6 +43,7 @@ pub enum Instruction {
     //(Coord ItemClass -- Option<ObjectId>) finds the neared item of ItemClass to ObjectId
     ForthFindNearest,
     ForthEq,
+    ForthJump(ThreadName, usize),
     ForthGE,
     //(BlackboardKey -- Option<_>)
     ForthGetBlackboard,
@@ -59,6 +60,7 @@ pub enum Instruction {
     ForthLit(StackItem),
     ForthLT,
     ForthMul,
+    ForthPopLast,
     ForthRem,
     ForthReturn,
     ForthSub,
@@ -98,6 +100,11 @@ impl Instruction {
                     missing.insert(token.clone());
                 }
             }
+            Instruction::ForthJump(token, _idx) => {
+                if !bt.contains_key(token) {
+                    missing.insert(token.clone());
+                }
+            }
             Instruction::Action(..)
             | Instruction::Combine(_, _)
             | Instruction::Eat(_)
@@ -131,6 +138,7 @@ impl Instruction {
             | Instruction::ForthIsEmpty
             | Instruction::ForthGetEntities
             | Instruction::ForthRemoveEntitiesOfType
+            | Instruction::ForthPopLast
             | Instruction::ForthIf(_) => (),
             Instruction::ForthTree(token) => {
                 if !bt.contains_key(token) {
@@ -413,6 +421,10 @@ impl Instruction {
                 stack.push(value);
                 Self::next(Status::None, pc)
             }
+            Instruction::ForthJump(token, idx) => {
+                *pc = Some((token.clone(), idx.clone()));
+                Ok(Status::None)
+            }
             Instruction::ForthLE => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
                 if nos <= tos {
@@ -493,6 +505,19 @@ impl Instruction {
                 } else {
                     StackItem::False
                 });
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthPopLast => {
+                let Some(StackItem::Table(x)) = stack.last() else {
+                    return Err("TOS wasn't a table".to_owned());
+                };
+                let last_maybe = x.map.borrow_mut().pop_last();
+
+                if let Some((_, last)) = last_maybe {
+                    stack.push(StackItem::some(last));
+                } else{
+                    stack.push(StackItem::False);
+                };
                 Self::next(Status::None, pc)
             }
             Instruction::ForthSomeInt => {
@@ -629,6 +654,12 @@ impl Instruction {
                     *token = y
                 };
             }
+            Instruction::ForthJump(token, ..) => {
+                if token.starts_with('_') {
+                    let y = format!("{prefix}{token}");
+                    *token = y
+                };
+            }
             Instruction::ForthTree(token) => {
                 if token.starts_with('_') {
                     let y = format!("{prefix}{token}");
@@ -668,6 +699,7 @@ impl Instruction {
             | Instruction::ForthIsEmpty
             | Instruction::ForthGetEntities
             | Instruction::ForthRemoveEntitiesOfType
+            | Instruction::ForthPopLast
             | Instruction::ForthIf(_) => (),
         }
     }

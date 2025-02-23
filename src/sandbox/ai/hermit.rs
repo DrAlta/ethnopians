@@ -1,5 +1,14 @@
-use crate::sandbox::ai::{parser::file_parser, TreePool};
 
+use crate::sandbox::ai::{parser::file_parser, TreePool};
+macro_rules! foofoo {
+    // `$x` followed by at least one `$y,`
+    ($($y:expr,)+) => (
+        // Call `find_min!` on the tail `$y`
+        [
+            $((stringify!($y), $y),)+
+        ]
+    )
+}
 pub fn get_hermit_behavoir_tree() -> TreePool {
     let test = {
         r#"get_my_home_location = forth {
@@ -26,6 +35,21 @@ pub fn get_hermit_behavoir_tree() -> TreePool {
     have_garden,
     harvest_veg,
     plant_veg
+};
+take_entity = forth{
+    dup
+    get_location
+    some_coord
+    if
+        go_to
+        lit(Success)
+        eq
+        if
+            take
+            return
+        then
+    then
+
 }"#
     };
     /* in have_garden a gardern is (spacing * width) by (space * hiegth) plot with nothing but vegs and agents in it.
@@ -249,18 +273,8 @@ get_veg = selector {
                 find_nearest
                 some_entity_id
                 if
-                    dup
-                    get_location
-                    some_coord
-                    if
-                        go_to
-                        lit(Success)
-                        eq
-                        if
-                            take
-                            return
-                        then
-                    then
+                    take_entity
+                    return
                 then
             then
             lit(Failure)
@@ -337,8 +351,21 @@ check_if_clear_for_garden = forth{
     lit("agent")
     remove_entities_of_type
     is_empty
-}"#
-    };
+};
+clear_for_garden = forth{
+    lit(x: 20, y: 20)
+    get_entities
+};
+clear_for_garden_02 = forth{
+    pop_last
+    some_entity_id
+    if
+        take_entity
+        jump(clear_for_garden_02)
+    then
+    return
+}
+"#};
     // vvv tasks used in have_house
     let have_2_wood = {
         r#"have_2_wood_02 = sel{
@@ -383,7 +410,7 @@ go_to_tree = forth {
     return
 }"#
     };
-    // vvv tasks used un have_2_wood_02
+    // vvv tasks used in have_2_wood_02
     let have_axe = {
         r#"have_knife = sel{
     inventory_have_ge(knife, 1), 
@@ -441,6 +468,9 @@ have_stick = sel{
 }"#
     };
     // end tasks used in have_2_wood_02
+
+
+    
     /*
     eat_veg = forth {
         lit("self")
@@ -461,7 +491,7 @@ have_stick = sel{
     let (tail1, mut db) = file_parser(root).unwrap();
     assert_eq!(tail1, "");
 
-    for (idx, source) in [
+    for (idx, source) in foofoo![
         test,
         hermit,
         sat_hunger,
@@ -472,11 +502,12 @@ have_stick = sel{
         have_axe,
         have_knife,
         have_2_stone,
+        have_garden,
     ]
     .into_iter()
-    .enumerate()
+//    .enumerate()
     {
-        let (tail, new_db) = file_parser(source).unwrap();
+        let (tail, new_db) = file_parser(source).expect("{idx} didn't parse");
         assert_eq!((tail, idx), ("", idx));
         db.extend(new_db.into_iter());
     }

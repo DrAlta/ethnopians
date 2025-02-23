@@ -10,5 +10,3 @@ mod get_hp_parser;
 pub use get_hp_parser::get_hp_parser;
 mod get_location_parser;
 pub use get_location_parser::get_location_parser;
-mod remove_entities_of_type_parser;
-pub use remove_entities_of_type_parser::remove_entities_of_type_parser;

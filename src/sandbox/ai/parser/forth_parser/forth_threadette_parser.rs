@@ -15,14 +15,16 @@ use crate::sandbox::ai::{
     Instruction, Thread, TreePool,
 };
 
-use super::drop_parser;
+use super::{drop_parser, is_empty_parser, jump_parser, pop_last_parser};
 
 pub fn forth_threadette_parser_2<'a>(
     input: &'a str,
 ) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
     alt((
+        is_empty_parser,
         remove_entities_of_type_parser,// this needs to be before `rem_parser`  
         lit_parser,
+        jump_parser,
         //calc
         distance_parser,
         // athirthmatic
@@ -39,6 +41,7 @@ pub fn forth_threadette_parser_2<'a>(
             get_energy_parser,
             get_hp_parser,
             get_location_parser,
+            pop_last_parser,
         )),
         // comparisions
         alt((
@@ -60,10 +63,10 @@ pub fn forth_threadette_parser_2<'a>(
         dup_parser,
         swap_parser,
         // actions
-        //      alt((
-        go_to_parser,
-        take_parser,
-        //        )),
+        alt((
+            go_to_parser,
+            take_parser,
+        )),
     ))(input)
 }
 
@@ -82,7 +85,7 @@ pub fn forth_threadette_parser<'a>(
                     logy!("error", "we shouldn't find a 'then'");
                     return Err(());
                 }
-                "if" | "lit" => return Err(()),
+                "if" | "lit" | "jump" => return Err(()),
                 _ => (),
             };
             let a = tuple((
@@ -114,6 +117,16 @@ mod tests {
         assert_eq!(
             head,
             vec![Instruction::ForthCall("gfoo".to_owned(), 0)]
+        )
+    }
+    #[test]
+    fn jump_test() {
+        let source = "jump(to_here)";
+        let (tail, (head, _pool)) = forth_threadette_parser(source).unwrap();
+        assert_eq!(tail, "");
+        assert_eq!(
+            head,
+            vec![Instruction::ForthJump("to_here".to_owned(), 0)]
         )
     }
     #[test]
