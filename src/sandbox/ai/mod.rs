@@ -75,14 +75,14 @@ mod tests {
                     },
                     super::Status::Failure => todo!(),
                     super::Status::FindNearest { ../*x, y, item_class*/ } => todo!(),
-                    super::Status::GetEnergy(entity) => {
-                        logy!("trace", "giving dummy value for GetEnergy on {entity}");
+                    super::Status::GetEnergy(_entity) => {
+                        logy!("trace", "giving dummy value for GetEnergy on {_entity}");
                         cpu.stack.push(StackItem::some(StackItem::Int(5)));
                     },
                     super::Status::GetLocation(_entity) => todo!(),
                     super::Status::GetHp(_entity) => todo!(),
-                    super::Status::GetIsInventoryGE { agent, item_class, amount } => {
-                        logy!("trace", "giving dummy value for if {agent} has GE {amount} of {item_class:?}");
+                    super::Status::GetIsInventoryGE { agent: _agent, item_class: _item_class, amount: _amount } => {
+                        logy!("trace", "giving dummy value for if {_agent} has GE {_amount} of {_item_class:?}");
                         cpu.stack.push(StackItem::success());
                     },
                     super::Status::GetEntities { ../*min_x, min_y, max_x, max_y*/ } => todo!(),

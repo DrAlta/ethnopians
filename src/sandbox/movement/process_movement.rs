@@ -28,10 +28,10 @@ pub fn process_movement(
 ) {
     let max_step = 5.0;
     let time_step = 1.0;
-
+/*
     #[cfg(feature = "move_history")]
     logy!("debug-process-movement", "Going tosaving histoy");
-
+*/
     let normalize_dir_of_travel: HashMap<EntityId, (Vec2, Number)> = query
         .iter()
         .filter_map(|x| {
@@ -83,8 +83,8 @@ pub fn process_movement(
 
     let mut collies = BTreeSet::new();
     let mut froms = HashMap::<EntityId, AARect>::new();
-    #[allow(unused_mut)]
-    let mut history = Vec::new();
+    //#[cfg(feature = "move_history")]
+    //let mut history = Vec::new();
     let mut last_froms = HashMap::<EntityId, (Number, Number)>::new();
     for step_number in 1..(number_of_substeps as usize + 1) {
         logy!("debug-process-movement", "processing step {step_number}");
@@ -212,8 +212,10 @@ pub fn process_movement(
             .iter()
             .map(|(id, entity)| (id.clone(), (entity.get_min_x(), entity.get_min_y())))
             .collect();
+        /*
         #[cfg(feature = "move_history")]
         history.push([froms.clone(), collisions.clone(), rearendings.clone()]);
+        */
     }
     let mut moves = Vec::new();
     for (unit_id, entity) in froms {

@@ -368,8 +368,7 @@ clear_for_garden_02 = forth{
 set_garden = forth {
         lit("garden")
         set_blackboard
-}
-"#};
+}"#}; // todo need to add set_blackboard and defer_blackboard instructions
     // vvv tasks used in have_house
     let have_2_wood = {
         r#"have_2_wood_02 = sel{
@@ -609,8 +608,8 @@ mod tests {
                 }
             }
         }
-        for (a, b) in &missing {
-            logy!("log", "{a} is missing: {b:?}");
+        for (_a, _b) in &missing {
+            logy!("log", "{_a} is missing: {_b:?}");
         }
         assert_eq!(missing, HashMap::new())
     }
