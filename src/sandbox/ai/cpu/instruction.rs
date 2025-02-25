@@ -63,12 +63,16 @@ pub enum Instruction {
     ForthPopLast,
     ForthRem,
     ForthReturn,
+    //(v, String) puts v into the blackboard under String
+    ForthSetBlackboard,
+    //(Table, v, k -- bool) stuffs v into the table under k returns true if the stuffing was successful false other wise
+    ForthStuff,
     ForthSub,
-    //(_ -- (_ false or coord true))
+    //(x -- (x false or coord true))
     ForthSomeCoord,
-    //(_ -- (_ false or EntityId true))
+    //(x -- (x false or EntityId true))
     ForthSomeEntityId,
-    //(_ -- (_ false or Int true))
+    //(x -- (x false or Int true))
     ForthSomeInt,
     ForthSwap,
     ForthIsEmpty,
@@ -139,6 +143,8 @@ impl Instruction {
             | Instruction::ForthGetEntities
             | Instruction::ForthRemoveEntitiesOfType
             | Instruction::ForthPopLast
+            | Instruction::ForthSetBlackboard
+            | Instruction::ForthStuff
             | Instruction::ForthIf(_) => (),
             Instruction::ForthTree(token) => {
                 if !bt.contains_key(token) {
@@ -385,11 +391,11 @@ impl Instruction {
                 stack.push(match blackboard.get(&key) {
                     Some(x) => StackItem::Option(match x {
                         BlackboardValue::EntityId(y) => {
-                            Some(Box::new(StackItem::EntityId(y.clone())))
+                            Box::new(StackItem::EntityId(y.clone()))
                         }
-                        BlackboardValue::String(a) => Some(Box::new(StackItem::String(a.clone()))),
+                        BlackboardValue::String(a) => Box::new(StackItem::String(a.clone())),
                     }),
-                    None => StackItem::Option(None),
+                    None => StackItem::none()
                 });
                 Self::next(Status::None, pc)
             }
@@ -457,8 +463,41 @@ impl Instruction {
                 stack.push(StackItem::Int(nos % tos));
                 Self::next(Status::None, pc)
             }
+            Instruction::ForthSetBlackboard => {
+                let Some(StackItem::String(_)) = stack.get(stack.len() - 2) else {
+                    return Err("no nos".to_owned());
+                };
+                let Some(tos) = stack.pop() else {
+                    unreachable!()
+                };
+                let Some(StackItem::String(key)) = stack.pop() else {
+                    unreachable!()
+                };
+                blackboard.insert(key, crate::sandbox::ai::Variable::Chit(tos.into()));
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthStuff => {
+                    let Some(StackItem::Table(_)) = stack.get(stack.len() - 3) else {
+                    return Err("3rd item wasn't a table".to_owned());
+                };
+                let Some(key) = stack.pop() else {
+                    unreachable!()
+                };
+                let Some(value) = stack.pop() else {
+                    unreachable!()
+                };
+                let Some(table) = stack.last_mut() else {
+                    unreachable!()
+                };
+                let ret = match table.stuff(value, key){
+                    Ok(_) => StackItem::True,
+                    Err(_) => StackItem::False
+                };
+                stack.push(ret);
+                Self::next(Status::None, pc)
+            }
             Instruction::ForthSomeCoord => {
-                let Some(StackItem::Option(Some(x))) = stack.last() else {
+                let Some(StackItem::Option(x)) = stack.last() else {
                     stack.push(StackItem::False);
                     return Self::next(Status::None, pc);
                 };
@@ -469,7 +508,7 @@ impl Instruction {
                         return Self::next(Status::None, pc);
                     }
                 }
-                let Some(StackItem::Option(Some(y))) = stack.pop() else {
+                let Some(StackItem::Option(y)) = stack.pop() else {
                     unreachable!()
                 };
                 stack.push(Box::into_inner(y));
@@ -477,7 +516,7 @@ impl Instruction {
                 Self::next(Status::None, pc)
             }
             Instruction::ForthSomeEntityId => {
-                let Some(StackItem::Option(Some(x))) = stack.last() else {
+                let Some(StackItem::Option(x)) = stack.last() else {
                     stack.push(StackItem::False);
                     return Self::next(Status::None, pc);
                 };
@@ -488,7 +527,7 @@ impl Instruction {
                         return Self::next(Status::None, pc);
                     }
                 }
-                let Some(StackItem::Option(Some(y))) = stack.pop() else {
+                let Some(StackItem::Option(y)) = stack.pop() else {
                     unreachable!()
                 };
                 stack.push(Box::into_inner(y));
@@ -521,7 +560,7 @@ impl Instruction {
                 Self::next(Status::None, pc)
             }
             Instruction::ForthSomeInt => {
-                let Some(StackItem::Option(Some(x))) = stack.last() else {
+                let Some(StackItem::Option(x)) = stack.last() else {
                     stack.push(StackItem::False);
                     return Self::next(Status::None, pc);
                 };
@@ -532,7 +571,7 @@ impl Instruction {
                         return Self::next(Status::None, pc);
                     }
                 }
-                let Some(StackItem::Option(Some(y))) = stack.pop() else {
+                let Some(StackItem::Option(y)) = stack.pop() else {
                     unreachable!()
                 };
                 stack.push(Box::into_inner(y));
@@ -700,6 +739,8 @@ impl Instruction {
             | Instruction::ForthGetEntities
             | Instruction::ForthRemoveEntitiesOfType
             | Instruction::ForthPopLast
+            | Instruction::ForthSetBlackboard
+            | Instruction::ForthStuff
             | Instruction::ForthIf(_) => (),
         }
     }

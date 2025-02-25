@@ -40,7 +40,7 @@ pub enum StackItem {
     EntityId(EntityId),
     //    Todo(Vec<EntityId>),
     // vvv sure to keep these vvvv
-    Option(Option<Box<StackItem>>),
+    Option(Box<StackItem>),
     String(String),
     Table(Rc<TableInterior>),
 }
@@ -94,10 +94,7 @@ impl std::fmt::Display for StackItem {
             StackItem::Coord { x, y } => write!(f, "Coord[{x}:{y}]"),
             StackItem::String(x) => write!(f, "{x}"),
             StackItem::EntityId(x) => write!(f, "{x}"),
-            StackItem::Option(stack_item) => match stack_item {
-                Some(x) => write!(f, "Some({x})"),
-                None => write!(f, "None"),
-            },
+            StackItem::Option(stack_item) =>  write!(f, "Some({stack_item})"),
             //            StackItem::Todo(items) => todo!(),
         }
     }
@@ -129,10 +126,10 @@ impl std::hash::Hash for StackItem {
 
 impl StackItem {
     pub fn some(value: StackItem) -> StackItem {
-        Self::Option(Some(Box::new(value)))
+        Self::Option(Box::new(value))
     }
     pub fn none() -> StackItem {
-        Self::Option(None)
+        Self::False
     }
     pub fn new_table() -> StackItem {
         StackItem::Table(Rc::new(TableInterior {

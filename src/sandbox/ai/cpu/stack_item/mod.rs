@@ -1,4 +1,5 @@
 mod deep_copy;
+mod from;
 mod stack_item;
 pub use stack_item::StackItem;
 mod table;

@@ -22,7 +22,7 @@ use crate::sandbox::ai::{
     Instruction, Thread, TreePool,
 };
 
-use super::{drop_parser, is_empty_parser, jump_parser, pop_last_parser};
+use super::{drop_parser, getters::set_blackboard, is_empty_parser, jump_parser, pop_last_parser};
 
 pub fn forth_threadette_parser_2<'a>(
     input: &'a str,
@@ -49,6 +49,7 @@ pub fn forth_threadette_parser_2<'a>(
             get_hp_parser,
             get_location_parser,
             pop_last_parser,
+            set_blackboard,
         )),
         // comparisions
         alt((
