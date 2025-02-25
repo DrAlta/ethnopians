@@ -1,15 +1,18 @@
+use qol::logy;
+
 use crate::{vec2, Number, Vec2};
 
 pub fn columns(a: Vec2, b: Vec2, num_units: usize, unit_space: Number) -> Vec<Vec2> {
     let len = a.distance(b);
     let columns = (len / unit_space).floor().max(1.0);
     let column_spaceing = len / columns;
-    println!(
+    logy!(
+        "trace",
         "len:{len} columns:{columns} column_spaceing:{column_spaceing} c:{}",
         ((a + b) * 0.5)
     );
     let left_vector = (b - a).normalize() * column_spaceing;
-    //println!("a:{a} b:{b} c:{}", ((a + b) * 0.5));
+    //print ln!("a:{a} b:{b} c:{}", ((a + b) * 0.5));
     let center = (a + b) * 0.5;
     let mut units = num_units;
     let mut ret = Vec::new();
@@ -67,7 +70,7 @@ fn fill_row(center1: Vec2, columns: usize, left_vector: Vec2, units: usize) -> V
                 } else {
                     left_vector * 0.5
                 };
-            println!("c:{center}");
+            logy!("trace", "center:{center}");
         }
     }
     ret

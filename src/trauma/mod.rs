@@ -38,6 +38,7 @@
 //! let b =   effective_traumatic_stress / comfurt_zone
 //! final_x_intercept = ((intermediat_x-intecept - old_x_interceop) * b) + old_x_intercept
 use fraction64::Fraction;
+use qol::pout;
 
 mod psych;
 
@@ -101,5 +102,5 @@ fn test() {
     let event = Event::simple_new(TraumaExperienceType::Humiliation, Fraction::from(1));
     let stage1 = pawn.handle_experience_stage_1(event);
     let _x = pawn.handle_experience_stage_2(stage1, Fraction::from(1));
-    println!("{:#?}", pawn.get_recent_experiences());
+    pout!("{:#?}", pawn.get_recent_experiences());
 }

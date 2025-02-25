@@ -17,8 +17,6 @@ pub mod sandbox;
 pub mod social_sim;
 mod trauma;
 
-pub mod sqrt;
-
 pub mod util;
 
 pub type Number = f64;

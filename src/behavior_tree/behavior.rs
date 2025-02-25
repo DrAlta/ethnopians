@@ -1,4 +1,4 @@
-use qol::logy;
+use qol::{logy, pout};
 
 use super::{Item, NodeId, Treeturn};
 
@@ -109,7 +109,7 @@ impl Behavior {
         let Some(a) = stack.pop() else {
             return Err("Nothing on stack to print!".into());
         };
-        println!("{:?}", a);
+        pout!("{:?}", a);
         return Ok(Treeturn::Success);
     }
 }

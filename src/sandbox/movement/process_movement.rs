@@ -231,7 +231,6 @@ pub fn process_movement(
     for (id, (x, y)) in moves {
         // see if the entity reached it's destication
         if let Ok((_, Some(Movement { target, speed: _ }), _, _)) = query.get(id) {
-            println!("{}:{} == {}", x, y, target);
             if (x - target.x).abs() <= 0.0001 && (y - target.y).abs() <= 0.0001 {
                 // it reached it's destination so...
                 // send the TravelComplated event

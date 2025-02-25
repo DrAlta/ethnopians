@@ -10,12 +10,13 @@ type NodeId = String;
 
 #[cfg(test)]
 mod tests {
+    use qol::{logy, pout};
+
     use super::*;
 
     #[test]
     pub fn sequence_test() {
-        #[cfg(feature = "trace-behavior-tree")]
-        println!("trace-behavior-tree enabled");
+        logy!("trace-behavior-tree", "trace-behavior-tree enabled");
         let bt = Behavior::Sequence {
             behaviors: vec![
                 Behavior::Sequence {
@@ -32,7 +33,7 @@ mod tests {
         let mut c = 0;
         //while !bt.running.is_empty() {
         while c < 15 {
-            println!("\n\n\nLoop:{c}");
+            pout!("\n\n\nLoop:{c}");
             match bt.tick(&mut stack, &mut running) {
                 Ok(Treeturn::Success) | Ok(Treeturn::Failure) => break,
                 Ok(Treeturn::Running(_)) => (),
