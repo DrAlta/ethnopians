@@ -22,17 +22,20 @@ use crate::sandbox::ai::{
     Instruction, Thread, TreePool,
 };
 
-use super::{drop_parser, getters::set_blackboard, is_empty_parser, jump_parser, pop_last_parser};
+use super::{drop_parser, getters::set_blackboard, is_empty_parser, jump_parser, pop_last_parser, stuff_parser};
 
 pub fn forth_threadette_parser_2<'a>(
     input: &'a str,
 ) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
     alt((
-        is_empty_parser,
-        remove_entities_of_type_parser, // this needs to be before `rem_parser`
+        //table
+        alt((
+            is_empty_parser,
+            remove_entities_of_type_parser,
+            stuff_parser,
+        )),
         lit_parser,
-        jump_parser,
-        //calc
+        // calc
         distance_parser,
         // athirthmatic
         add_parser,
@@ -66,12 +69,16 @@ pub fn forth_threadette_parser_2<'a>(
         //flow
         if_parser,
         return_parser,
+        jump_parser,
         //stack manip
         drop_parser,
         dup_parser,
         swap_parser,
         // actions
-        alt((go_to_parser, take_parser)),
+        alt((
+            go_to_parser, 
+            take_parser,
+        )),
     ))(input)
 }
 
