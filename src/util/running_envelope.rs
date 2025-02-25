@@ -6,7 +6,7 @@ use crate::Number;
 /// - Smoothed maximum value (`max_val`) and a further smoothed upper envelope (`high`)
 /// - Smoothed minimum value (`min_val`) and a further smoothed lower envelope (`low`)
 ///
-/// It uses exponential smoothing for both tracking the signal’s level and its dynamic range. 
+/// It uses exponential smoothing for both tracking the signal’s level and its dynamic range.
 /// The `attack` and `release` parameters control how quickly the envelope tracks upward or downward deviations,
 /// while `decay` determines the overall smoothing factor applied when updating these values.
 pub struct RunningEnvelope {
@@ -94,7 +94,7 @@ impl RunningEnvelope {
         self.position(new_sample)
     }
     /// I had Chad do this bezier, my dylexia make reading Standard math notation difficult.
-    /// 
+    ///
     /// Maps a value to a subjective rating in the range [-1, 1] using a quadratic Bézier curve.
     ///
     /// This mapping uses the envelope's low, average, and high:
@@ -121,50 +121,48 @@ impl RunningEnvelope {
         let t = ((value - self.low) / range).clamp(0.0, 1.0);
         // Normalize the average's location
         let t_avg = ((self.avg - self.low) / range).clamp(0.0, 1.0);
-        
+
         // Avoid division-by-zero if avg is extremely close to low or high.
         if t_avg.abs() < Number::EPSILON || (1.0 - t_avg).abs() < Number::EPSILON {
             // Fall back to a simple linear mapping from -1 to 1.
             return 2.0 * t - 1.0;
         }
-        
+
         // Compute the control point P₁ so that B(t_avg) = 0.
         let p1 = (1.0 - 2.0 * t_avg) / (2.0 * t_avg * (1.0 - t_avg));
-        
+
         // Quadratic Bézier curve:
         // B(t) = (1-t)² * (-1) + 2*(1-t)*t * p1 + t² * (1)
-        let subjective = (1.0 - t).powi(2) * (-1.0) 
-            + 2.0 * (1.0 - t) * t * p1 
-            + t.powi(2) * 1.0;
+        let subjective = (1.0 - t).powi(2) * (-1.0) + 2.0 * (1.0 - t) * t * p1 + t.powi(2) * 1.0;
         subjective
     }
-/*
-/// Computes the subjective position of a given value relative to the running envelope.
-/// 
-/// The envelope is defined by the running average (`avg`) and the upper bound (`high`). 
-/// This function returns a normalized value such that:
-/// - A `value` equal to `avg` yields 0.0.
-/// - A `value` equal to `high` yields 1.0.
-/// - Values greater than the average but below high linearly map between 0 and 1.
-/// - Values below the average yield negative positions.
-///
-/// This is used for a hedonic treadmill to rate items on an absolute scale and then
-/// interpret them relative to a character's subjective baseline happiness.
-    pub fn position(&self, value: Number) -> Number {
-        // Calculate the effective range. Here we assume that self.high is the upper bound.
-        // (You could similarly use self.avg - self.low for negative deviations if desired.)
-        let range = self.high - self.avg;
+    /*
+    /// Computes the subjective position of a given value relative to the running envelope.
+    ///
+    /// The envelope is defined by the running average (`avg`) and the upper bound (`high`).
+    /// This function returns a normalized value such that:
+    /// - A `value` equal to `avg` yields 0.0.
+    /// - A `value` equal to `high` yields 1.0.
+    /// - Values greater than the average but below high linearly map between 0 and 1.
+    /// - Values below the average yield negative positions.
+    ///
+    /// This is used for a hedonic treadmill to rate items on an absolute scale and then
+    /// interpret them relative to a character's subjective baseline happiness.
+        pub fn position(&self, value: Number) -> Number {
+            // Calculate the effective range. Here we assume that self.high is the upper bound.
+            // (You could similarly use self.avg - self.low for negative deviations if desired.)
+            let range = self.high - self.avg;
 
-        // If range is too close to zero, return 0.0 to avoid division errors.
-        if range.abs() < Number::EPSILON {
-            return 0.0;
+            // If range is too close to zero, return 0.0 to avoid division errors.
+            if range.abs() < Number::EPSILON {
+                return 0.0;
+            }
+
+            // Determine how far the value is above (or below) the average.
+            let offset = value - self.avg;
+
+            // Normalize the offset by the range.
+            offset / range
         }
-
-        // Determine how far the value is above (or below) the average.
-        let offset = value - self.avg;
-        
-        // Normalize the offset by the range.
-        offset / range
-    }
-*/
+    */
 }

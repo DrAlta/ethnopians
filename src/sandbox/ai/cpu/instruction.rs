@@ -515,7 +515,7 @@ impl Instruction {
 
                 if let Some((_, last)) = last_maybe {
                     stack.push(StackItem::some(last));
-                } else{
+                } else {
                     stack.push(StackItem::False);
                 };
                 Self::next(Status::None, pc)

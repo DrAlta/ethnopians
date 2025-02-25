@@ -1,6 +1,6 @@
 use qol::logy;
 
-use crate::sandbox::ai::{TableGet, TableInterior, ExecutionToken, StackItem, Status};
+use crate::sandbox::ai::{ExecutionToken, StackItem, Status, TableGet, TableInterior};
 
 use super::{ProgramCounter, ReturnStack, Stack};
 

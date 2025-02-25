@@ -11,9 +11,10 @@
 //! knife has higher DPS than axe but shorter range
 use std::collections::HashMap;
 
-
 mod cpu;
-pub use cpu::{Blackboard, BlackboardValue, CPU, Instruction, StackItem, TableGet, TableInterior, Variable};
+pub use cpu::{
+    Blackboard, BlackboardValue, Instruction, StackItem, TableGet, TableInterior, Variable, CPU,
+};
 mod behavior_tree;
 pub use behavior_tree::Corrent;
 mod hermit;

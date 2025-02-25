@@ -53,18 +53,16 @@ impl TableInterior {
     }
 }
 
-
-
-pub trait TableGet<T>{
+pub trait TableGet<T> {
     fn table_get(&self, k: T) -> Option<&Value>;
 }
 
-impl TableGet<&Value> for BTreeMap<Value, Value>{
+impl TableGet<&Value> for BTreeMap<Value, Value> {
     fn table_get(&self, k: &Value) -> Option<&Value> {
         self.get(k)
     }
 }
-impl<T: Into<Value>> TableGet<T> for BTreeMap<Value, Value>{
+impl<T: Into<Value>> TableGet<T> for BTreeMap<Value, Value> {
     fn table_get(&self, k: T) -> Option<&Value> {
         let k2: Value = k.into();
         self.get(&k2)

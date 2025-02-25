@@ -204,12 +204,12 @@ impl From<i32> for StackItem {
         Self::Int(value)
     }
 }
-impl From<String> for StackItem{
+impl From<String> for StackItem {
     fn from(value: String) -> Self {
         Self::String(value)
     }
 }
-impl From<&str> for StackItem{
+impl From<&str> for StackItem {
     fn from(value: &str) -> Self {
         Self::String(value.to_owned())
     }

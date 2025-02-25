@@ -1,8 +1,6 @@
 use qol::logy;
 
-use crate::sandbox::ai::{
-    TableGet, TableInterior, ExecutionToken, Instruction, StackItem, Status,
-};
+use crate::sandbox::ai::{ExecutionToken, Instruction, StackItem, Status, TableGet, TableInterior};
 
 use super::{ProgramCounter, ReturnStack, Stack};
 
@@ -48,7 +46,7 @@ pub fn tick_selector(
     };
     let TableInterior { map, parents: _ } = x.as_ref();
     let map2 = map.borrow();
-    
+
     let Some(StackItem::Int(idx)) = map2.table_get("Selector") else {
         logy!("debug", "{map:#?}");
         return Err("Selector state not found on stack".into());

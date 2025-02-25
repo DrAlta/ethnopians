@@ -1,9 +1,5 @@
 use nom::{
-    bytes::complete::tag,
-    character::complete::char,
-    error::ErrorKind,
-    sequence::tuple,
-    IResult,
+    bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
 };
 
 use crate::sandbox::ai::{
@@ -23,7 +19,13 @@ pub fn jump_parser<'a>(
         space_parser,
         char(')'),
     ))(input)?;
-    Ok((tail, (vec![Instruction::ForthJump(body.to_owned(), 0)], TreePool::new())))
+    Ok((
+        tail,
+        (
+            vec![Instruction::ForthJump(body.to_owned(), 0)],
+            TreePool::new(),
+        ),
+    ))
 }
 
 #[cfg(test)]
@@ -38,9 +40,6 @@ mod tests {
         let (tail, (body, used)) = jump_parser(input).unwrap();
         assert_eq!(tail, "");
         assert_eq!(used, TreePool::new());
-        assert_eq!(
-            body,
-            vec![Instruction::ForthJump("one".to_owned(), 0)]
-        )
+        assert_eq!(body, vec![Instruction::ForthJump("one".to_owned(), 0)])
     }
 }

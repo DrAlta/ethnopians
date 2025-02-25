@@ -28,9 +28,7 @@ mod tests {
     use super::*;
     #[test]
     fn sample_test() {
-        let mut rng = thats_so_random::DummyRNG::new(
-            [0_u32, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        );
+        let mut rng = thats_so_random::DummyRNG::new([0_u32, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
         let a = HashMap::from([
             ("a".to_owned(), NonZero::new(1_u8).unwrap()),
             ("b".to_owned(), NonZero::new(2).unwrap()),

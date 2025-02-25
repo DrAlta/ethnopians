@@ -28,10 +28,10 @@ pub fn process_movement(
 ) {
     let max_step = 5.0;
     let time_step = 1.0;
-/*
-    #[cfg(feature = "move_history")]
-    logy!("debug-process-movement", "Going tosaving histoy");
-*/
+    /*
+        #[cfg(feature = "move_history")]
+        logy!("debug-process-movement", "Going tosaving histoy");
+    */
     let normalize_dir_of_travel: HashMap<EntityId, (Vec2, Number)> = query
         .iter()
         .filter_map(|x| {

@@ -25,10 +25,10 @@ impl AARect {
         self.min_y
     }
     pub fn inside(&self, x: Number, y: Number) -> bool {
-        x >= self.min_x &&
-        x <= self.min_x + self.width &&
-        y >= self.min_y &&
-        y <= self.min_y + self.height
+        x >= self.min_x
+            && x <= self.min_x + self.width
+            && y >= self.min_y
+            && y <= self.min_y + self.height
     }
 }
 

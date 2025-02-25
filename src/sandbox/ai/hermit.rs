@@ -1,4 +1,3 @@
-
 use crate::sandbox::ai::{parser::file_parser, TreePool};
 macro_rules! foofoo {
     // `$x` followed by at least one `$y,`
@@ -368,8 +367,9 @@ clear_for_garden_02 = forth{
 set_garden = forth {
         lit("garden")
         set_blackboard
-}"#}; // todo need to add set_blackboard and defer_blackboard instructions
-    // vvv tasks used in have_house
+}"#
+    }; // todo need to add set_blackboard and defer_blackboard instructions
+       // vvv tasks used in have_house
     let have_2_wood = {
         r#"have_2_wood_02 = sel{
     inventory_have_ge(wood, 2),
@@ -472,8 +472,6 @@ have_stick = sel{
     };
     // end tasks used in have_2_wood_02
 
-
-    
     /*
     eat_veg = forth {
         lit("self")
@@ -508,7 +506,7 @@ have_stick = sel{
         have_garden,
     ]
     .into_iter()
-//    .enumerate()
+    //    .enumerate()
     {
         let (tail, new_db) = file_parser(source).expect("{idx} didn't parse");
         assert_eq!((tail, idx), ("", idx));

@@ -27,7 +27,10 @@ impl Client {
             });
         enjoyment + (fulfillment * self.enjoyment_of_fullfillment)
     }
-    pub fn gen<RNG: RandomNumberGenerator>(traits: &HashMap<Trait, NonZero<u8>>, rng: &mut RNG) -> Client {
+    pub fn gen<RNG: RandomNumberGenerator>(
+        traits: &HashMap<Trait, NonZero<u8>>,
+        rng: &mut RNG,
+    ) -> Client {
         let mut exclude = Vec::new();
         exclude.push(sample(traits, &exclude, rng).unwrap());
         exclude.push(sample(traits, &exclude, rng).unwrap());
@@ -47,7 +50,7 @@ impl Client {
 
 #[allow(dead_code)]
 pub fn main() {
-    let mut rng = thats_so_random::DummyRNG::new([0_u32, 1, 2,3,4]);
+    let mut rng = thats_so_random::DummyRNG::new([0_u32, 1, 2, 3, 4]);
 
     let traits = HashMap::from([
         ("a".to_owned(), NonZero::new(1).unwrap()),
