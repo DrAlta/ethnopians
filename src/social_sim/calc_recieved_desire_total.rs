@@ -2,9 +2,8 @@ use std::collections::HashMap;
 
 use qol::{logy, BiHashMap, PushOrInsert};
 
-use crate::{ActionId, ActorId, Desire};
+use crate::{social_sim::{ActionId, ActorId, Desire}, util::h_plus};
 
-use super::h_plus;
 
 /// this is wrong but might be useful. it collects the max desires of eveyone else to interacting with everyone that isn't interacting with someone
 pub fn calc_recieved_desire_total(

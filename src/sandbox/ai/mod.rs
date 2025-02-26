@@ -88,6 +88,7 @@ mod tests {
                     },
                     super::Status::GetEntities { ../*min_x, min_y, max_x, max_y*/ } => todo!(),
                     super::Status::RemoveEntitiesOfType(_item) => todo!(),
+                    super::Status::RetainEntitiesOfType(_item) => todo!(),
                     super::Status::Running(_inpulse_id) => todo!(),
                     super::Status::None => (),
                 },

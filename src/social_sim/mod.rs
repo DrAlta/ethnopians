@@ -1,15 +1,15 @@
+//! this is supersecced by the ensemblage crate
 use std::collections::HashMap;
 
-use crate::{ActionId, ActorId, Desire, TimeIndex};
 use qol::{logy, BiHashMap};
+
+use crate::types::ActionId;
 
 //start placeholder
 mod get_actions;
 pub use get_actions::get_actions;
 //end placeholder
 
-mod action_desire;
-pub use action_desire::ActionDesire;
 
 mod actors_most_desired_person_to_interact_with;
 pub use actors_most_desired_person_to_interact_with::actors_most_desired_person_to_interact_with;
@@ -35,10 +35,8 @@ pub use calc_h_plus_of_desires_towards_actors::calc_h_plus_of_desires_towards_ac
 mod calc_h_plus_of_full_desires_towards_actors;
 pub use calc_h_plus_of_full_desires_towards_actors::calc_h_plus_of_full_desires_towards_actors;
 
-mod h_plus;
-pub use h_plus::h_plus;
-mod r#move;
-pub use r#move::Move;
+mod types;
+pub use types::{ActionDesire, ActorId, Desire, Move, TimeIndex};
 
 type IntentId = String;
 type RelationId = String;

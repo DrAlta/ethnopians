@@ -1,7 +1,7 @@
 use std::collections::{BTreeSet, HashMap};
 
 use crate::{
-    util::{AARect, SpatialId, SweepAndPrune},
+    types::{AARect, SpatialId, SweepAndPrune},
     Number,
 };
 use qol::logy;

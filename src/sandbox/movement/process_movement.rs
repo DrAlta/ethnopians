@@ -5,7 +5,7 @@ use bevy::{
     prelude::{Commands, Query},
 };
 
-use crate::{util::AARect, Number};
+use crate::{types::AARect, Number};
 
 use qol::logy;
 

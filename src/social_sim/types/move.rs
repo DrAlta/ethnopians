@@ -1,4 +1,4 @@
-use crate::{ActionId, ActorId};
+use crate::social_sim::{ActionId, ActorId};
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Move {

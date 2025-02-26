@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use qol::BiHashMap;
 
-use crate::{ActorId, Desire};
+use crate::social_sim::{ActorId, Desire};
 
 pub fn actors_most_desired_person_to_interact_with(
     full_desires: &BiHashMap<ActorId, ActorId, Desire>,

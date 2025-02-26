@@ -1,6 +1,4 @@
-pub fn lerp(a: f32, b: f32, t: f32) -> f32 {
-    a + t * (b - a)
-}
+
 
 pub fn radians_to_u8(radians: f32) -> u8 {
     // Normalize radians to the range [0, 2*pi)

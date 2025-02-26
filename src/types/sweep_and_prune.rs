@@ -1,6 +1,9 @@
 use std::collections::BTreeSet;
 
-use crate::{util::SpatialId, Number};
+use crate::Number;
+
+pub type SpatialId = usize;
+
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct AARect {

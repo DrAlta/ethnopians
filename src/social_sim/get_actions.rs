@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use qol::BiHashMap;
 
-use crate::{ActionId, ActorId, Desire, TimeIndex};
+use crate::social_sim::{ActionId, ActorId, Desire, TimeIndex};
 
 type IntentId = String;
 type RelationId = String;

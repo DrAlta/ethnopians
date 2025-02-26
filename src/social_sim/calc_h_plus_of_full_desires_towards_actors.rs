@@ -2,9 +2,7 @@ use std::collections::HashMap;
 
 use qol::{BiHashMap, PushOrInsert};
 
-use crate::{ActorId, Desire};
-
-use super::h_plus;
+use crate::{social_sim::{ActorId, Desire}, util::h_plus};
 
 pub fn calc_h_plus_of_full_desires_towards_actors(
     full_desires: &BiHashMap<ActorId, ActorId, Desire>,

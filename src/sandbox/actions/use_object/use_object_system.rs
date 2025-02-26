@@ -3,15 +3,15 @@ use std::hash::{DefaultHasher, Hash, Hasher};
 use bevy::prelude::*;
 use qol::logy;
 
-use crate::sandbox::{
+use crate::{sandbox::{
     actions::{
         use_object::{use_object, UseRequest},
-        ActionId, PosibleActionsRequest, PosibleActionsResponce,
+        PosibleActionsRequest, PosibleActionsResponce,
     },
     change_request::ChangeRequest,
     world::{Energy, Size, Type},
     Location,
-};
+}, types::ActionId};
 
 pub fn use_object_system(
     query: Query<(Entity, &Type, &Location, Option<&Size>, Option<&Energy>)>,
@@ -66,7 +66,7 @@ pub fn use_object_system(
                 posible_actions_responce.send(PosibleActionsResponce {
                     agent_id: *agent_id,
                     target_id: *target_id,
-                    action_id: ActionId::UseObject,
+                    action_id: ActionId::USE_OBJECT,
                 });
             }
             Err(_err) => {

@@ -33,7 +33,7 @@ pub fn get_hermit_behavoir_tree() -> TreePool {
     have_house,
     have_garden,
     harvest_veg,
-    plant_veg
+    plant_vegs
 };
 take_entity = forth{
     dup
@@ -49,6 +49,27 @@ take_entity = forth{
         then
     then
 
+};
+take_all = forth{
+    pop_last
+    some_entity_id
+    if
+        take_entity
+        lit(Success)
+        eq
+        if
+            jump(take_all)
+            return
+        then
+    then
+    lit(False)
+    eq
+    if
+        lit(Success)
+        return
+    then
+    lit(Failure)
+    return
 }"#
     };
     /* in have_garden a gardern is (spacing * width) by (space * hiegth) plot with nothing but vegs and agents in it.
@@ -113,6 +134,7 @@ have_house = sel {
 };
 have_garden = forth {
     lit("garden_location")
+    get_blackboard
     some_coord
     if
         drop
@@ -234,8 +256,117 @@ have_garden = forth {
     lit(Failure)
     return
 };
-harvest_veg = todo;
-plant_veg = todo"#
+harvest_veg = forth{
+    lit("garden_location")
+    some_coord
+    if
+        lit(x: 20, y: 20)
+        get_entities
+        lit("veggies")
+        retain_entities_of_type
+        take_all
+        swap
+        drop
+        return
+    then
+    drop
+    lit(Failure)
+    return
+};
+plant_vegs = forth {
+    12
+    have_n_seed
+    drop
+    lit("garden_location")
+    get_blackboard
+    some_coord
+    if
+        dup
+    then
+
+};
+plant_row = forth{
+    dup
+    plant_veg
+    lit(0)
+    plant_row_02
+};
+plant_row_02 = forth{
+    dup
+    lit(4)
+    lt
+    if
+        swap
+        lit(x: 5, y: 0)
+        add
+        dup
+        plant_veg
+        lit(Success)
+        if
+            swap
+            jump(plant_row_02)
+        then
+        lit(Failure)
+        return
+    then
+    drop
+    lit(Success)
+    return
+};
+
+have_n_seed = forth{
+    dup
+    lit("Seed")
+    inventory_have_ge
+    if
+        drop
+        lit(Success)
+        return
+    then
+    split_veg_to_seed
+    lit(Success)
+    not
+    if
+        lit(Failure)
+        return
+    then
+    jump(have_n_seed)
+};
+split_veg_to_seed = forth{
+    have_knife
+    lit(Success)
+    not
+    if
+        lit(Failure)
+        return
+    then
+    1
+    lit("Veggie")
+    inventory_have_ge
+    not
+    if
+        lit("Veggie")
+        find_nearest
+        some_entity_id
+        if
+            dup
+            get_location
+            some_coord
+            if
+                go_to
+                take
+                lit(Success)
+                eq
+                not
+                if
+                    lit(Failure)
+                    return
+                then
+            then
+        then
+    then
+
+}"#
     };
     // vvv tasks used in hermit
     let sat_hunger = {
@@ -354,18 +485,13 @@ check_if_clear_for_garden = forth{
 clear_for_garden = forth{
     lit(x: 20, y: 20)
     get_entities
-};
-clear_for_garden_02 = forth{
-    pop_last
-    some_entity_id
-    if
-        take_entity
-        jump(clear_for_garden_02)
-    then
+    take_all
+    swap
+    drop
     return
 };
 set_garden = forth {
-        lit("garden")
+        lit("garden_location")
         set_blackboard
 }"#
     }; // todo need to add set_blackboard and defer_blackboard instructions

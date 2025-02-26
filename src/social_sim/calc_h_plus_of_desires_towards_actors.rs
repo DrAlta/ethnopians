@@ -2,9 +2,7 @@ use std::collections::HashMap;
 
 use qol::{BiHashMap, PushOrInsert};
 
-use crate::{ActionId, ActorId, Desire};
-
-use super::h_plus;
+use crate::{social_sim::{ActionId, ActorId, Desire}, util::h_plus};
 
 pub fn calc_h_plus_of_desires_towards_actors(
     action_weights_hierarchy: &BiHashMap<ActorId, ActorId, HashMap<ActionId, Desire>>,

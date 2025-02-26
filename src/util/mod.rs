@@ -1,7 +1,8 @@
-mod running_envelope;
-pub use running_envelope::RunningEnvelope;
+mod h_plus;
+pub use h_plus::h_plus;
+mod lerp;
+pub use lerp::lerp;
 mod sqrt;
 pub use sqrt::Sqrt;
-mod sweep_and_prune;
-pub use sweep_and_prune::{AARect, SweepAndPrune};
-pub type SpatialId = usize;
+mod zero_to_one_infinity_to_zero;
+pub use zero_to_one_infinity_to_zero::{zero2one_infinity_to_zero_throught_point, zero2one_infinity_to_zero_with_coefficient, calc_zero2one_infinity_to_zero_coefficient};

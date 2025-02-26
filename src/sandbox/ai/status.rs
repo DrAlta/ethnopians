@@ -38,6 +38,7 @@ pub enum Status {
     },
     // prey for the the items of the type to be removes from the array on top of the stack
     RemoveEntitiesOfType(Item),
+    RetainEntitiesOfType(Item),
     Running(InpulseId),
     None,
 }

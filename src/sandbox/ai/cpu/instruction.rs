@@ -77,6 +77,7 @@ pub enum Instruction {
     ForthSwap,
     ForthIsEmpty,
     ForthRemoveEntitiesOfType,
+    ForthRetainEntitiesOfType,
     // (coord coord -- Table) gets all entities in a TOS rectanle at NOS
     ForthGetEntities,
 }
@@ -145,6 +146,7 @@ impl Instruction {
             | Instruction::ForthPopLast
             | Instruction::ForthSetBlackboard
             | Instruction::ForthStuff
+            | Instruction::ForthRetainEntitiesOfType
             | Instruction::ForthIf(_) => (),
             Instruction::ForthTree(token) => {
                 if !bt.contains_key(token) {
@@ -664,6 +666,37 @@ impl Instruction {
                 Self::next(Status::None, pc)
                 */
             }
+            Instruction::ForthRetainEntitiesOfType => {
+                let Some(StackItem::String(stack_string)) = stack.last() else {
+                    return Err("top of stack not a number".into());
+                };
+                let stack_str: &str = stack_string;
+                let Ok(item_type_from_stack) = stack_str.try_into() else {
+                    return Err(format!("couldn't convert {stack_str:?} to type"));
+                };
+                Self::next(Status::RetainEntitiesOfType(item_type_from_stack), pc)
+
+                /* pre bevy impl
+                let Some(StackItem::Todo(_)) = stack.get(stack.len() - 2) else {
+                    return Err("next of stack not a number".into());
+                };
+                let Some(StackItem::String(_)) = stack.pop() else {
+                    unreachable!()
+                };
+                let Some(StackItem::Todo(entities)) = stack.last_mut() else {
+                    unreachable!()
+                };
+
+                entities.retain(|id|{
+                    if let Some(this_items_type) = world.get_type(id) {
+                        !(this_items_type == &item_type_from_stack)
+                    } else {
+                        true
+                    }
+                });
+                Self::next(Status::None, pc)
+                */
+            }
             Instruction::ForthTree(token) => {
                 let Some(StackItem::String(x)) = stack.last() else {
                     return Err("top was not init".to_owned());
@@ -741,6 +774,7 @@ impl Instruction {
             | Instruction::ForthPopLast
             | Instruction::ForthSetBlackboard
             | Instruction::ForthStuff
+            | Instruction::ForthRetainEntitiesOfType
             | Instruction::ForthIf(_) => (),
         }
     }

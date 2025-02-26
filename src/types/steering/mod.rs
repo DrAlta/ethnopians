@@ -1,17 +1,21 @@
 use std::{collections::BTreeMap, ops::Add};
 
+use crate::{util::lerp, Number};
+
 mod degrees;
 use degrees::Degrees;
 
 mod util;
-pub use util::{lerp, radians_to_u8, u8_to_radians};
+pub use util::{radians_to_u8, u8_to_radians};
 
-pub struct Steering(BTreeMap<u8, f32>);
+/// Steering stores an intensity around a circle.
+/// It does this by storing the intensity at points around the circle and linier interprating between to closest two to the point being sampled
+pub struct Steering(BTreeMap<u8, Number>);
 impl Steering {
     pub fn new() -> Self {
         Self(BTreeMap::new())
     }
-    pub fn get<T: Degrees>(&self, direction: T) -> Option<f32> {
+    pub fn get<T: Degrees>(&self, direction: T) -> Option<Number> {
         let direction = direction.degrees();
         let x = self
             .0
@@ -30,20 +34,20 @@ impl Steering {
         };
 
         // Calculate interpolation factor
-        let a = (direction as f32 - *prev_key as f32).rem_euclid(256.0);
+        let a = (direction as Number - *prev_key as Number).rem_euclid(256.0);
 
-        let b = (*next_key as f32 - *prev_key as f32).rem_euclid(256.0);
+        let b = (*next_key as Number - *prev_key as Number).rem_euclid(256.0);
 
         let t = a / b;
 
         // Interpolate between the two closest values
         Some(lerp(*prev, *next, t))
     }
-    pub fn max<T: Degrees>(&self) -> Option<f32> {
+    pub fn max<T: Degrees>(&self) -> Option<Number> {
         Some(*(&self.0).values().max_by(|a, b| a.total_cmp(b))?)
     }
 }
-impl<T: Into<BTreeMap<u8, f32>>> From<T> for Steering {
+impl<T: Into<BTreeMap<u8, Number>>> From<T> for Steering {
     fn from(value: T) -> Self {
         Self(value.into())
     }
