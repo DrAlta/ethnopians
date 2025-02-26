@@ -5,7 +5,7 @@ type Number =f64;
 pub fn danja_distance(x:Number, y:Number) -> Number {
     let (s,b) = if y < x {(x,y)} else {(y,x)};
     let q = s + (b * (1.0 / s));
-    let l = 0.5 * (b * 0.17160241048);
+    let l = 0.5 * (b * 0.171573371);
     (( q + s + b) / 2.0 ) - l
 }
 fn main(){
