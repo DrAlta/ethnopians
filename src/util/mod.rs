@@ -1,3 +1,5 @@
+mod danja_distance;
+pub use danja_distance::danja_distance;
 mod h_plus;
 pub use h_plus::h_plus;
 mod lerp;
