@@ -30,7 +30,6 @@ impl std::fmt::Display for Id {
         match self {
             &Self::USE_OBJECT => {
                 write!(f, "Action:Use_Object")
-
             }
             _ => {
                 write!(f, "Action{}", self.0)

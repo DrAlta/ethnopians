@@ -22,7 +22,10 @@ use crate::sandbox::ai::{
     Instruction, Thread, TreePool,
 };
 
-use super::{drop_parser, getters::set_blackboard, is_empty_parser, jump_parser, pop_last_parser, stuff_parser, table::retain_entities_of_type_parser};
+use super::{
+    drop_parser, getters::set_blackboard, is_empty_parser, jump_parser, pop_last_parser,
+    stuff_parser, table::retain_entities_of_type_parser,
+};
 
 pub fn forth_threadette_parser_2<'a>(
     input: &'a str,
@@ -76,10 +79,7 @@ pub fn forth_threadette_parser_2<'a>(
         dup_parser,
         swap_parser,
         // actions
-        alt((
-            go_to_parser, 
-            take_parser,
-        )),
+        alt((go_to_parser, take_parser)),
     ))(input)
 }
 

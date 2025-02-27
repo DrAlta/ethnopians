@@ -11,10 +11,10 @@ impl From<StackItem> for BlackboardValue {
             StackItem::String(x) => BlackboardValue::String(x),
             StackItem::True => BlackboardValue::String("True".to_owned()),
             StackItem::False => BlackboardValue::String("False".to_owned()),
-            x @ StackItem::Int(_) |
-            x @ StackItem::Coord { .. } |
-            x @ StackItem::Option(_) |
-            x @ StackItem::Table(_) => BlackboardValue::String(format!("{x}")),
+            x @ StackItem::Int(_)
+            | x @ StackItem::Coord { .. }
+            | x @ StackItem::Option(_)
+            | x @ StackItem::Table(_) => BlackboardValue::String(format!("{x}")),
         }
     }
 }

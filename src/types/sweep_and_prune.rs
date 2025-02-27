@@ -4,7 +4,6 @@ use crate::Number;
 
 pub type SpatialId = usize;
 
-
 #[derive(Debug, Clone, PartialEq)]
 pub struct AARect {
     pub min_x: Number,

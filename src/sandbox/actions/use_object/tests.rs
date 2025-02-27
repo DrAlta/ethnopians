@@ -1,10 +1,13 @@
 use bevy::prelude::*;
 
-use crate::{sandbox::{
-    actions::{use_object::UseRequest, PosibleActionsRequest, PosibleActionsResponce},
-    world::Type,
-    EntityId, Item, Location,
-}, types::ActionId};
+use crate::{
+    sandbox::{
+        actions::{use_object::UseRequest, PosibleActionsRequest, PosibleActionsResponce},
+        world::Type,
+        EntityId, Item, Location,
+    },
+    types::ActionId,
+};
 
 use super::*;
 

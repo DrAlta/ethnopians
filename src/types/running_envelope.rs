@@ -10,53 +10,58 @@ use crate::Number;
 /// The `attack` and `release` parameters control how quickly the envelope tracks upward or downward deviations,
 /// while `decay` determines the overall smoothing factor applied when updating these values.
 pub struct RunningEnvelope {
+    /// The smoothed maximum envelope value.
+    ///
+    /// This value tracks the high extremes of the signal using a hybrid method
+    /// that considers both the instantaneous `new_sample` and the running
+    /// average.
+    pub fast_attack_high: Number,
+
     /// The further smoothed high envelope value.
     ///
-    /// This field is a filtered version of `max_val` designed to provide a stable upper bound
-    /// that reacts less abruptly to transient spikes.
+    /// This field is a filtered version of `fast_attack_high` designed to
+    /// provide a stable upper bound that reacts less abruptly to transient
+    /// spikes.
     pub high: Number,
-
-    /// The further smoothed low envelope value.
-    ///
-    /// This field is a filtered version of `min_val` meant to yield a stable lower bound,
-    /// preventing overly reactive changes due to brief dips.
-    pub low: Number,
 
     /// The running average of the signal.
     ///
-    /// This is computed as an exponential moving average of the input values and provides
-    /// a baseline reference level for the signal.
+    /// This is computed as an exponential moving average of the input values
+    /// and provides a baseline reference level for the signal.
     pub avg: Number,
 
-    /// The smoothed maximum envelope value.
+    /// The further smoothed low envelope value.
     ///
-    /// This value tracks the high extremes of the signal using a hybrid method that
-    /// considers both the instantaneous `new_sample` and the running average.
-    pub max_val: Number,
+    /// This field is a filtered version of `fast_attack_low` meant to yield a
+    /// stable lower bound, preventing overly reactive changes due to brief
+    /// dips.
+    pub low: Number,
 
     /// The smoothed minimum envelope value.
     ///
-    /// This value tracks the low extremes of the signal and is updated similarly to `max_val`,
-    /// but for downward deviations.
-    pub min_val: Number,
+    /// This value tracks the low extremes of the signal and is updated
+    /// similarly to `fast_attack_high`, but for downward deviations.
+    pub fast_attack_low: Number,
 
-    /// Attack parameter.
+    /// Release parameters.
     ///
-    /// This controls how quickly the maximum envelope reacts to increases in the signal.
-    /// A higher value makes the envelope climb faster when a new high is encountered.
-    pub attack: Number,
+    /// This parameter governs how quickly the maximun envelope reacts to
+    /// decreases in the signal.
+    /// A higher value means the envelope will drop more rapidly when the
+    /// signal stops raising as high.
+    pub max_release: Number,
 
-    /// Release parameter.
-    ///
-    /// This parameter governs how quickly the minimum envelope reacts to decreases in the signal.
-    /// A higher value means the envelope will drop more rapidly when a new low is detected.
-    pub release: Number,
+    /// This parameter governs how quickly the minimum envelope reacts to
+    /// increases in the signal.
+    /// A higher value means the envelope will raise more rapidly when the
+    /// signal stops droping as low.
+    pub min_release: Number,
 
     /// Decay (smoothing) factor.
     ///
-    /// This is used in the exponential smoothing calculations for the running average and the
-    /// envelope values. A higher decay value gives more weight to historical values, making the
-    /// smoothing more pronounced.
+    /// This is used in the exponential smoothing calculations for the
+    /// running average and the envelope values. A higher decay value gives more
+    /// weight to historical values, making the smoothing more pronounced.
     pub decay: Number,
 }
 
@@ -72,24 +77,36 @@ impl RunningEnvelope {
     /// - `new_sample`: The most recent sample from the signal.
     pub fn update(&mut self, new_sample: Number) -> Number {
         // Calculate the weight for previous values (e.g., if decay is 10, then weight_old = 9).
-        let weight_old = self.decay - 1.0;
+        let weight_old = 1.0 - self.decay;
 
-        // Update the running average (EMA).
-        self.avg = ((self.avg * weight_old) + new_sample) / self.decay;
+        // Update the running average.
+        self.avg = (self.avg * weight_old) + (new_sample * self.decay);
 
-        // For the max envelope, choose the larger of the new sample and the average.
-        let candidate_max = new_sample.max(self.avg);
-        self.max_val = (1.0 - self.attack) * self.max_val + self.attack * candidate_max;
+        // For the max envelope, if the `new_sample` is geater that the old
+        // value use it else do a running average with the larger of the
+        // `new_sample` or the average
+        self.fast_attack_high = if new_sample > self.fast_attack_high {
+            new_sample
+        } else {
+            self.fast_attack_high * (1.0 - self.max_release)
+                + (new_sample.max(self.avg) * self.max_release)
+        };
 
         // Smooth the high envelope based on the max envelope.
-        self.high = ((self.high * weight_old) + self.max_val) / self.decay;
+        self.high = (self.high * weight_old) + (self.fast_attack_high * self.decay);
 
-        // For the min envelope, choose the lower of the new sample and the average.
-        let candidate_min = new_sample.min(self.avg);
-        self.min_val = (1.0 - self.release) * self.min_val + self.release * candidate_min;
+        // For the min envelope, if the `new_sample` is leaser that the old
+        // value use it else do a running average with the leaser of the
+        // `new_sample` or the average
+        self.fast_attack_low = if new_sample < self.fast_attack_low {
+            new_sample
+        } else {
+            self.fast_attack_low * (1.0 - self.min_release)
+                + (new_sample.min(self.avg) * self.min_release)
+        };
 
         // Smooth the low envelope based on the min envelope.
-        self.low = ((self.low * weight_old) + self.min_val) / self.decay;
+        self.low = (self.low * weight_old) + (self.fast_attack_low * self.decay);
 
         self.position(new_sample)
     }

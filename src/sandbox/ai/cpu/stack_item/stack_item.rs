@@ -94,7 +94,7 @@ impl std::fmt::Display for StackItem {
             StackItem::Coord { x, y } => write!(f, "Coord[{x}:{y}]"),
             StackItem::String(x) => write!(f, "{x}"),
             StackItem::EntityId(x) => write!(f, "{x}"),
-            StackItem::Option(stack_item) =>  write!(f, "Some({stack_item})"),
+            StackItem::Option(stack_item) => write!(f, "Some({stack_item})"),
             //            StackItem::Todo(items) => todo!(),
         }
     }

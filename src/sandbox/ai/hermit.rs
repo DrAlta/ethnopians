@@ -313,10 +313,9 @@ plant_row_02 = forth{
     lit(Success)
     return
 };
-
 have_n_seed = forth{
     dup
-    lit("Seed")
+    lit("seed")
     inventory_have_ge
     if
         drop
@@ -341,11 +340,11 @@ split_veg_to_seed = forth{
         return
     then
     1
-    lit("Veggie")
+    lit("veggie")
     inventory_have_ge
     not
     if
-        lit("Veggie")
+        lit("veggie")
         find_nearest
         some_entity_id
         if
@@ -476,7 +475,7 @@ have_2_wood =seq{
 check_if_clear_for_garden = forth{
     lit(x: 20, y: 20)
     get_entities
-    lit("veg")
+    lit("veggie")
     remove_entities_of_type
     lit("agent")
     remove_entities_of_type

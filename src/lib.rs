@@ -11,7 +11,7 @@ pub mod sandbox;
 //pub mod social_sim;//! this is supersecced by the ensemblage crate
 mod trauma;
 pub mod types;
-pub use types::{Consts, vec2, Vec2};
+pub use types::{vec2, Consts, Vec2};
 pub mod util;
 
 pub type Number = f64;

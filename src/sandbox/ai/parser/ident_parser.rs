@@ -3,5 +3,7 @@ use nom::{
 };
 
 pub fn ident_parser<'a>(input: &'a str) -> IResult<&'a str, &'a str, (&'a str, ErrorKind)> {
-    recognize(many1(one_of("abcdefghijklmnopqrstuvwxyz_1234567890")))(input)
+    recognize(many1(one_of(
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_1234567890",
+    )))(input)
 }

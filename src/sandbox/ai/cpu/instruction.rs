@@ -392,12 +392,10 @@ impl Instruction {
                 */
                 stack.push(match blackboard.get(&key) {
                     Some(x) => StackItem::Option(match x {
-                        BlackboardValue::EntityId(y) => {
-                            Box::new(StackItem::EntityId(y.clone()))
-                        }
+                        BlackboardValue::EntityId(y) => Box::new(StackItem::EntityId(y.clone())),
                         BlackboardValue::String(a) => Box::new(StackItem::String(a.clone())),
                     }),
-                    None => StackItem::none()
+                    None => StackItem::none(),
                 });
                 Self::next(Status::None, pc)
             }
@@ -479,7 +477,7 @@ impl Instruction {
                 Self::next(Status::None, pc)
             }
             Instruction::ForthStuff => {
-                    let Some(StackItem::Table(_)) = stack.get(stack.len() - 3) else {
+                let Some(StackItem::Table(_)) = stack.get(stack.len() - 3) else {
                     return Err("3rd item wasn't a table".to_owned());
                 };
                 let Some(key) = stack.pop() else {
@@ -491,9 +489,9 @@ impl Instruction {
                 let Some(table) = stack.last_mut() else {
                     unreachable!()
                 };
-                let ret = match table.stuff(value, key){
+                let ret = match table.stuff(value, key) {
                     Ok(_) => StackItem::True,
-                    Err(_) => StackItem::False
+                    Err(_) => StackItem::False,
                 };
                 stack.push(ret);
                 Self::next(Status::None, pc)
