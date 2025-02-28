@@ -21,7 +21,7 @@ pub fn forth_parser<'a>(
     let mut thread = Vec::new();
     let mut pool = HashMap::new();
     for (idx, (mut vec, mut hash_map)) in body.into_iter().enumerate() {
-        let prefix = format!("_{idx}");
+        let prefix = format!("@{idx}");
         hash_map.correct(&prefix);
         vec.iter_mut().for_each(|x| x.correct(&prefix));
         thread.append(&mut vec);

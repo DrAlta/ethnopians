@@ -274,7 +274,7 @@ harvest_veg = forth{
     return
 };
 plant_vegs = forth {
-    12
+    lit(12)
     have_n_seed
     drop
     lit("garden_location")
@@ -324,7 +324,7 @@ have_n_seed = forth{
     then
     split_veg_to_seed
     lit(Success)
-    not
+    not_true
     if
         lit(Failure)
         return
@@ -334,15 +334,15 @@ have_n_seed = forth{
 split_veg_to_seed = forth{
     have_knife
     lit(Success)
-    not
+    not_true
     if
         lit(Failure)
         return
     then
-    1
+    lit(1)
     lit("veggie")
     inventory_have_ge
-    not
+    not_true
     if
         lit("veggie")
         find_nearest
@@ -356,7 +356,7 @@ split_veg_to_seed = forth{
                 take
                 lit(Success)
                 eq
-                not
+                not_true
                 if
                     lit(Failure)
                     return
@@ -697,10 +697,10 @@ mod tests {
             TreePool::from([
                 (
                     "footest".to_owned(),
-                    vec![Instruction::ForthTree("footest_0".to_owned())]
+                    vec![Instruction::ForthTree("footest@0".to_owned())]
                 ),
                 (
-                    "footest_0".to_owned(),
+                    "footest@0".to_owned(),
                     vec![
                         Instruction::ForthLit(StackItem::String("self".to_owned())),
                         Instruction::ForthGetEnergy,

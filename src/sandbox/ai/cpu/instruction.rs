@@ -26,7 +26,7 @@ pub enum Instruction {
     // takes a Blackboard key that points to an ItemClass
     Eat(BlackboardKey),
     // takes a Blackboard key that points to an ItemClass and u8 of the number to compare to
-    InventoryGE(BlackboardKey, u8),
+    InventoryGE(BlackboardKey, i32),
     Selector(Vec<ExecutionToken>),
     Sequence(Vec<ExecutionToken>),
     // takes two Blackboard keys that points to ItemClass
@@ -60,6 +60,7 @@ pub enum Instruction {
     ForthLit(StackItem),
     ForthLT,
     ForthMul,
+    ForthNotTrue,
     ForthPopLast,
     ForthRem,
     ForthReturn,
@@ -75,6 +76,7 @@ pub enum Instruction {
     //(x -- (x false or Int true))
     ForthSomeInt,
     ForthSwap,
+    ForthInventoryGE,
     ForthIsEmpty,
     ForthRemoveEntitiesOfType,
     ForthRetainEntitiesOfType,
@@ -147,6 +149,8 @@ impl Instruction {
             | Instruction::ForthSetBlackboard
             | Instruction::ForthStuff
             | Instruction::ForthRetainEntitiesOfType
+            | Instruction::ForthNotTrue
+            | Instruction::ForthInventoryGE
             | Instruction::ForthIf(_) => (),
             Instruction::ForthTree(token) => {
                 if !bt.contains_key(token) {
@@ -418,6 +422,36 @@ impl Instruction {
                 }
                 Ok(Status::None)
             }
+            Instruction::ForthInventoryGE => {
+                let Some(StackItem::String(_)) = stack.last() else {
+                    return Err("tos was not an string".to_owned());
+                };
+                let Some(StackItem::Int(_)) = stack.get(stack.len() - 2) else {
+                    return Err("nos was not an Int".to_owned());
+                };
+                let Some(StackItem::String(item_class_string)) = stack.pop() else {
+                    return Err("tos was not an string".to_owned());
+                };
+                let Some(StackItem::Int(amount)) = stack.pop() else {
+                    return Err("nos was not an INt".to_owned());
+                };
+                let item_class_str: &str = &item_class_string;
+                let Ok(item_class) = item_class_str.try_into() else {
+                    return Err(format!("{item_class_string} is not a valid item class"));
+                };
+
+                let Some(&BlackboardValue::EntityId(agent)) = blackboard.get("self") else {
+                    return Err(format!("self not found in blackboard"));
+                };
+                Self::next(
+                    Status::GetIsInventoryGE {
+                        agent,
+                        item_class,
+                        amount,
+                    },
+                    pc
+                )
+            }
             Instruction::ForthIsInt => {
                 let value = if let Some(StackItem::Int(_)) = stack.last() {
                     StackItem::True
@@ -456,6 +490,19 @@ impl Instruction {
             Instruction::ForthMul => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
                 stack.push(StackItem::Int(nos * tos));
+                Self::next(Status::None, pc)
+            }
+            Instruction::ForthNotTrue => {
+                //stack.push(ifSome(StackItem::True) == 
+                match stack.pop() {
+                    Some(StackItem::True) => {
+                        stack.push(StackItem::False);
+                    },
+                    Some(_) => {
+                        stack.push(StackItem::True);
+                    },
+                    None => return Err("no top of stack".to_owned()),
+                };
                 Self::next(Status::None, pc)
             }
             Instruction::ForthRem => {
@@ -712,26 +759,26 @@ impl Instruction {
         match self {
             Instruction::Selector(vec) | Instruction::Sequence(vec) => {
                 vec.into_iter().for_each(|x| {
-                    if x.starts_with('_') {
+                    if x.starts_with('@') {
                         let y = format!("{prefix}{x}");
                         *x = y
                     };
                 });
             }
             Instruction::ForthCall(token, ..) => {
-                if token.starts_with('_') {
+                if token.starts_with('@') {
                     let y = format!("{prefix}{token}");
                     *token = y
                 };
             }
             Instruction::ForthJump(token, ..) => {
-                if token.starts_with('_') {
+                if token.starts_with('@') {
                     let y = format!("{prefix}{token}");
                     *token = y
                 };
             }
             Instruction::ForthTree(token) => {
-                if token.starts_with('_') {
+                if token.starts_with('@') {
                     let y = format!("{prefix}{token}");
                     *token = y
                 };
@@ -773,6 +820,8 @@ impl Instruction {
             | Instruction::ForthSetBlackboard
             | Instruction::ForthStuff
             | Instruction::ForthRetainEntitiesOfType
+            | Instruction::ForthNotTrue
+            | Instruction::ForthInventoryGE
             | Instruction::ForthIf(_) => (),
         }
     }
@@ -829,10 +878,10 @@ impl Instruction {
 
 #[test]
 fn correct_test() {
-    let mut i = Instruction::Selector(vec!["_2".to_owned(), "_3".to_owned()]);
+    let mut i = Instruction::Selector(vec!["@2".to_owned(), "@3".to_owned()]);
     i.correct("prefix");
     assert_eq!(
         i,
-        Instruction::Selector(vec!["prefix_2".to_owned(), "prefix_3".to_owned()])
+        Instruction::Selector(vec!["prefix@2".to_owned(), "prefix@3".to_owned()])
     )
 }

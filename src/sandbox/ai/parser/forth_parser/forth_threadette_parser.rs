@@ -23,8 +23,7 @@ use crate::sandbox::ai::{
 };
 
 use super::{
-    drop_parser, getters::set_blackboard, is_empty_parser, jump_parser, pop_last_parser,
-    stuff_parser, table::retain_entities_of_type_parser,
+    drop_parser, getters::set_blackboard, is_empty_parser, jump_parser, not_true_parser, pop_last_parser, stuff_parser, table::retain_entities_of_type_parser
 };
 
 pub fn forth_threadette_parser_2<'a>(
@@ -63,9 +62,10 @@ pub fn forth_threadette_parser_2<'a>(
             eq_parser,
             ge_parser,
             gt_parser,
+            is_int_parser,
             le_parser,
             lt_parser,
-            is_int_parser,
+            not_true_parser,
             some_coord_parser,
             some_entity_id_parser,
             some_int_parser,

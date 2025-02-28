@@ -58,7 +58,7 @@ mod tests {
         logy!(
             "debug",
             "\n\n\n{:?}\n\n\n",
-            bt.get("sat_hunger_2_1_1_1").unwrap()
+            bt.get("sat_hunger@2@1@1@1").unwrap()
         );
         let mut cpu = CPU::load("hermit".to_owned());
         loop {

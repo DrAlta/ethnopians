@@ -71,7 +71,7 @@ mod tests {
 
     #[test]
     fn named_tree_parser_test() {
-        let source = r#"have_2_wood_2 = sel{
+        let source = r#"have_02_wood_02 = sel{
         inventory_have_ge(wood, 2),
         have_axe,
         go_to_tree,
@@ -80,20 +80,20 @@ mod tests {
         let (tail, db) = file_parser(source).unwrap();
         let standard = HashMap::from([
             (
-                "have_2_wood_2".to_owned(),
+                "have_02_wood_02".to_owned(),
                 vec![Instruction::Selector(vec![
-                    "have_2_wood_2_1".to_owned(),
+                    "have_02_wood_02@1".to_owned(),
                     "have_axe".to_owned(),
                     "go_to_tree".to_owned(),
-                    "have_2_wood_2_4".to_owned(),
+                    "have_02_wood_02@4".to_owned(),
                 ])],
             ),
             (
-                "have_2_wood_2_1".to_owned(),
+                "have_02_wood_02@1".to_owned(),
                 vec![Instruction::InventoryGE("wood".to_owned(), 2)],
             ),
             (
-                "have_2_wood_2_4".to_owned(),
+                "have_02_wood_02@4".to_owned(),
                 vec![Instruction::Use("axe".to_owned(), "tree".to_owned())],
             ),
         ]);
@@ -105,7 +105,7 @@ mod tests {
         let source = r#"sat_hunger = selector{
         sel{
             selector{
-                inventory_have_ge(veg, 1)
+                inventory_have_ge(veggie, 1)
             }
         }
     }"#;
@@ -113,19 +113,19 @@ mod tests {
         let standard = BTreeMap::from([
             (
                 "sat_hunger".to_owned(),
-                vec![Instruction::Selector(vec!["sat_hunger_1".to_owned()])],
+                vec![Instruction::Selector(vec!["sat_hunger@1".to_owned()])],
             ),
             (
-                "sat_hunger_1".to_owned(),
-                vec![Instruction::Selector(vec!["sat_hunger_1_1".to_owned()])],
+                "sat_hunger@1".to_owned(),
+                vec![Instruction::Selector(vec!["sat_hunger@1@1".to_owned()])],
             ),
             (
-                "sat_hunger_1_1".to_owned(),
-                vec![Instruction::Selector(vec!["sat_hunger_1_1_1".to_owned()])],
+                "sat_hunger@1@1".to_owned(),
+                vec![Instruction::Selector(vec!["sat_hunger@1@1@1".to_owned()])],
             ),
             (
-                "sat_hunger_1_1_1".to_owned(),
-                vec![Instruction::InventoryGE("veg".to_owned(), 1)],
+                "sat_hunger@1@1@1".to_owned(),
+                vec![Instruction::InventoryGE("veggie".to_owned(), 1)],
             ),
         ]);
         assert_eq!(standard, db.into_iter().collect(),);
@@ -156,19 +156,19 @@ mod tests {
             (
                 "sat_hunger_2".to_owned(),
                 Instruction::Sequence(vec![
-                    "sat_hunger_2_1".to_owned(),
-                    "sat_hunger_2_2".to_owned(),
+                    "sat_hunger@2@1".to_owned(),
+                    "sat_hunger@2@2".to_owned(),
                 ])
             ),
             (
-                "sat_hunger_2_1".to_owned(),
+                "sat_hunger@2@1".to_owned(),
                 Instruction::Selector(vec![
-                    "sat_hunger_2_1_1".to_owned(),
+                    "sat_hunger@2@1@1".to_owned(),
                     "get_veg".to_owned(),
                 ])
             ),
             (
-                "sat_hunger_2_2".to_owned(),
+                "sat_hunger@2@2".to_owned(),
                 Instruction::Eat("veg".to_owned())
             )
         ]);

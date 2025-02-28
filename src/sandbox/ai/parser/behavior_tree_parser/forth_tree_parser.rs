@@ -21,7 +21,7 @@ pub fn forth_tree_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a s
     ))(input)?;
     //    Ok((tail, Thingie::Tree(body, used)))
     //vvv new vvv
-    let thread_name = "_0";
+    let thread_name = "@0";
     let mut hash = HashMap::new();
     for (k, mut v) in db.into_iter() {
         v.iter_mut().for_each(|x| x.correct(thread_name));
@@ -65,9 +65,9 @@ mod tests {
             panic!("parser didn't return a THingie::Tree")
         };
         assert_eq!(tail, "");
-        assert_eq!(body, vec![Instruction::ForthTree("_0".to_owned())]);
+        assert_eq!(body, vec![Instruction::ForthTree("@0".to_owned())]);
         assert_eq!(
-            used.get("_0").unwrap(),
+            used.get("@0").unwrap(),
             &vec![
                 Instruction::ForthLit(StackItem::String("self".to_owned())),
                 Instruction::ForthGetEnergy,

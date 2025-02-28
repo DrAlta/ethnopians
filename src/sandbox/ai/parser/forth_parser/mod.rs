@@ -4,7 +4,7 @@ mod arithmetic;
 pub use arithmetic::{add_parser, div_parser, mul_parser, rem_parser, sub_parser};
 mod comparison;
 pub use comparison::{
-    eq_parser, ge_parser, gt_parser, is_int_parser, le_parser, lt_parser, some_coord_parser,
+    eq_parser, ge_parser, gt_parser, is_int_parser, le_parser, lt_parser, not_true_parser, some_coord_parser,
     some_entity_id_parser, some_int_parser,
 };
 mod distance_parser;

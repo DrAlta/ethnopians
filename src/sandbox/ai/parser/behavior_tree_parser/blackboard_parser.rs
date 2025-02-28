@@ -70,7 +70,7 @@ pub fn blackboard_parser<'a, 'b>(
         match thingie {
             Thingie::Token(token) => vec.push(token),
             Thingie::Tree(mut this_i, db) => {
-                let thread_name = format!("_{}", idx + 1);
+                let thread_name = format!("@{}", idx + 1);
                 for (k, mut v) in db.into_iter() {
                     v.iter_mut().for_each(|x| x.correct(&thread_name));
                     assert_eq!(hash.insert(format!("{thread_name}{k}"), v), None,);

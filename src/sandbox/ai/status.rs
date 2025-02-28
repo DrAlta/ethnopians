@@ -28,7 +28,7 @@ pub enum Status {
     GetIsInventoryGE {
         agent: EntityId,
         item_class: Item,
-        amount: u8,
+        amount: i32,
     },
     GetEntities {
         min_x: i32,
