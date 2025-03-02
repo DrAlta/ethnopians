@@ -1,3 +1,5 @@
+mod find_in_inventory;
+pub use find_in_inventory::find_in_inventory_parser;
 mod find_nearest_parser;
 pub use find_nearest_parser::find_nearest_parser;
 mod get_blackboard;

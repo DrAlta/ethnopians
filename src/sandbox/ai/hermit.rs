@@ -361,10 +361,19 @@ split_veg_to_seed = forth{
                     lit(Failure)
                     return
                 then
+                lit("seed")
+                find_in_inventory
+                some_entity
+                if
+                    use
+                    return
+                then
+                drop
             then
         then
     then
-
+    lit(Failure)
+    return
 }"#
     };
     // vvv tasks used in hermit

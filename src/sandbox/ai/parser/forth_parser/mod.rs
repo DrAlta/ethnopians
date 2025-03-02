@@ -15,8 +15,8 @@ mod forth_threadette_parser;
 pub use forth_threadette_parser::forth_threadette_parser;
 mod getters;
 pub use getters::{
-    find_nearest_parser, get_blackboard, get_energy_parser, get_entities_parser, get_hp_parser,
-    get_location_parser,
+    find_in_inventory_parser, find_nearest_parser, get_blackboard, get_energy_parser, get_entities_parser, get_hp_parser,
+    get_location_parser, set_blackboard
 };
 mod if_parser;
 pub use if_parser::if_parser;
@@ -29,4 +29,4 @@ pub use return_parser::return_parser;
 mod stack;
 pub use stack::{drop_parser, dup_parser, swap_parser};
 mod table;
-pub use table::{is_empty_parser, pop_last_parser, remove_entities_of_type_parser, stuff_parser};
+pub use table::{is_empty_parser, pop_last_parser, remove_entities_of_type_parser, stuff_parser, retain_entities_of_type_parser};
