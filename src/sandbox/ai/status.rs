@@ -4,6 +4,9 @@ use crate::sandbox::{ai::InpulseId, EntityId, Item};
 pub enum Status {
     Success,
     Failure,
+    FindInInventory {
+        item_class: Item,
+    },
     // FindNearest means the process is praying for the answer to
     // "what is closest item of the specfified type to the location given"
     /// to be put on the stack

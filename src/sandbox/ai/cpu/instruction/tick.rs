@@ -1,165 +1,11 @@
-use std::collections::BTreeSet;
-
 use qol::logy;
 
 use crate::sandbox::ai::{
-    cpu::{tick_action, tick_selector, tick_sequence, Prayer, ProgramCounter, ReturnStack, Stack},
-    Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, InpulseId, StackItem, Status,
-    ThreadName, TreePool,
+    cpu::{tick_action, tick_selector, tick_sequence, Instruction, Prayer, ProgramCounter, ReturnStack, Stack},
+    Blackboard, BlackboardKey, BlackboardValue, StackItem, Status,
 };
 
-///
-/// ForthFindNearest{entity_id: ObjectId, item_class: ItemClass},
-/// ForthGetHP(BlackboardKey),
-/// and ForthGetEnergy(BlackboardKey),
-/// should probably take their argumants off the stack
-///
-/// should Combine, Use, Eat take a BlackboardKey that points to a ItemClass or the ItemClass directly? ether way InventoryGE should probably do the same
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Instruction {
-    // signels the process runing virtual machine to proform an action (? -- ?)
-    // InpulseId::GoTo ( Coord -- (Success or Failure))
-    // InpulseId::Take ( EntityId-- (Success or Failure))
-    Action(InpulseId),
-    // takes two Blackboard keys that points to ItemClass
-    Combine(BlackboardKey, BlackboardKey),
-    // takes a Blackboard key that points to an ItemClass
-    Eat(BlackboardKey),
-    // takes a Blackboard key that points to an ItemClass and u8 of the number to compare to
-    InventoryGE(BlackboardKey, i32),
-    Selector(Vec<ExecutionToken>),
-    Sequence(Vec<ExecutionToken>),
-    // takes two Blackboard keys that points to ItemClass
-    Use(BlackboardKey, BlackboardKey),
-    ForthTree(ExecutionToken),
-    //--------------------------------------------------------------------------
-    ForthAdd,
-    ForthCall(ThreadName, usize),
-    //(Coord Coord -- Int)
-    ForthDistance,
-    ForthDiv,
-    ForthDrop,
-    ForthDup,
-    //(Coord ItemClass -- Option<ObjectId>) finds the neared item of ItemClass to ObjectId
-    ForthFindNearest,
-    ForthEq,
-    ForthJump(ThreadName, usize),
-    ForthGE,
-    //(BlackboardKey -- Option<_>)
-    ForthGetBlackboard,
-    ForthGetEnergy,
-    //(BlackboardKey -- Option<Int>)
-    ForthGetHP,
-    //(BlackboardKey -- Option<Coord>)
-    ForthGetLocation,
-    ForthGT,
-    ForthIf(usize),
-    //(_ -- (_ false or Int true))
-    ForthIsInt,
-    ForthLE,
-    ForthLit(StackItem),
-    ForthLT,
-    ForthMul,
-    ForthNotTrue,
-    ForthPopLast,
-    ForthRem,
-    ForthReturn,
-    //(v, String) puts v into the blackboard under String
-    ForthSetBlackboard,
-    //(Table, v, k -- bool) stuffs v into the table under k returns true if the stuffing was successful false other wise
-    ForthStuff,
-    ForthSub,
-    //(x -- (x false or coord true))
-    ForthSomeCoord,
-    //(x -- (x false or EntityId true))
-    ForthSomeEntityId,
-    //(x -- (x false or Int true))
-    ForthSomeInt,
-    ForthSwap,
-    ForthInventoryGE,
-    ForthIsEmpty,
-    ForthRemoveEntitiesOfType,
-    ForthRetainEntitiesOfType,
-    // (coord coord -- Table) gets all entities in a TOS rectanle at NOS
-    ForthGetEntities,
-}
-
-impl Instruction {
-    pub fn missing_threads_used(&self, bt: &TreePool) -> BTreeSet<ExecutionToken> {
-        let mut missing = BTreeSet::new();
-        match self {
-            Instruction::Selector(vec) | Instruction::Sequence(vec) => {
-                for token in vec {
-                    if !bt.contains_key(token) {
-                        missing.insert(token.clone());
-                    }
-                }
-            }
-            Instruction::ForthCall(token, _idx) => {
-                if token == "remove_entities_of_type" {
-                    logy!(
-                        "debug",
-                        "call to remove_entities_of_type was processed. contained:{}",
-                        bt.contains_key(token)
-                    );
-                }
-                if !bt.contains_key(token) {
-                    missing.insert(token.clone());
-                }
-            }
-            Instruction::ForthJump(token, _idx) => {
-                if !bt.contains_key(token) {
-                    missing.insert(token.clone());
-                }
-            }
-            Instruction::Action(..)
-            | Instruction::Combine(_, _)
-            | Instruction::Eat(_)
-            | Instruction::InventoryGE(_, _)
-            | Instruction::Use(_, _)
-            | Instruction::ForthGetHP
-            | Instruction::ForthGetEnergy
-            | Instruction::ForthLit(..)
-            | Instruction::ForthAdd
-            | Instruction::ForthSub
-            | Instruction::ForthMul
-            | Instruction::ForthDiv
-            | Instruction::ForthRem
-            | Instruction::ForthGT
-            | Instruction::ForthLT
-            | Instruction::ForthGE
-            | Instruction::ForthLE
-            | Instruction::ForthIsInt
-            | Instruction::ForthReturn
-            | Instruction::ForthFindNearest
-            | Instruction::ForthGetBlackboard
-            | Instruction::ForthGetLocation
-            | Instruction::ForthSomeCoord
-            | Instruction::ForthSomeInt
-            | Instruction::ForthSomeEntityId
-            | Instruction::ForthDistance
-            | Instruction::ForthDup
-            | Instruction::ForthSwap
-            | Instruction::ForthEq
-            | Instruction::ForthDrop
-            | Instruction::ForthIsEmpty
-            | Instruction::ForthGetEntities
-            | Instruction::ForthRemoveEntitiesOfType
-            | Instruction::ForthPopLast
-            | Instruction::ForthSetBlackboard
-            | Instruction::ForthStuff
-            | Instruction::ForthRetainEntitiesOfType
-            | Instruction::ForthNotTrue
-            | Instruction::ForthInventoryGE
-            | Instruction::ForthIf(_) => (),
-            Instruction::ForthTree(token) => {
-                if !bt.contains_key(token) {
-                    missing.insert(token.clone());
-                }
-            }
-        }
-        missing
-    }
+impl Instruction{
     pub fn tick(
         &self,
         stack: &mut Stack,
@@ -268,6 +114,36 @@ impl Instruction {
                     stack.push(StackItem::False);
                 }
                 Self::next(Status::None, pc)
+            }
+            Instruction::ForthFindInInventory => {
+                let Some(StackItem::String(_)) = stack.last() else {
+                    return Err("tos wasn't a sting".to_owned());
+                };
+                let Some(StackItem::String(item_class_string)) = stack.pop() else {
+                    unreachable!()
+                };
+                let Ok(item_class) = item_class_string.try_into() else {
+                    return Err("item class was not valid".to_owned());
+                };
+                Self::next(Status::FindInInventory { item_class }, pc)
+                /* this the old pre bevy impl
+                match world.find_nearest(
+                    crate::Vec2 {
+                        x: x as f32,
+                        y: y as f32,
+                    },
+                    &item_class,
+                ) {
+                    Some(thing) => {
+                        stack.push(StackItem::some(StackItem::EntityId(thing)));
+                        Self::next(Status::None, pc)
+                    }
+                    None => {
+                        stack.push(StackItem::Option(None));
+                        Self::next(Status::None, pc)
+                    }
+                }
+                */
             }
             // ForthFindNearest should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::ForthFindNearest => {
@@ -755,133 +631,4 @@ impl Instruction {
             }
         }
     }
-    pub fn correct(&mut self, prefix: &str) {
-        match self {
-            Instruction::Selector(vec) | Instruction::Sequence(vec) => {
-                vec.into_iter().for_each(|x| {
-                    if x.starts_with('@') {
-                        let y = format!("{prefix}{x}");
-                        *x = y
-                    };
-                });
-            }
-            Instruction::ForthCall(token, ..) => {
-                if token.starts_with('@') {
-                    let y = format!("{prefix}{token}");
-                    *token = y
-                };
-            }
-            Instruction::ForthJump(token, ..) => {
-                if token.starts_with('@') {
-                    let y = format!("{prefix}{token}");
-                    *token = y
-                };
-            }
-            Instruction::ForthTree(token) => {
-                if token.starts_with('@') {
-                    let y = format!("{prefix}{token}");
-                    *token = y
-                };
-            }
-            Instruction::Action(_)
-            | Instruction::Combine(_, _)
-            | Instruction::Eat(_)
-            | Instruction::InventoryGE(_, _)
-            | Instruction::Use(_, _)
-            | Instruction::ForthGetHP
-            | Instruction::ForthGetEnergy
-            | Instruction::ForthLit(_)
-            | Instruction::ForthAdd
-            | Instruction::ForthSub
-            | Instruction::ForthMul
-            | Instruction::ForthDiv
-            | Instruction::ForthRem
-            | Instruction::ForthGT
-            | Instruction::ForthLT
-            | Instruction::ForthGE
-            | Instruction::ForthLE
-            | Instruction::ForthIsInt
-            | Instruction::ForthReturn
-            | Instruction::ForthFindNearest
-            | Instruction::ForthGetBlackboard
-            | Instruction::ForthGetLocation
-            | Instruction::ForthSomeCoord
-            | Instruction::ForthSomeInt
-            | Instruction::ForthSomeEntityId
-            | Instruction::ForthDistance
-            | Instruction::ForthDup
-            | Instruction::ForthSwap
-            | Instruction::ForthEq
-            | Instruction::ForthDrop
-            | Instruction::ForthIsEmpty
-            | Instruction::ForthGetEntities
-            | Instruction::ForthRemoveEntitiesOfType
-            | Instruction::ForthPopLast
-            | Instruction::ForthSetBlackboard
-            | Instruction::ForthStuff
-            | Instruction::ForthRetainEntitiesOfType
-            | Instruction::ForthNotTrue
-            | Instruction::ForthInventoryGE
-            | Instruction::ForthIf(_) => (),
-        }
-    }
-}
-impl Instruction {
-    pub fn next(status: Status, pc: &mut ProgramCounter) -> Prayer {
-        if let Some((_, idx)) = pc {
-            *idx += 1;
-        }
-        return Ok(status);
-    }
-    pub fn exit(status: Status, return_stack: &mut ReturnStack, pc: &mut ProgramCounter) -> Prayer {
-        if let Some(parent_token) = return_stack.pop() {
-            // return to calling fuction
-            *pc = Some(parent_token);
-            return Ok(status);
-        } else {
-            // the program finished
-            *pc = None;
-            return Ok(status);
-        };
-    }
-    pub fn get_two_coords(stack: &mut Stack) -> Result<((i32, i32), (i32, i32)), String> {
-        let Some(StackItem::Coord { .. }) = stack.last() else {
-            return Err("top of stack not a number".into());
-        };
-        let Some(StackItem::Coord { .. }) = stack.get(stack.len() - 2) else {
-            return Err("next of stack not a number".into());
-        };
-        let Some(StackItem::Coord { x: tos_x, y: tos_y }) = stack.pop() else {
-            unreachable!()
-        };
-        let Some(StackItem::Coord { x: nos_x, y: nos_y }) = stack.pop() else {
-            unreachable!()
-        };
-        Ok(((nos_x, nos_y), (tos_x, tos_y)))
-    }
-    pub fn get_two_ints(stack: &mut Stack) -> Result<(i32, i32), String> {
-        let Some(StackItem::Int(_)) = stack.last() else {
-            return Err("top of stack not a number".into());
-        };
-        let Some(StackItem::Int(_)) = stack.get(stack.len() - 2) else {
-            return Err("next of stack not a number".into());
-        };
-        let Some(StackItem::Int(tos)) = stack.pop() else {
-            unreachable!()
-        };
-        let Some(StackItem::Int(nos)) = stack.pop() else {
-            unreachable!()
-        };
-        Ok((nos, tos))
-    }
-}
-
-#[test]
-fn correct_test() {
-    let mut i = Instruction::Selector(vec!["@2".to_owned(), "@3".to_owned()]);
-    i.correct("prefix");
-    assert_eq!(
-        i,
-        Instruction::Selector(vec!["prefix@2".to_owned(), "prefix@3".to_owned()])
-    )
 }

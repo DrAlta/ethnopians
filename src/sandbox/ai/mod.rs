@@ -70,6 +70,9 @@ mod tests {
             );
             match cpu.step(&bt, &mut blackboard) {
                 Ok(status) => match status {
+                    super::Status::FindInInventory { item_class: _ } =>{
+                        todo!()
+                    }
                     super::Status::Success => {
                         logy!("trace", "hermit ai succeeded\n{cpu:?}");
                         break
