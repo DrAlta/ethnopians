@@ -470,7 +470,7 @@ plant_row = forth{
     plant_row_02
 };
 plant_vegs_02 = forth{
-    let(Success)
+    lit(Success)
     eq
     rot
     or
@@ -611,7 +611,7 @@ let have_n_seeds_defs = {r#"split_veg_to_seed = forth{
                 then
                 lit("seed")
                 find_in_inventory
-                some_entity
+                some_entity_id
                 if
                     use
                     return

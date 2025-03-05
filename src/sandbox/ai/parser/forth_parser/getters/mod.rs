@@ -12,5 +12,7 @@ mod get_hp_parser;
 pub use get_hp_parser::get_hp_parser;
 mod get_location_parser;
 pub use get_location_parser::get_location_parser;
+mod inventory_have_ge_parser;
+pub use inventory_have_ge_parser::inventory_have_ge_parser;
 mod set_blackboard;
 pub use set_blackboard::set_blackboard;

@@ -16,7 +16,7 @@ pub use forth_threadette_parser::forth_threadette_parser;
 mod getters;
 pub use getters::{
     find_in_inventory_parser, find_nearest_parser, get_blackboard, get_energy_parser, get_entities_parser, get_hp_parser,
-    get_location_parser, set_blackboard
+    get_location_parser, inventory_have_ge_parser, set_blackboard
 };
 mod if_parser;
 pub use if_parser::if_parser;

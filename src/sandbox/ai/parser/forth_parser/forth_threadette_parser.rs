@@ -15,7 +15,7 @@ use crate::sandbox::ai::{
             get_location_parser, go_to_parser, gt_parser, if_parser, is_int_parser, le_parser,
             lit_parser, lt_parser, mul_parser, rem_parser, remove_entities_of_type_parser,
             return_parser, some_coord_parser, some_entity_id_parser, some_int_parser, sub_parser,
-            swap_parser, take_parser, drop_parser, find_in_inventory_parser, set_blackboard, is_empty_parser, jump_parser, not_true_parser, pop_last_parser, stuff_parser, retain_entities_of_type_parser
+            swap_parser, take_parser, drop_parser, find_in_inventory_parser, set_blackboard, is_empty_parser, inventory_have_ge_parser, jump_parser, not_true_parser, pop_last_parser, stuff_parser, retain_entities_of_type_parser
         },
         ident_parser,
     },
@@ -55,6 +55,7 @@ pub fn forth_threadette_parser_2<'a>(
             get_hp_parser,
             get_location_parser,
             pop_last_parser,
+            inventory_have_ge_parser,
             set_blackboard,
         )),
         // comparisions
