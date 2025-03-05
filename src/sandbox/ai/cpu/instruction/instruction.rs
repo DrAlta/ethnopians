@@ -58,6 +58,7 @@ pub enum Instruction {
     ForthLT,
     ForthMul,
     ForthNotTrue,
+    ForthOr,
     ForthPopLast,
     ForthRem,
     ForthReturn,

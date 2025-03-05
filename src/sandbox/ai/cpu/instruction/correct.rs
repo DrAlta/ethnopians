@@ -66,6 +66,7 @@ impl Instruction {
             | Instruction::ForthGetEntities
             | Instruction::ForthRemoveEntitiesOfType
             | Instruction::ForthPopLast
+            | Instruction::ForthOr
             | Instruction::ForthSetBlackboard
             | Instruction::ForthStuff
             | Instruction::ForthRetainEntitiesOfType

@@ -70,6 +70,9 @@ impl Instruction{
                 Ok(Status::None)
             }
             Instruction::ForthDistance => {
+                if stack.len() < 2 {
+                    return Err("less that 2 items on stack".to_owned())
+                };
                 let Some(StackItem::Coord { .. }) = stack.last() else {
                     return Err("top of stack not a number".into());
                 };
@@ -147,6 +150,9 @@ impl Instruction{
             }
             // ForthFindNearest should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::ForthFindNearest => {
+                if stack.len() < 2 {
+                    return Err("less that 2 items on stack".to_owned())
+                };
                 let Some(StackItem::String(_)) = stack.last() else {
                     return Err("tos wasn't a sting".to_owned());
                 };
@@ -299,6 +305,9 @@ impl Instruction{
                 Ok(Status::None)
             }
             Instruction::ForthInventoryGE => {
+                if stack.len() < 2 {
+                    return Err("less that 2 items on stack".to_owned())
+                };
                 let Some(StackItem::String(_)) = stack.last() else {
                     return Err("tos was not an string".to_owned());
                 };
@@ -381,12 +390,29 @@ impl Instruction{
                 };
                 Self::next(Status::None, pc)
             }
+            Instruction::ForthOr => {
+                if stack.len() < 2 {
+                    return Err("less that 2 items on stack".to_owned())
+                };
+                let tos = stack.pop().unwrap();
+                let nos = stack.pop().unwrap();
+                stack.push(if tos == StackItem::True || nos == StackItem::True {
+                    StackItem::True
+                } else {
+                    StackItem::False
+                });
+                Self::next(Status::None, pc)
+            }
+
             Instruction::ForthRem => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
                 stack.push(StackItem::Int(nos % tos));
                 Self::next(Status::None, pc)
             }
             Instruction::ForthSetBlackboard => {
+                if stack.len() < 2 {
+                    return Err("less that 2 items on stack".to_owned())
+                };
                 let Some(StackItem::String(_)) = stack.get(stack.len() - 2) else {
                     return Err("no nos".to_owned());
                 };
@@ -515,6 +541,9 @@ impl Instruction{
                 }
             }
             Instruction::ForthSwap => {
+                if stack.len() < 2 {
+                    return Err("less that 2 items on stack".to_owned())
+                };
                 let Some(_) = stack.get(stack.len() - 2) else {
                     return Err("no nos".to_owned());
                 };

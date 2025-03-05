@@ -57,6 +57,7 @@ impl Instruction {
             | Instruction::ForthFindNearest
             | Instruction::ForthGetBlackboard
             | Instruction::ForthGetLocation
+            | Instruction::ForthOr
             | Instruction::ForthSomeCoord
             | Instruction::ForthSomeInt
             | Instruction::ForthSomeEntityId

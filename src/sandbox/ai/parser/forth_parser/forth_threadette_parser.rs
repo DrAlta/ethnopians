@@ -22,6 +22,8 @@ use crate::sandbox::ai::{
     Instruction, Thread, TreePool,
 };
 
+use super::or_parser;
+
 
 pub fn forth_threadette_parser_2<'a>(
     input: &'a str,
@@ -64,6 +66,7 @@ pub fn forth_threadette_parser_2<'a>(
             le_parser,
             lt_parser,
             not_true_parser,
+            or_parser,
             some_coord_parser,
             some_entity_id_parser,
             some_int_parser,

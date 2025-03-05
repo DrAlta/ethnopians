@@ -12,6 +12,8 @@ mod lt_parser;
 pub use lt_parser::lt_parser;
 mod not_true_parser;
 pub use not_true_parser::not_true_parser;
+mod or_parser;
+pub use or_parser::or_parser;
 mod some_coord_parser;
 pub use some_coord_parser::some_coord_parser;
 mod some_entity_id_parser;
