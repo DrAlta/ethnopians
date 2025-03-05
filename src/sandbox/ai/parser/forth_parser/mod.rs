@@ -27,6 +27,6 @@ pub use lit_parser::lit_parser;
 mod return_parser;
 pub use return_parser::return_parser;
 mod stack;
-pub use stack::{drop_parser, dup_parser, swap_parser};
+pub use stack::{drop_parser, dup_parser, rot_parser, swap_parser};
 mod table;
 pub use table::{is_empty_parser, pop_last_parser, remove_entities_of_type_parser, stuff_parser, retain_entities_of_type_parser};

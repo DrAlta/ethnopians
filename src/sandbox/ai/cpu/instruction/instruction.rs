@@ -78,6 +78,7 @@ pub enum Instruction {
     ForthIsEmpty,
     ForthRemoveEntitiesOfType,
     ForthRetainEntitiesOfType,
+    ForthRot,
     // (coord coord -- Table) gets all entities in a TOS rectanle at NOS
     ForthGetEntities,
 }

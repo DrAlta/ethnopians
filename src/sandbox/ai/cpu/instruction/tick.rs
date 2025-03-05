@@ -409,6 +409,14 @@ impl Instruction{
                 stack.push(StackItem::Int(nos % tos));
                 Self::next(Status::None, pc)
             }
+            Instruction::ForthRot => {
+                if stack.len() < 3 {
+                    return Err("less that 3 items on stack".to_owned())
+                };
+                let x = stack.remove(stack.len() - 3);
+                stack.push(x);
+                Self::next(Status::None, pc)
+            }
             Instruction::ForthSetBlackboard => {
                 if stack.len() < 2 {
                     return Err("less that 2 items on stack".to_owned())

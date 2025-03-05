@@ -72,6 +72,7 @@ impl Instruction {
             | Instruction::ForthRetainEntitiesOfType
             | Instruction::ForthNotTrue
             | Instruction::ForthInventoryGE
+            | Instruction::ForthRot
             | Instruction::ForthIf(_) => (),
         }
     }

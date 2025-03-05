@@ -75,6 +75,7 @@ impl Instruction {
             | Instruction::ForthRetainEntitiesOfType
             | Instruction::ForthNotTrue
             | Instruction::ForthInventoryGE
+            | Instruction::ForthRot
             | Instruction::ForthIf(_) => (),
             Instruction::ForthTree(token) => {
                 if !bt.contains_key(token) {
