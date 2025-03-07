@@ -623,6 +623,17 @@ let have_n_seeds_defs = {r#"split_veg_to_seed = forth{
     lit(Failure)
     return
 }"#};
+/*
+coord_a int_a
+coord_a int_a int_a 
+coord_a int_a true
+int_a coord_a [5,0] 
+int_a coord_b 
+int_a coord_b coord_b 
+int_a coord_b success
+int_a coord_b success success
+int_a coord_b true
+*/
 let plant_row_defs = {r#"plant_row_02 /*(Coord Int -- Succes/Failure) plants seed  at Int multiples of  [x:5,Y:0] from coord  */= forth{
     dup
     lit(4)
@@ -634,8 +645,11 @@ let plant_row_defs = {r#"plant_row_02 /*(Coord Int -- Succes/Failure) plants see
         dup
         plant_seed
         lit(Success)
+        eq
         if
             swap
+            lit(1)
+            sub
             jump(plant_row_02)
         then
         lit(Failure)
@@ -643,6 +657,25 @@ let plant_row_defs = {r#"plant_row_02 /*(Coord Int -- Succes/Failure) plants see
     then
     drop
     lit(Success)
+    return
+}"#};
+
+    let plant_row_defs = {r#"plant_seed /* (coord -- Success/Failure ) plants a seed at coord*/= forth{
+    lit("seed")
+    find_in_inventory
+    some_entity_id
+    if
+        swap
+        go_to
+        lit(Success)
+        eq
+        if
+            plant
+            return
+        then
+    then
+    drop
+    lit(Failure)
     return
 }"#};
 
