@@ -15,14 +15,13 @@ use crate::sandbox::ai::{
             get_location_parser, go_to_parser, gt_parser, if_parser, is_int_parser, le_parser,
             lit_parser, lt_parser, mul_parser, rem_parser, remove_entities_of_type_parser,
             return_parser, some_coord_parser, some_entity_id_parser, some_int_parser, sub_parser,
-            swap_parser, take_parser, drop_parser, find_in_inventory_parser, rot_parser, set_blackboard, is_empty_parser, inventory_have_ge_parser, jump_parser, not_true_parser, pop_last_parser, stuff_parser, retain_entities_of_type_parser
+            swap_parser, take_parser, drop_parser, find_in_inventory_parser, rot_parser, set_blackboard, is_empty_parser, inventory_have_ge_parser, jump_parser, not_true_parser, pop_last_parser, stuff_parser, retain_entities_of_type_parser, or_parser, plant_parser, use_parser
         },
         ident_parser,
     },
     Instruction, Thread, TreePool,
 };
 
-use super::or_parser;
 
 
 pub fn forth_threadette_parser_2<'a>(
@@ -82,7 +81,12 @@ pub fn forth_threadette_parser_2<'a>(
         rot_parser,
         swap_parser,
         // actions
-        alt((go_to_parser, take_parser)),
+        alt((
+            go_to_parser,
+            plant_parser,
+            take_parser,
+            use_parser,
+        )),
     ))(input)
 }
 

@@ -660,7 +660,7 @@ let plant_row_defs = {r#"plant_row_02 /*(Coord Int -- Succes/Failure) plants see
     return
 }"#};
 
-    let plant_row_defs = {r#"plant_seed /* (coord -- Success/Failure ) plants a seed at coord*/= forth{
+    let plant_row_02_defs = {r#"plant_seed /* (coord -- Success/Failure ) plants a seed at coord*/= forth{
     lit("seed")
     find_in_inventory
     some_entity_id
@@ -718,6 +718,7 @@ let plant_row_defs = {r#"plant_row_02 /*(Coord Int -- Succes/Failure) plants see
 
         have_n_seeds_defs,
         plant_row_defs,
+        plant_row_02_defs,
     ]
     .into_iter()
     //    .enumerate()
@@ -821,7 +822,7 @@ mod tests {
             }
         }
         for (_a, _b) in &missing {
-            logy!("log", "{_a} is missing: {_b:?}");
+            logy!("log", "\n{_a} is missing:\n{_b:?}\n");
         }
         assert_eq!(missing, HashMap::new())
     }

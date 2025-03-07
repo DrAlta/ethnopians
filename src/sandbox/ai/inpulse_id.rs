@@ -5,5 +5,7 @@ pub enum InpulseId {
     Act3,
 
     GoTo,
+    Plant,
     Take,
+    Use,
 }

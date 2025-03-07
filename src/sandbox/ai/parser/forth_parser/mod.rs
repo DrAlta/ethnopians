@@ -1,5 +1,5 @@
 mod actions;
-pub use actions::{go_to_parser, take_parser};
+pub use actions::{go_to_parser, plant_parser, take_parser, use_parser};
 mod arithmetic;
 pub use arithmetic::{add_parser, div_parser, mul_parser, rem_parser, sub_parser};
 mod comparison;
