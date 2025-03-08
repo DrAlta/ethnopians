@@ -10,7 +10,7 @@ macro_rules! foofoo {
 }
 
 pub fn get_hermit_behavior_task() -> TreePool {
-    let test = {
+   /* let test = {
         r#"get_my_home_location = forth {
         lit("self")
         get_blackboard
@@ -26,7 +26,7 @@ pub fn get_hermit_behavior_task() -> TreePool {
         then
         return
     }"#
-    };
+    };*/
     let root = {
         r#"hermit = sel{
     sat_hunger,
@@ -711,7 +711,7 @@ have_stick = sel{
     assert_eq!(tail1, "");
 
     for (idx, source) in foofoo![
-        test,
+        //test,
         hermit_defs,
         sat_hunger_defs,
         have_house_defs,

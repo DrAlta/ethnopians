@@ -12,7 +12,7 @@ mod ident_parser;
 pub use ident_parser::ident_parser;
 mod i32_parser;
 pub use i32_parser::i32_parser;
-
-use nom::character::complete::multispace0 as space_parser;
+mod space_parser;
+pub use space_parser::space_parser;
 
 type TreesUsed = crate::sandbox::ai::TreePool;

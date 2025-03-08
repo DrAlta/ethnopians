@@ -3,13 +3,13 @@ use std::collections::HashMap;
 use crate::sandbox::ai::{
     parser::{
         behavior_tree_parser::{tree_parser, Thingie, TreesUsed},
-        comment_parser, ident_parser, space_parser,
+        ident_parser, space_parser,
     },
     Instruction, Thread, ThreadName, TreePool,
 };
 use nom::{
     character::complete::char,
-    combinator::{map_res, opt},
+    combinator::map_res,
     error::ErrorKind,
     multi::separated_list1,
     sequence::tuple,
@@ -41,10 +41,9 @@ pub fn named_tree_parser<'a>(
     //    _prefix: &'b str
 ) -> IResult<&'a str, (ThreadName, TreePool), (&'a str, ErrorKind)> {
     //    let mut hash = HashMap::new();
-    let (tail, (thread_name, _, _, _, _, (mut i, db))) = tuple((
+    let (tail, (thread_name, _, _, _, (mut i, db))) = tuple((
         ident_parser,
         space_parser,
-        opt(tuple((comment_parser, space_parser))),
         char('='),
         space_parser,
         map_res(tree_parser, |x| {

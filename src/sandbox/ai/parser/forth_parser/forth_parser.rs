@@ -1,12 +1,8 @@
 use std::collections::HashMap;
 
-use crate::sandbox::ai::{Corrent, Thread, TreePool};
+use crate::sandbox::ai::{parser::{comment_parser, space_parser}, Corrent, Thread, TreePool};
 use nom::{
-    character::complete::{multispace0, multispace1},
-    error::ErrorKind,
-    multi::separated_list1,
-    sequence::tuple,
-    IResult,
+    character::complete::{multispace0, multispace1}, combinator::opt, error::ErrorKind, multi::separated_list1, sequence::tuple, IResult
 };
 
 use super::forth_threadette_parser;
@@ -15,8 +11,14 @@ pub fn forth_parser<'a>(
     input: &'a str,
 ) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
     let (tail, (body, _)) = tuple((
-        separated_list1(multispace1, forth_threadette_parser),
-        multispace0,
+        separated_list1(
+            tuple((
+                multispace1,
+                opt(tuple((comment_parser, multispace0)))
+            )), 
+            forth_threadette_parser
+        ),
+        space_parser,
     ))(input)?;
     let mut thread = Vec::new();
     let mut pool = HashMap::new();

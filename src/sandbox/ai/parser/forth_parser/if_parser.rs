@@ -8,7 +8,7 @@ use nom::{
 };
 
 use crate::sandbox::ai::{
-    parser::{balanced_parser, forth_parser::forth_threadette_parser},
+    parser::{balanced_parser, forth_parser::forth_threadette_parser, space_parser},
     Thread, TreePool,
 };
 
@@ -17,7 +17,7 @@ use r#if::If;
 
 pub fn if_parser<'a>(input: &'a str) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
     let (tail, body) = balanced_parser(
-        map_res(tuple((multispace0, forth_threadette_parser)), |(_, x)| {
+        map_res(tuple((space_parser, forth_threadette_parser)), |(_, x)| {
             Result::<(Thread, TreePool), (&'a str, ErrorKind)>::Ok(x)
         }),
         recognize(tuple((multispace0, tag("if")))),
@@ -55,11 +55,12 @@ mod tests {
     #[test]
     fn nested_if_parser_test() {
         let input = "if
-            lit(1)
+            lit(1) /*comment1*/
+            lit(2) /*comment2*/
             if
                 return
-            then
-            lit(2)
+            then /*comment3*/
+            lit(3)
         then";
         let (tail, (body, used)) = if_parser(input).unwrap();
         assert_eq!(tail, "");
@@ -67,11 +68,12 @@ mod tests {
         assert_eq!(
             body,
             vec![
-                Instruction::ForthIf(4),
+                Instruction::ForthIf(5),
                 Instruction::ForthLit(StackItem::Int(1)),
+                Instruction::ForthLit(StackItem::Int(2)),
                 Instruction::ForthIf(1),
                 Instruction::ForthReturn,
-                Instruction::ForthLit(StackItem::Int(2)),
+                Instruction::ForthLit(StackItem::Int(3)),
             ]
         )
     }
