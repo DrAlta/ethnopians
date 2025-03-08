@@ -1,7 +1,6 @@
 use crate::sandbox::ai::{
     cpu::{Prayer, ProgramCounter, ReturnStack, Stack},
-    BlackboardKey, ExecutionToken, InpulseId, StackItem, Status,
-    ThreadName,
+    BlackboardKey, ExecutionToken, InpulseId, StackItem, Status, ThreadName,
 };
 
 ///

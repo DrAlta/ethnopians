@@ -2,10 +2,7 @@ use std::collections::BTreeSet;
 
 use qol::logy;
 
-use crate::sandbox::ai::{
-    cpu::Instruction,
-    ExecutionToken, TreePool,
-};
+use crate::sandbox::ai::{cpu::Instruction, ExecutionToken, TreePool};
 impl Instruction {
     pub fn missing_threads_used(&self, bt: &TreePool) -> BTreeSet<ExecutionToken> {
         let mut missing = BTreeSet::new();

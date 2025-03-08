@@ -1,6 +1,4 @@
-use crate::sandbox::ai::
-    cpu::Instruction
-;
+use crate::sandbox::ai::cpu::Instruction;
 
 impl Instruction {
     pub fn correct(&mut self, prefix: &str) {
@@ -77,5 +75,3 @@ impl Instruction {
         }
     }
 }
-
-

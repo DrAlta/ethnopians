@@ -1,6 +1,4 @@
-use nom::{
-    bytes::complete::tag, error::ErrorKind, IResult,
-};
+use nom::{bytes::complete::tag, error::ErrorKind, IResult};
 
 use crate::sandbox::ai::{Instruction, Thread, TreePool};
 
