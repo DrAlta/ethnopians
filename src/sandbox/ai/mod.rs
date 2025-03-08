@@ -18,7 +18,7 @@ pub use cpu::{
 mod behavior_tree;
 pub use behavior_tree::Corrent;
 mod hermit;
-pub use hermit::get_hermit_behavoir_tree;
+pub use hermit::get_hermit_behavior_task;
 mod inpulse_id;
 pub use inpulse_id::InpulseId;
 pub mod parser;
@@ -32,71 +32,3 @@ pub type ExecutionPointer = (ExecutionToken, usize);
 pub type Thread = Vec<Instruction>;
 pub type TreePool = HashMap<ThreadName, Thread>;
 pub type ItemId = String;
-
-#[cfg(test)]
-mod tests {
-    use qol::logy;
-
-    use crate::sandbox::{
-        ai::{get_hermit_behavoir_tree, Blackboard, BlackboardValue, StackItem, Variable, CPU},
-        EntityId,
-    };
-
-    #[test]
-    fn hermit_ai_run_test() {
-        let mut blackboard = Blackboard::new();
-        blackboard.insert(
-            "self".to_owned(),
-            Variable::Chit(BlackboardValue::EntityId(EntityId::from_raw(0))),
-        );
-        blackboard.insert(
-            "food".to_owned(),
-            Variable::Chit(BlackboardValue::String("Veggie".to_owned())),
-        );
-
-        let bt = get_hermit_behavoir_tree();
-        logy!(
-            "debug",
-            "\n\n\n{:?}\n\n\n",
-            bt.get("sat_hunger@2@1@1@1").unwrap()
-        );
-        let mut cpu = CPU::load("hermit".to_owned());
-        loop {
-            logy!(
-                "debug",
-                "\n\nexecuting {:?}\n stack: {:?}",
-                cpu.pc,
-                cpu.stack
-            );
-            match cpu.step(&bt, &mut blackboard) {
-                Ok(status) => match status {
-                    super::Status::FindInInventory { item_class: _ } =>{
-                        todo!()
-                    }
-                    super::Status::Success => {
-                        logy!("trace", "hermit ai succeeded\n{cpu:?}");
-                        break
-                    },
-                    super::Status::Failure => todo!(),
-                    super::Status::FindNearest { ../*x, y, item_class*/ } => todo!(),
-                    super::Status::GetEnergy(_entity) => {
-                        logy!("trace", "giving dummy value for GetEnergy on {_entity}");
-                        cpu.stack.push(StackItem::some(StackItem::Int(5)));
-                    },
-                    super::Status::GetLocation(_entity) => todo!(),
-                    super::Status::GetHp(_entity) => todo!(),
-                    super::Status::GetIsInventoryGE { agent: _agent, item_class: _item_class, amount: _amount } => {
-                        logy!("trace", "giving dummy value for if {_agent} has GE {_amount} of {_item_class:?}");
-                        cpu.stack.push(StackItem::success());
-                    },
-                    super::Status::GetEntities { ../*min_x, min_y, max_x, max_y*/ } => todo!(),
-                    super::Status::RemoveEntitiesOfType(_item) => todo!(),
-                    super::Status::RetainEntitiesOfType(_item) => todo!(),
-                    super::Status::Running(_inpulse_id) => todo!(),
-                    super::Status::None => (),
-                },
-                Err(err) => panic!("{err}"),
-            }
-        }
-    }
-}

@@ -69,7 +69,7 @@ pub fn named_tree_parser<'a>(
 
 #[cfg(test)]
 mod tests {
-    use crate::sandbox::ai::Instruction;
+    use crate::sandbox::ai::{Instruction, StackItem};
     use std::collections::BTreeMap;
 
     use super::*;
@@ -136,52 +136,51 @@ mod tests {
         assert_eq!(standard, db.into_iter().collect(),);
         assert_eq!(tail, "");
     }
-    /*
+
     #[test]
-    fn named_tree_parser_test2() {
-        let source = r#"sat_hunger = selector{
-        dont_need_to_eat,
-        seq{
-            selector{
-                inventory_have_ge(veg, 1),
-                get_veg
-            },
-            eat(veg)
-        }
-    }"#;
-        let (tail, db) = file_parser(source).unwrap();
-        let standard = BTreeMap::from([
-            (
-                "sat_hunger".to_owned(),
-                Instruction::Selector(vec![
-                    "dont_need_to_eat".to_owned(),
-                    "sat_hunger_2".to_owned(),
-                ]),
-            ),
-            (
-                "sat_hunger_2".to_owned(),
-                Instruction::Sequence(vec![
-                    "sat_hunger@2@1".to_owned(),
-                    "sat_hunger@2@2".to_owned(),
-                ])
-            ),
-            (
-                "sat_hunger@2@1".to_owned(),
-                Instruction::Selector(vec![
-                    "sat_hunger@2@1@1".to_owned(),
-                    "get_veg".to_owned(),
-                ])
-            ),
-            (
-                "sat_hunger@2@2".to_owned(),
-                Instruction::Eat("veg".to_owned())
-            )
-        ]);
-        assert_eq!(
-            standard,
-            db.into_iter().collect(),
-        );
+    fn footest_test() {
+        let input = "footest = forth {
+        lit(\"self\")
+        get_energy
+        some_int
+        if
+            lit(5)
+            gt
+            if
+                lit(Success)
+                return
+            then
+        then
+        lit(Failure)
+        return
+        
+    }";
+        let (tail, (_name, body)) = named_tree_parser(input).unwrap();
         assert_eq!(tail, "");
+        assert_eq!(
+            body,
+            TreePool::from([
+                (
+                    "footest".to_owned(),
+                    vec![Instruction::ForthTree("footest@0".to_owned())]
+                ),
+                (
+                    "footest@0".to_owned(),
+                    vec![
+                        Instruction::ForthLit(StackItem::String("self".to_owned())),
+                        Instruction::ForthGetEnergy,
+                        Instruction::ForthSomeInt,
+                        Instruction::ForthIf(5),
+                        Instruction::ForthLit(StackItem::Int(5)),
+                        Instruction::ForthGT,
+                        Instruction::ForthIf(2),
+                        Instruction::ForthLit(StackItem::success()),
+                        Instruction::ForthReturn,
+                        Instruction::ForthLit(StackItem::failure()),
+                        Instruction::ForthReturn,
+                    ]
+                )
+            ])
+        );
     }
-    */
 }

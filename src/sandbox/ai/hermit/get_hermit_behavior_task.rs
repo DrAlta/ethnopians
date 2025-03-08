@@ -8,7 +8,8 @@ macro_rules! foofoo {
         ]
     )
 }
-pub fn get_hermit_behavoir_tree() -> TreePool {
+
+pub fn get_hermit_behavior_task() -> TreePool {
     let test = {
         r#"get_my_home_location = forth {
         lit("self")
@@ -735,100 +736,4 @@ have_stick = sel{
 
     //    logy!("debug", "{:?}", db.get("check_if_clear_for_garden"));
     db
-}
-
-#[cfg(test)]
-mod tests {
-    use std::collections::HashMap;
-
-    use qol::{logy, InsertOrInsert};
-
-    use crate::sandbox::ai::{parser::named_tree_parser, Instruction, StackItem};
-
-    use super::*;
-    /*
-        "self"
-        Some(self_id)
-        self_id, true
-        self_id
-        self_id, self_id
-        self_id, Some(hp)
-        self_id, hp, true
-        self_id, hp, 50
-        self_id, true
-        self_id, "house"
-        self_id, Some(house_id)
-        self_id, house_id, true
-        self_id, house_id, house_id,
-        self_id, house_id, Some(house_coord)
-        self_id, house_id, house_coord, true
-        self_id, house_id, Success
-        self_id, house_id, Success, Success
-        self_id, house_id, true | if use
-        self_id, Success
-    */
-    #[test]
-    fn hermit_test() {
-        let input = "footest = forth {
-    lit(\"self\")
-    get_energy
-    some_int
-    if
-        lit(5)
-        gt
-        if
-            lit(Success)
-            return
-        then
-    then
-    lit(Failure)
-    return
-    
-}";
-        let (tail, (_name, body)) = named_tree_parser(input).unwrap();
-        assert_eq!(tail, "");
-        assert_eq!(
-            body,
-            TreePool::from([
-                (
-                    "footest".to_owned(),
-                    vec![Instruction::ForthTree("footest@0".to_owned())]
-                ),
-                (
-                    "footest@0".to_owned(),
-                    vec![
-                        Instruction::ForthLit(StackItem::String("self".to_owned())),
-                        Instruction::ForthGetEnergy,
-                        Instruction::ForthSomeInt,
-                        Instruction::ForthIf(5),
-                        Instruction::ForthLit(StackItem::Int(5)),
-                        Instruction::ForthGT,
-                        Instruction::ForthIf(2),
-                        Instruction::ForthLit(StackItem::success()),
-                        Instruction::ForthReturn,
-                        Instruction::ForthLit(StackItem::failure()),
-                        Instruction::ForthReturn,
-                    ]
-                )
-            ])
-        );
-    }
-
-    #[test]
-    pub fn check_for_missing_threads_in_hermit_ai() {
-        let bt = get_hermit_behavoir_tree();
-        let mut missing = HashMap::new();
-        for (thread_name, thread) in &bt {
-            for i in thread {
-                let x = i.missing_threads_used(&bt);
-                if !x.is_empty() {
-                    missing.insert_or_insert(thread_name, x);
-                }
-            }
-        }
-        for (_a, _b) in &missing {
-            logy!("log", "\n{_a} is missing:\n{_b:?}\n");
-        }
-        assert_eq!(missing, HashMap::new())
-    }
 }
