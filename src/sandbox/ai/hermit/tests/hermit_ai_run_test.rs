@@ -5,7 +5,6 @@ use crate::sandbox::{
     EntityId,
 };
 
-
 #[test]
 fn hermit_ai_run_test() {
     let mut blackboard = Blackboard::new();
