@@ -427,12 +427,19 @@ have_2_wood =seq{
 };
 check_if_clear_for_garden = forth{
     lit(x: 20, y: 20)
+    add
     get_entities
     lit("veggie")
     remove_entities_of_type
     lit("agent")
     remove_entities_of_type
     is_empty
+    if
+        lit(Success)
+        return
+    then
+    lit(Failure)
+    return
 };
 clear_for_garden = forth{
     lit(x: 20, y: 20)
