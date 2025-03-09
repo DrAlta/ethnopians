@@ -66,39 +66,6 @@ impl Clone for StackItem {
         }
     }
 }
-impl std::fmt::Display for StackItem {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            StackItem::Table(rc) => {
-                let inner_map = rc.map.borrow_mut();
-                let mut table_iter = inner_map.iter();
-                write!(f, "{{",)?;
-                if let Some(first) = table_iter.next() {
-                    write!(f, "{}: {}", first.0, first.1)?;
-                    for (key, value) in table_iter {
-                        write!(f, ", {}: {}", key, value)?;
-                    }
-                }
-                write!(f, "}}")
-            }
-            /*
-            StackItem::Sequence(x) => write!(f, "SequenceState({x})"),
-            StackItem::Selector(x) => write!(f, "SelectorState({x})"),
-            StackItem::Success => write!(f, "Success"),
-            StackItem::Failure => write!(f, "Failure"),
-            StackItem::Init => write!(f, "Init"),
-            */
-            StackItem::Int(x) => write!(f, "{x}"),
-            StackItem::True => write!(f, "True"),
-            StackItem::False => write!(f, "False"),
-            StackItem::Coord { x, y } => write!(f, "Coord[{x}:{y}]"),
-            StackItem::String(x) => write!(f, "{x}"),
-            StackItem::EntityId(x) => write!(f, "{x}"),
-            StackItem::Option(stack_item) => write!(f, "Some({stack_item})"),
-            //            StackItem::Todo(items) => todo!(),
-        }
-    }
-}
 impl std::hash::Hash for StackItem {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         match self {

@@ -16,7 +16,7 @@ impl Instruction {
         pc: &mut ProgramCounter,
         blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
     ) -> Prayer {
-        logy!("debug", "\nticking:{self:?}");
+        logy!("debug", "ticking:{self:?}");
         match self {
             Instruction::Action(action_id) => tick_action(action_id, stack, return_stack, pc),
             Instruction::Combine(_, _) => todo!(),
