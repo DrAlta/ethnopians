@@ -8,6 +8,8 @@ pub fn take_parser<'a>(
     let (tail, _body) = tag("take")(input)?;
     Ok((
         tail,
-        (vec![Instruction::Action(InpulseId::Take)], TreePool::new()),
+        (vec![
+            Instruction::ForthAction(InpulseId::Take),
+        ], TreePool::new()),
     ))
 }

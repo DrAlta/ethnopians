@@ -1,8 +1,7 @@
 use qol::logy;
 
-use crate::sandbox::ai::{ExecutionToken, Instruction, StackItem, Status, TableGet, TableInterior};
+use crate::sandbox::ai::{cpu::{ProgramCounter, ReturnStack, Stack}, ExecutionToken, Instruction, StackItem, Status, TableGet, TableInterior};
 
-use super::{ProgramCounter, ReturnStack, Stack};
 
 pub fn tick_selector(
     children: &Vec<ExecutionToken>,

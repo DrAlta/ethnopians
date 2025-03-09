@@ -35,36 +35,58 @@ fn main2(){
                     */
                 },
                 Status::Failure => todo!(),
-                Status::FindNearest { ../*x, y, item_class*/ } => todo!(),
+                Status::FindNearest { x: _x, y: _y, item_class: _item_class} => {
+                    logy!("log", "giving dummy value for nearest {_item_class:?} to [{_x}:{_y}]");
+                    cpu.stack.push(StackItem::success());
+                },
                 Status::GetEnergy(_entity) => {
                     logy!("log", "giving dummy value for GetEnergy on {_entity}");
                     cpu.stack.push(StackItem::some(StackItem::Int(5)));
                 },
-                Status::GetLocation(_entity) => todo!(),
+                Status::GetLocation(_entity) => {
+                    logy!("log", "giving dummy value for location of {_entity}");
+                    cpu.stack.push(StackItem::some(StackItem::Coord { x: 6, y: 9 }));
+                },
                 Status::GetHp(_entity) => {
+                    logy!("log", "giving dummy value for GetHp on {_entity}");
                     cpu.stack.push(StackItem::some(StackItem::Int(4)));
                 },
                 Status::GetIsInventoryGE { agent: _agent, item_class: _item_class, amount: _amount } => {
                     logy!("log", "giving dummy value for if {_agent} has GE {_amount} of {_item_class:?}");
                     cpu.stack.push(StackItem::success());
                 },
-                Status::GetEntities { ../*min_x, min_y, max_x, max_y*/ } => todo!(),
-                Status::RemoveEntitiesOfType(_item) => todo!(),
-                Status::RetainEntitiesOfType(_item) => todo!(),
+                Status::GetEntities { min_x: _min_x, min_y: _min_y, max_x: _max_x, max_y: _max_y } => {
+                    logy!("log", "giving dummy value for entities in [{_min_x} : {_min_y}] to [{_max_x} : {_max_y}]");
+                    cpu.stack.push([
+                        (StackItem::Int(0), StackItem::EntityId(EntityId::from_raw(50))),
+                        (StackItem::Int(1), StackItem::EntityId(EntityId::from_raw(51))),
+                        (StackItem::Int(2), StackItem::EntityId(EntityId::from_raw(52))),
+                        (StackItem::Int(3), StackItem::EntityId(EntityId::from_raw(53))),
+                    ].try_into().unwrap());
+                },
+                Status::RemoveEntitiesOfType(_item) => {
+                    logy!("todo", "need to implement RemoveEntitiesOfType");
+                },
+                Status::RetainEntitiesOfType(_item) => {
+                    logy!("todo", "need to implement RetainEntitiesOfType");
+                },
                 Status::Running(inpulse_id) => {
                     match inpulse_id {
                         /*
                         ethnolib::sandbox::ai::InpulseId::Act1 => todo!(),
                         ethnolib::sandbox::ai::InpulseId::Act2 => todo!(),
                         ethnolib::sandbox::ai::InpulseId::Act3 => todo!(),
-                        ethnolib::sandbox::ai::InpulseId::GoTo => todo!(),
-                        ethnolib::sandbox::ai::InpulseId::Plant => todo!(),
-                        ethnolib::sandbox::ai::InpulseId::Take => todo!(),
-                        ethnolib::sandbox::ai::InpulseId::Use => todo!(),
                         */
-                        //ethnolib::sandbox::ai::InpulseId::EatClass(_) => todo!(),
+                        ethnolib::sandbox::ai::InpulseId::Plant |
+                        ethnolib::sandbox::ai::InpulseId::Take |
+                        ethnolib::sandbox::ai::InpulseId::Use |
+                        ethnolib::sandbox::ai::InpulseId::EatClass(_) |
+                        ethnolib::sandbox::ai::InpulseId::GoTo => {
+                            cpu.stack.pop();
+                            cpu.stack.push(StackItem::success());
+                        },
                         _ => {
-                            cpu.stack.push(StackItem::String("Success".to_owned()));
+                            cpu.stack.push(StackItem::success());
                         }
                     }
                 },

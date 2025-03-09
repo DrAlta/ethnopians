@@ -12,10 +12,6 @@ use crate::sandbox::ai::{
 /// should Combine, Use, Eat take a BlackboardKey that points to a ItemClass or the ItemClass directly? ether way InventoryGE should probably do the same
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Instruction {
-    // signels the process runing virtual machine to proform an action (? -- ?)
-    // InpulseId::GoTo ( Coord -- (Success or Failure))
-    // InpulseId::Take ( EntityId-- (Success or Failure))
-    Action(InpulseId),
     // takes two Blackboard keys that points to ItemClass
     Combine(BlackboardKey, BlackboardKey),
     // takes a Blackboard key that points to an ItemClass
@@ -26,6 +22,10 @@ pub enum Instruction {
     Sequence(Vec<ExecutionToken>),
     // takes two Blackboard keys that points to ItemClass
     Use(BlackboardKey, BlackboardKey),
+    // signels the process runing virtual machine to proform an action (? -- ?)
+    // InpulseId::GoTo ( Coord -- (Success or Failure))
+    // InpulseId::Take ( EntityId-- (Success or Failure))
+    ForthAction(InpulseId),
     ForthTree(ExecutionToken),
     //--------------------------------------------------------------------------
     ForthAdd,

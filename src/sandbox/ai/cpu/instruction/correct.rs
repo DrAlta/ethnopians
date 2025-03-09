@@ -29,7 +29,7 @@ impl Instruction {
                     *token = y
                 };
             }
-            Instruction::Action(_)
+            Instruction::ForthAction(_)
             | Instruction::Combine(_, _)
             | Instruction::Eat(_)
             | Instruction::InventoryGE(_, _)

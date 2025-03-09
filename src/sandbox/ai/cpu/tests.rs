@@ -11,12 +11,12 @@ fn step_test() {
 
     let mut bt = TreePool::new();
     let action1 = "act1".to_owned();
-    bt.insert(action1.clone(), vec![Instruction::Action(InpulseId::Act1)]);
+    bt.insert(action1.clone(), vec![Instruction::ForthAction(InpulseId::Act1)]);
 
     let action2 = "act2".to_owned();
-    bt.insert(action2.clone(), vec![Instruction::Action(InpulseId::Act2)]);
+    bt.insert(action2.clone(), vec![Instruction::ForthAction(InpulseId::Act2)]);
     let action3 = "act3".to_owned();
-    bt.insert(action3.clone(), vec![Instruction::Action(InpulseId::Act3)]);
+    bt.insert(action3.clone(), vec![Instruction::ForthAction(InpulseId::Act3)]);
 
     let sequence = "seq".to_owned();
     bt.insert(
@@ -168,12 +168,12 @@ fn test() {
 
     let mut bt = HashMap::<ThreadName, Thread>::new();
     let action1 = "a1".to_owned();
-    bt.insert(action1.clone(), vec![Instruction::Action(InpulseId::Act1)]);
+    bt.insert(action1.clone(), vec![Instruction::ForthAction(InpulseId::Act1)]);
 
     let action2 = "a2".to_owned();
-    bt.insert(action2.clone(), vec![Instruction::Action(InpulseId::Act2)]);
+    bt.insert(action2.clone(), vec![Instruction::ForthAction(InpulseId::Act2)]);
     let action3 = "a3".to_owned();
-    bt.insert(action3.clone(), vec![Instruction::Action(InpulseId::Act3)]);
+    bt.insert(action3.clone(), vec![Instruction::ForthAction(InpulseId::Act3)]);
 
     let sequence = "seq".to_owned();
     bt.insert(

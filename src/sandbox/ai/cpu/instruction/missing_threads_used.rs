@@ -31,7 +31,7 @@ impl Instruction {
                     missing.insert(token.clone());
                 }
             }
-            Instruction::Action(..)
+            Instruction::ForthAction(..)
             | Instruction::Combine(_, _)
             | Instruction::Eat(_)
             | Instruction::InventoryGE(_, _)

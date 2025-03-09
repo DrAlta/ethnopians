@@ -8,6 +8,8 @@ pub fn go_to_parser<'a>(
     let (tail, _body) = tag("go_to")(input)?;
     Ok((
         tail,
-        (vec![Instruction::Action(InpulseId::GoTo)], TreePool::new()),
+        (vec![
+            Instruction::ForthAction(InpulseId::GoTo),
+        ], TreePool::new()),
     ))
 }

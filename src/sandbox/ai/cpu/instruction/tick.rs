@@ -2,7 +2,7 @@ use qol::logy;
 
 use crate::sandbox::ai::{
     cpu::{
-        tick_action, tick_selector, tick_sequence, Instruction, Prayer, ProgramCounter,
+        Instruction, instruction::{tick_selector, tick_sequence}, Prayer, ProgramCounter,
         ReturnStack, Stack,
     }, Blackboard, BlackboardKey, BlackboardValue, InpulseId, StackItem, Status
 };
@@ -17,7 +17,11 @@ impl Instruction {
     ) -> Prayer {
         logy!("debug", "ticking:{self:?}");
         match self {
-            Instruction::Action(action_id) => tick_action(action_id, stack, return_stack, pc),
+            Instruction::ForthAction(action_id) => {
+                *pc = return_stack.pop();
+
+                return Ok(Status::Running(action_id.clone()));
+            },
             Instruction::Combine(_, _) => todo!(),
             Instruction::Eat(x) => {
 
