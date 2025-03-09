@@ -379,6 +379,7 @@ impl Instruction {
                 Self::next(Status::None, pc)
             }
             Instruction::ForthJump(token, idx) => {
+                stack.push(StackItem::init());
                 *pc = Some((token.clone(), idx.clone()));
                 Ok(Status::None)
             }
