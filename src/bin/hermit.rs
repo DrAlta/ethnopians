@@ -41,7 +41,9 @@ fn main2(){
                     cpu.stack.push(StackItem::some(StackItem::Int(5)));
                 },
                 Status::GetLocation(_entity) => todo!(),
-                Status::GetHp(_entity) => todo!(),
+                Status::GetHp(_entity) => {
+                    cpu.stack.push(StackItem::some(StackItem::Int(4)));
+                },
                 Status::GetIsInventoryGE { agent: _agent, item_class: _item_class, amount: _amount } => {
                     logy!("log", "giving dummy value for if {_agent} has GE {_amount} of {_item_class:?}");
                     cpu.stack.push(StackItem::success());

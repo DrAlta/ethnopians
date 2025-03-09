@@ -44,7 +44,7 @@ pub enum Instruction {
     //(BlackboardKey -- Option<_>)
     ForthGetBlackboard,
     ForthGetEnergy,
-    //(BlackboardKey -- Option<Int>)
+    //(EntityId -- Option<Int>)
     ForthGetHP,
     //(BlackboardKey -- Option<Coord>)
     ForthGetLocation,

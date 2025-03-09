@@ -28,7 +28,7 @@ pub fn get_hermit_behavior_task() -> TreePool {
     }"#
     };*/
     let root = {
-        r#"hermit = sel{
+        r#"hermit = seq{
     sat_hunger,
     sat_sleep,
     have_house,
@@ -100,12 +100,22 @@ sat_sleep = forth {
     get_blackboard
     some_entity_id
     if
+        dup
         get_hp
         some_int
         if
             lit(50)
             lt
             if
+                get_location
+                some_coord
+                if
+                    go_to
+                    return
+                then
+
+
+
                 lit("house")
                 find_nearest
                 some_entity_id
@@ -125,6 +135,7 @@ sat_sleep = forth {
             return
         then
     then
+    drop
     lit(Failure)
     return
 };

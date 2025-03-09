@@ -258,14 +258,11 @@ impl Instruction {
             }
             // ForthGetHP should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::ForthGetHP => {
-                let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos wasn't a sting".to_owned());
+                let Some(StackItem::EntityId(_)) = stack.last() else {
+                    return Err("tos wasn't an EntityId".to_owned());
                 };
-                let Some(StackItem::String(key)) = stack.pop() else {
+                let Some(StackItem::EntityId(entity_id)) = stack.pop() else {
                     unreachable!()
-                };
-                let Some(BlackboardValue::EntityId(entity_id)) = blackboard.get(&key) else {
-                    return Err(format!("{key} not found in blackboard"));
                 };
                 Self::next(Status::GetHp(entity_id.clone()), pc)
                 /* this is the pre bevy impl
