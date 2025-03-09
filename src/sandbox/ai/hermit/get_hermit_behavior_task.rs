@@ -10,23 +10,6 @@ macro_rules! foofoo {
 }
 
 pub fn get_hermit_behavior_task() -> TreePool {
-   /* let test = {
-        r#"get_my_home_location = forth {
-        lit("self")
-        get_blackboard
-        some_entity_id
-        if
-            lit("house")
-            find_nearest
-            some_entity_id
-            if
-                get_location
-                return
-            then
-        then
-        return
-    }"#
-    };*/
     let root = {
         r#"hermit = seq{
     sat_hunger,
@@ -155,6 +138,7 @@ have_garden = forth {
         lit(Success)
         return
     then
+    drop
     get_my_home_location
     some_coord
     if
@@ -424,14 +408,20 @@ have_2_wood =seq{
     get_blackboard
     some_entity_id
     if
-        lit("house")
-        find_nearest
-        some_entity_id
+        dup
+        get_location
+        some_coord
         if
-            get_location
-            return
+            lit("house")
+            find_nearest
+            some_entity_id
+            if
+                get_location
+                return
+            then
         then
     then
+    drop
     lit(false)
     return
 };

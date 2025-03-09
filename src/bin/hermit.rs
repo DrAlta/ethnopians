@@ -19,9 +19,11 @@ fn main2(){
     let mut cpu = CPU::load("hermit".to_owned());
     loop {
         pout!(
-            "\nexecuting {}\nstack: {}",
+            "\nexecuting {}\nstack: {}\nreturn: {:?}",
             if let Some((a,b)) = &cpu.pc {format!("{a}:{b}")} else{ "None".to_owned()},
-            Vecna::from(&cpu.stack)
+            Vecna::from(&cpu.stack),
+            cpu.return_stack,
+            
         );
         match cpu.step(&task_db, &mut blackboard) {
             Ok(status) => match status {
@@ -37,7 +39,7 @@ fn main2(){
                 Status::Failure => todo!(),
                 Status::FindNearest { x: _x, y: _y, item_class: _item_class} => {
                     logy!("log", "giving dummy value for nearest {_item_class:?} to [{_x}:{_y}]");
-                    cpu.stack.push(StackItem::success());
+                    cpu.stack.push(StackItem::some(StackItem::EntityId(EntityId::from_raw(4))));
                 },
                 Status::GetEnergy(_entity) => {
                     logy!("log", "giving dummy value for GetEnergy on {_entity}");

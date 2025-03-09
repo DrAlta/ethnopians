@@ -33,7 +33,7 @@ impl Instruction {
                         Err(format!("{x} was an EntityId not a class"))
                     },
                     BlackboardValue::String(y) => {
-                        stack.pop();
+                        //stack.pop();
                         let Some(parent_token) = return_stack.pop() else {
                             return Err("nothing to return to".to_owned());
                         };
@@ -95,7 +95,9 @@ impl Instruction {
                 }
             }
             Instruction::ForthCall(token, idx) => {
-                *pc = Some((token.clone(), *idx));
+                stack.push(StackItem::init());
+                let old_pc = std::mem::replace(pc, Some((token.clone(), *idx))).unwrap();
+                return_stack.push((old_pc.0, old_pc.1 + 1));
                 Ok(Status::None)
             }
             Instruction::ForthDistance => {
@@ -117,7 +119,7 @@ impl Instruction {
                 let distance =
                     ((nos_x - tos_x).abs().pow(2) + (nos_y - tos_y).abs().pow(2)).isqrt();
                 stack.push(StackItem::Int(distance));
-                Self::exit(Status::None, return_stack, pc)
+                Self::next(Status::None, pc)
             }
             Instruction::ForthDiv => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
