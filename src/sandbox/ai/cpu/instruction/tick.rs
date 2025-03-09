@@ -141,7 +141,11 @@ impl Instruction {
                 Self::next(Status::None, pc)
             }
             Instruction::ForthEq => {
-                let (nos, tos) = Self::get_two_ints(stack)?;
+                if stack.len() < 2 {
+                    return Err("less that two items on the stack".to_owned())
+                };
+                let tos = stack.pop().unwrap();
+                let nos = stack.pop().unwrap();
                 if nos == tos {
                     stack.push(StackItem::True);
                 } else {
