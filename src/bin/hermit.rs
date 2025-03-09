@@ -29,8 +29,10 @@ fn main2(){
                     todo!()
                 }
                 Status::Success => {
+                    /*
                     logy!("log", "hermit ai succeeded\n\n\n-----\n{cpu:#?}\n-----");
                     break
+                    */
                 },
                 Status::Failure => todo!(),
                 Status::FindNearest { ../*x, y, item_class*/ } => todo!(),
@@ -47,7 +49,23 @@ fn main2(){
                 Status::GetEntities { ../*min_x, min_y, max_x, max_y*/ } => todo!(),
                 Status::RemoveEntitiesOfType(_item) => todo!(),
                 Status::RetainEntitiesOfType(_item) => todo!(),
-                Status::Running(_inpulse_id) => todo!(),
+                Status::Running(inpulse_id) => {
+                    match inpulse_id {
+                        /*
+                        ethnolib::sandbox::ai::InpulseId::Act1 => todo!(),
+                        ethnolib::sandbox::ai::InpulseId::Act2 => todo!(),
+                        ethnolib::sandbox::ai::InpulseId::Act3 => todo!(),
+                        ethnolib::sandbox::ai::InpulseId::GoTo => todo!(),
+                        ethnolib::sandbox::ai::InpulseId::Plant => todo!(),
+                        ethnolib::sandbox::ai::InpulseId::Take => todo!(),
+                        ethnolib::sandbox::ai::InpulseId::Use => todo!(),
+                        */
+                        //ethnolib::sandbox::ai::InpulseId::EatClass(_) => todo!(),
+                        _ => {
+                            cpu.stack.push(StackItem::String("Success".to_owned()));
+                        }
+                    }
+                },
                 Status::None => (),
             },
             Err(err) => panic!("hermitAI gave error: {err}"),

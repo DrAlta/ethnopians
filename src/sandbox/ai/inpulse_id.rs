@@ -1,3 +1,5 @@
+use crate::sandbox::ItemClass;
+
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum InpulseId {
     Act1,
@@ -8,4 +10,5 @@ pub enum InpulseId {
     Plant,
     Take,
     Use,
+    EatClass(ItemClass),
 }

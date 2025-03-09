@@ -4,8 +4,7 @@ use crate::sandbox::ai::{
     cpu::{
         tick_action, tick_selector, tick_sequence, Instruction, Prayer, ProgramCounter,
         ReturnStack, Stack,
-    },
-    Blackboard, BlackboardKey, BlackboardValue, StackItem, Status,
+    }, Blackboard, BlackboardKey, BlackboardValue, InpulseId, StackItem, Status
 };
 
 impl Instruction {
@@ -20,7 +19,30 @@ impl Instruction {
         match self {
             Instruction::Action(action_id) => tick_action(action_id, stack, return_stack, pc),
             Instruction::Combine(_, _) => todo!(),
-            Instruction::Eat(_) => todo!(),
+            Instruction::Eat(x) => {
+
+                let Some(class_id) = blackboard.get(x) else {
+                    return Err(format!("couldn't find {x} in blackboard"))
+                };
+                match class_id {
+                    BlackboardValue::EntityId(_) => {
+                        Err(format!("{x} was an EntityId not a class"))
+                    },
+                    BlackboardValue::String(y) => {
+                        stack.pop();
+                        let Some(parent_token) = return_stack.pop() else {
+                            return Err("nothing to return to".to_owned());
+                        };
+                        // return to calling fuction
+                        *pc = Some(parent_token);
+                        Ok(
+                            Status::Running(
+                                InpulseId::EatClass(y.clone())
+                            )
+                        )
+                    },
+                }
+            },
             Instruction::InventoryGE(key, amount) => {
                 let Some(StackItem::String(x)) = stack.last() else {
                     return Err("tos was not an Init".to_owned());
