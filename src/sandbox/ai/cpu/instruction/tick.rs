@@ -629,6 +629,7 @@ impl Instruction {
                 let Ok(item_type_from_stack) = stack_str.try_into() else {
                     return Err(format!("couldn't convert {stack_str:?} to type"));
                 };
+                stack.pop();
                 Self::next(Status::RemoveEntitiesOfType(item_type_from_stack), pc)
 
                 /* pre bevy impl
@@ -660,6 +661,7 @@ impl Instruction {
                 let Ok(item_type_from_stack) = stack_str.try_into() else {
                     return Err(format!("couldn't convert {stack_str:?} to type"));
                 };
+                stack.pop();
                 Self::next(Status::RetainEntitiesOfType(item_type_from_stack), pc)
 
                 /* pre bevy impl
