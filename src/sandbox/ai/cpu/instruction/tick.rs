@@ -18,9 +18,12 @@ impl Instruction {
         logy!("debug", "ticking:{self:?}");
         match self {
             Instruction::ForthAction(action_id) => {
-                *pc = return_stack.pop();
+//                *pc = return_stack.pop();
 
-                return Ok(Status::Running(action_id.clone()));
+                return Self::next(
+                    Status::Running(action_id.clone()), 
+                    pc
+                );
             },
             Instruction::Combine(_, _) => todo!(),
             Instruction::Eat(x) => {
