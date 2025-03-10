@@ -52,6 +52,7 @@ take_all = forth{
         lit(Success)
         return
     then
+    drop
     lit(Failure)
     return
 }"#
