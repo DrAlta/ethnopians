@@ -37,7 +37,7 @@ fn main2(){
                     break
                     */
                 },
-                Status::Failure => todo!(),
+                Status::Failure => (),
                 Status::FindNearest { x: _x, y: _y, item_class: _item_class} => {
                     logy!("log", "giving dummy value for nearest {_item_class:?} to [{_x}:{_y}]");
                     cpu.stack.push(StackItem::some(StackItem::EntityId(EntityId::from_raw(4))));
