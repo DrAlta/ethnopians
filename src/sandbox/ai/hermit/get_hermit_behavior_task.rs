@@ -100,7 +100,7 @@ sat_sleep = forth {
 
 
 
-                lit("house")
+                lit("House")
                 find_nearest
                 some_entity_id
                 if
@@ -243,7 +243,7 @@ harvest_veg = forth{
     if
         lit(x: 20, y: 20)
         get_entities
-        lit("veggies")
+        lit("Veggie")
         retain_entities_of_type
         take_all
         swap
@@ -321,14 +321,14 @@ plant_vegs = forth {
     
 };
 get_veg = selector {
-    blackboard(food => veg) {
+    blackboard(food => Veggie) {
         inventory_have_ge(food, 1),
         forth {
             lit("self")
             get_blackboard
             some_entity_id
             if
-                lit("veg")
+                lit("Veggie")
                 find_nearest
                 some_entity_id
                 if
@@ -352,7 +352,7 @@ get_veg = selector {
         some_coord
         if
             dup
-            lit("house")
+            lit("House")
             find_nearest
             some_entity_id
             if
@@ -394,7 +394,7 @@ have_2_wood =seq{
         get_location
         some_coord
         if
-            lit("house")
+            lit("House")
             find_nearest
             some_entity_id
             if
@@ -412,9 +412,9 @@ check_if_clear_for_garden /* (coord -- bool) */ = forth{
     lit(x: 20, y: 20)
     add
     get_entities
-    lit("veggie")
+    lit("Veggie")
     remove_entities_of_type
-    lit("agent")
+    lit("Agent")
     remove_entities_of_type
     is_empty
     swap
@@ -445,7 +445,7 @@ set_garden = forth {
     let plant_vegs_defs = {
         r#"have_n_seed = forth{
     dup
-    lit("seed")
+    lit("Seed")
     inventory_have_ge
     if
         drop
@@ -503,7 +503,7 @@ go_to_tree = forth {
         get_location
         some_coord
         if
-            lit("tree")
+            lit("Tree")
             find_nearest
             some_entity_id
             if
@@ -554,7 +554,7 @@ have_stick = sel{
             get_location
             some_coord
             if
-                lit("stone")
+                lit("Stone")
                 find_nearest
                 some_entity_id
                 if
@@ -588,11 +588,11 @@ have_stick = sel{
         return
     then
     lit(1)
-    lit("veggie")
+    lit("Veggie")
     inventory_have_ge
     not_true
     if
-        lit("veggie")
+        lit("Veggie")
         find_nearest
         some_entity_id
         if
@@ -609,7 +609,7 @@ have_stick = sel{
                     lit(Failure)
                     return
                 then
-                lit("seed")
+                lit("Seed")
                 find_in_inventory
                 some_entity_id
                 if
@@ -665,7 +665,7 @@ have_stick = sel{
 
     let plant_row_02_defs = {
         r#"plant_seed /* (coord -- Success/Failure ) plants a seed at coord*/= forth{
-    lit("seed")
+    lit("Seed")
     find_in_inventory
     some_entity_id
     if
@@ -692,7 +692,7 @@ have_stick = sel{
         get_blackboard
         some_entity_id
         if
-            lit("veg")
+            lit("Veggie")
             find_inventory
             some_entity_id
             if

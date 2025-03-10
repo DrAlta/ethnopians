@@ -36,7 +36,10 @@ impl Instruction {
                         Err(format!("{x} was an EntityId not a class"))
                     },
                     BlackboardValue::String(y) => {
-                        //stack.pop();
+                        assert_eq!(
+                            Some(StackItem::init()),
+                            stack.pop()
+                        ); // popping in init off the stack
                         let Some(parent_token) = return_stack.pop() else {
                             return Err("nothing to return to".to_owned());
                         };
