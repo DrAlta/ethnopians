@@ -130,11 +130,11 @@ have_house = sel {
         combine(wood,wood)
     }
 };
-have_garden = forth {
+have_garden /* ( -- Success/Failure) */ = forth {
     lit("garden_location")
     get_blackboard
     some_coord
-    if
+    if /* if she already known the colation of her garden return Success */
         drop
         lit(Success)
         return
@@ -142,11 +142,11 @@ have_garden = forth {
     drop
     get_my_home_location
     some_coord
-    if
-        dup
+    if      /* home_coord */
+    /* ok she didn't have a garden but did have a home */
+        dup /* home_coord, home_coord */
         lit(x: -10, y: 5)
-        add
-        dup
+        add /* home_coord, first_garden_coord */
         check_if_clear_for_garden
         if
             set_garden
@@ -159,7 +159,6 @@ have_garden = forth {
         dup
         lit(x: 5, y: -10)
         add
-        dup
         check_if_clear_for_garden
         if
             set_garden
@@ -172,7 +171,6 @@ have_garden = forth {
         dup
         lit(x: -25, y: -10)
         add
-        dup
         check_if_clear_for_garden
         if
             set_garden
@@ -185,7 +183,6 @@ have_garden = forth {
         dup
         lit(x: -10, y: -25)
         add
-        dup
         check_if_clear_for_garden
         if
             set_garden
@@ -194,15 +191,10 @@ have_garden = forth {
             return
         then
         drop
-
-
-
-
 
         dup
         lit(x: -10, y: 5)
         add
-        dup
         clear_for_garden
         if
             set_garden
@@ -211,11 +203,10 @@ have_garden = forth {
             return
         then
         drop
-        
+
         dup
         lit(x: 5, y: -10)
         add
-        dup
         clear_for_garden
         if
             set_garden
@@ -228,7 +219,6 @@ have_garden = forth {
         dup
         lit(x: -25, y: -10)
         add
-        dup
         clear_for_garden
         if
             set_garden
@@ -241,7 +231,6 @@ have_garden = forth {
         dup
         lit(x: -10, y: -25)
         add
-        dup
         clear_for_garden
         if
             set_garden
@@ -249,9 +238,8 @@ have_garden = forth {
             lit(Success)
             return
         then
-        drop
-        drop
     then
+    drop
     lit(Failure)
     return
 };
@@ -426,7 +414,8 @@ have_2_wood =seq{
     lit(false)
     return
 };
-check_if_clear_for_garden = forth{
+check_if_clear_for_garden /* (coord -- bool) */ = forth{
+    dup
     lit(x: 20, y: 20)
     add
     get_entities
@@ -435,6 +424,8 @@ check_if_clear_for_garden = forth{
     lit("agent")
     remove_entities_of_type
     is_empty
+    swap
+    drop
     if
         lit(Success)
         return
