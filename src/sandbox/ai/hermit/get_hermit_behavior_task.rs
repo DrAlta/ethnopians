@@ -142,11 +142,11 @@ have_garden /* ( -- Success/Failure) */ = forth {
     drop
     get_my_home_location
     some_coord
-    if      /* home_coord */
+    if
     /* ok she didn't have a garden but did have a home */
-        dup /* home_coord, home_coord */
+        dup
         lit(x: -10, y: 5)
-        add /* home_coord, first_garden_coord */
+        add
         check_if_clear_for_garden
         if
             set_garden
@@ -154,7 +154,6 @@ have_garden /* ( -- Success/Failure) */ = forth {
             lit(Success)
             return
         then
-        drop
         
         dup
         lit(x: 5, y: -10)
@@ -166,7 +165,6 @@ have_garden /* ( -- Success/Failure) */ = forth {
             lit(Success)
             return
         then
-        drop
 
         dup
         lit(x: -25, y: -10)
@@ -178,7 +176,6 @@ have_garden /* ( -- Success/Failure) */ = forth {
             lit(Success)
             return
         then
-        drop
 
         dup
         lit(x: -10, y: -25)
@@ -190,8 +187,8 @@ have_garden /* ( -- Success/Failure) */ = forth {
             lit(Success)
             return
         then
-        drop
 
+        /* now we are done seeing if any place is open so now we try clearing spots */
         dup
         lit(x: -10, y: 5)
         add
@@ -202,7 +199,6 @@ have_garden /* ( -- Success/Failure) */ = forth {
             lit(Success)
             return
         then
-        drop
 
         dup
         lit(x: 5, y: -10)
@@ -214,7 +210,6 @@ have_garden /* ( -- Success/Failure) */ = forth {
             lit(Success)
             return
         then
-        drop
 
         dup
         lit(x: -25, y: -10)
@@ -226,7 +221,6 @@ have_garden /* ( -- Success/Failure) */ = forth {
             lit(Success)
             return
         then
-        drop
 
         dup
         lit(x: -10, y: -25)
@@ -397,7 +391,6 @@ have_2_wood =seq{
     get_blackboard
     some_entity_id
     if
-        dup
         get_location
         some_coord
         if
@@ -433,12 +426,15 @@ check_if_clear_for_garden /* (coord -- bool) */ = forth{
     lit(Failure)
     return
 };
-clear_for_garden = forth{
+clear_for_garden /* (coord -- bool) */ = forth{
+    dup
     lit(x: 20, y: 20)
     get_entities
     take_all
     swap
     drop
+    lit(Success)
+    eq
     return
 };
 set_garden = forth {

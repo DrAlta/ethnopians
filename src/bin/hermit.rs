@@ -16,10 +16,7 @@ fn main2(){
     );
 
     let task_db = get_hermit_behavior_task();
-    let mut cpu = CPU::load("check_if_clear_for_garden".to_owned());
-    cpu.stack.pop();
-    cpu.stack.push(StackItem::Coord { x: 6, y: 9 });
-    cpu.stack.push(StackItem::init());
+    let mut cpu = CPU::load("hermit".to_owned());
     
     loop {
         pout!(
