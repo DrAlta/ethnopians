@@ -1,0 +1,32 @@
+have_n_seed = forth{
+    dup
+    lit("Seed")
+    inventory_have_ge
+    if
+        drop
+        lit(Success)
+        return
+    then
+    split_veg_to_seed
+    lit(Success)
+    not_true
+    if
+        lit(Failure)
+        return
+    then
+    jump(have_n_seed)
+};
+plant_row = forth{
+    dup
+    plant_seed
+    lit(0)
+    plant_row_02
+};
+plant_vegs_02 = forth{
+    lit(Success)
+    eq
+    rot
+    or
+    swap
+    return
+}

@@ -1,0 +1,32 @@
+have_axe = sel{
+    inventory_have_ge(axe, 1),
+    seq{
+        have_knife,
+        have_stick,
+        combine(stick, knife)
+    }
+};
+go_to_tree = forth {
+    lit("self")
+    get_blackboard
+    some_entity_id
+    if
+        get_location
+        some_coord
+        if
+            lit("Tree")
+            find_nearest
+            some_entity_id
+            if
+                get_location
+                some_coord
+                if
+                    go_to
+                    return
+                then
+            then
+        then
+    then
+    lit(Failure)
+    return
+}

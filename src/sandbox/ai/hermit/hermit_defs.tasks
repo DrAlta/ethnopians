@@ -1,0 +1,234 @@
+sat_hunger = selector{
+    dont_need_to_eat,
+    blackboard(food => veg) {
+        seq{
+            selector{
+                inventory_have_ge(food, 1),
+                get_veg
+            },
+            eat(food)
+        }
+    }
+};
+sat_sleep = forth {
+    lit("self")
+    get_blackboard
+    some_entity_id
+    if
+        dup
+        get_hp
+        some_int
+        if
+            lit(50)
+            lt
+            if
+                get_location /* getting the location of self */
+                some_coord
+                if
+                    lit("House")
+                    find_nearest /* finding the closest house to self */
+                    some_entity_id
+                    if
+                        dup /* house_id, house_id */
+                        get_location
+                        some_coord
+                        if /* house_id, house_loc */
+                            go_to /* house_id, Success/Failure */
+                            lit(Failure) /* house_id, Success/Failure, Failure */
+                            eq /* house_id, True/False */
+                            if
+                                /* house_id */
+                                drop
+                                lit(Failure)
+                                return
+                            then
+                            use
+                            return
+                        then
+                    then
+                then
+                drop
+                lit(Failure)
+                return
+            then
+            lit(Success)
+            return
+        then
+    then
+    drop
+    lit(Failure)
+    return
+};
+have_house = sel {
+    is_house_in_range,
+    seq{
+        have_2_wood,
+        combine(wood,wood)
+    }
+};
+have_garden /* ( -- Success/Failure) */ = forth {
+    lit("garden_location")
+    get_blackboard
+    some_coord
+    if /* if she already known the colation of her garden return Success */
+        drop
+        lit(Success)
+        return
+    then
+    drop
+    get_my_home_location
+    some_coord
+    if
+    /* ok she didn't have a garden but did have a home */
+        dup
+        lit(x: -10, y: 5)
+        add
+        check_if_clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+        
+        dup
+        lit(x: 5, y: -10)
+        add
+        check_if_clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+
+        dup
+        lit(x: -25, y: -10)
+        add
+        check_if_clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+
+        dup
+        lit(x: -10, y: -25)
+        add
+        check_if_clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+
+        /* now we are done seeing if any place is open so now we try clearing spots */
+        dup
+        lit(x: -10, y: 5)
+        add
+        clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+
+        dup
+        lit(x: 5, y: -10)
+        add
+        clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+
+        dup
+        lit(x: -25, y: -10)
+        add
+        clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+
+        dup
+        lit(x: -10, y: -25)
+        add
+        clear_for_garden
+        if
+            set_garden
+            drop
+            lit(Success)
+            return
+        then
+    then
+    drop
+    lit(Failure)
+    return
+};
+harvest_veg = forth{
+    lit("garden_location")
+    some_coord
+    if
+        lit(x: 20, y: 20)
+        get_entities
+        lit("Veggie")
+        retain_entities_of_type
+        take_all
+        swap
+        drop
+        return
+    then
+    drop
+    lit(Failure)
+    return
+};
+plant_vegs = forth {
+    lit(12)
+    have_n_seed
+    drop
+    lit("garden_location")
+    get_blackboard
+    some_coord
+    if
+        lit(True)
+        swap
+        dup
+        plant_row
+        plant_vegs_02
+        dup
+        lit(x:0, y: 5)
+        add
+        plant_row
+        plant_vegs_02
+        dup
+        lit(x:0, y: 5)
+        add
+        plant_row
+        plant_vegs_02
+        dup
+        lit(x:0, y: 5)
+        add
+        plant_row
+        plant_vegs_02
+        dup
+        lit(x:0, y: 5)
+        add
+        plant_row
+        plant_vegs_02
+        drop
+        if
+            lit(Success)
+            return
+        then
+    then
+    lit(Failure)
+    return
+}

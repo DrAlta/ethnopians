@@ -1,0 +1,14 @@
+have_knife = sel{
+    inventory_have_ge(knife, 1), 
+    seq{
+        have_2_stone,
+        combine(stone, stone)
+    }
+};
+have_stick = sel{
+    inventory_have_ge(stick, 1), 
+    seq{
+        go_to_tree,
+        use(hands, tree)
+    }
+}

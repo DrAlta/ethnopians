@@ -45,7 +45,7 @@ fn main(){
             (StackItem::Int(3), StackItem::EntityId(garden_4)),
         ].try_into().unwrap()
     ];
-    let get_energy = vec![5];
+    let get_energy = vec![7];
 
     let get_location = vec![
         (6,9),

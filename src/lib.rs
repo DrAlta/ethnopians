@@ -8,6 +8,7 @@ pub mod kill_share;
 pub mod mate;
 pub mod preferances;
 pub mod sandbox;
+pub mod seven_emotions;
 //pub mod social_sim;//! this is supersecced by the ensemblage crate
 mod trauma;
 pub mod types;
