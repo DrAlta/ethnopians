@@ -12,7 +12,8 @@ mod instruction;
 pub use instruction::Instruction;
 mod stack_item;
 pub use stack_item::{StackItem, TableGet, TableInterior};
-
+mod task_testing_harness;
+pub use task_testing_harness::task_testing_harness;
 
 #[cfg(test)]
 mod tests;

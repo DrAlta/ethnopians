@@ -1,2 +1,3 @@
 mod check_for_missing_threads_in_hermit_ai;
 mod hermit_ai_run_test;
+mod sat_hunger_tests;
