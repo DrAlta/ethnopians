@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 
-use crate::sandbox::{ai::{task_testing_harness, Blackboard, BlackboardValue, StackItem, Variable}, EntityId, Item};
+use crate::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, StackItem, Variable}, EntityId, Item};
 
 
 // "energy is grather that 5"
@@ -52,8 +52,12 @@ fn sat_hunger_test_t(){
     let get_hp= vec![4];
     let get_is_inventory_ge = vec![true];
     let running = vec![true];
+
+    let task_db = get_hermit_behavior_task();
+
     task_testing_harness(
         "sat_hunger",
+        task_db,
         vec![StackItem::success()],
         find_in_inventory,
         find_nearest,
@@ -116,8 +120,12 @@ fn sat_hunger_test_ft(){
     let get_hp= vec![4];
     let get_is_inventory_ge = vec![true];
     let running = vec![true];
+
+    let task_db = get_hermit_behavior_task();
+
     task_testing_harness(
         "sat_hunger",
+        task_db,
         vec![StackItem::success()],
         find_in_inventory,
         find_nearest,
@@ -180,9 +188,13 @@ fn sat_hunger_test_ff(){
     let get_hp= vec![4];
     let get_is_inventory_ge = vec![false];
     let running = vec![true];
+
+    let task_db = get_hermit_behavior_task();
+
     task_testing_harness(
         "sat_hunger",
-        vec![StackItem::success()],
+        task_db,
+    vec![StackItem::success()],
         find_in_inventory,
         find_nearest,
         get_entities,

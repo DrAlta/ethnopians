@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use qol::{logy, pout, Vecna};
 
-use crate::sandbox::{ai::{get_hermit_behavior_task, Blackboard, BlackboardValue, InpulseId, StackItem, Status, CPU}, EntityId, Item};
+use crate::sandbox::{ai::{Blackboard, BlackboardValue, InpulseId, StackItem, Status, CPU}, EntityId, Item};
 
 
 type Prayer = Status;
@@ -10,6 +10,7 @@ type Prayer = Status;
 
 pub fn task_testing_harness(
     task: &str,
+    task_db: HashMap<String, Vec<super::Instruction>>,
     final_stack: crate::sandbox::ai::Stack,
     find_in_inventory: Vec<EntityId>,
     find_nearest: Vec<EntityId>,
@@ -39,7 +40,6 @@ pub fn task_testing_harness(
     let mut retain_entities_of_type_idx= 0;
     // end these ara for the dummy values
 
-    let task_db = get_hermit_behavior_task();
     let mut cpu = CPU::load(task.to_owned());
     
     loop {
@@ -170,6 +170,9 @@ pub fn task_testing_harness(
                 Status::Running(inpulse_id) => {
                     logy!("log", "doing dummy inpule {running_idx}. : {inpulse_id:?}");
                     match &inpulse_id {
+                        InpulseId::Act1 |
+                        InpulseId::Act2 |
+                        InpulseId::Act3 |
                         InpulseId::EatClass(_) =>(),
                         InpulseId::Use |
                         InpulseId::Take |

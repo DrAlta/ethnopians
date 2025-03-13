@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use qol::pout;
+
 use super::*;
 use crate::sandbox::ai::{
     Blackboard, InpulseId, Instruction, Status, Thread, ThreadName, TreePool,
@@ -9,17 +11,17 @@ use crate::sandbox::ai::{
 fn step_test() {
     let mut blackboard = Blackboard::new();
 
-    let mut bt = TreePool::new();
+    let mut task_db = TreePool::new();
     let action1 = "act1".to_owned();
-    bt.insert(action1.clone(), vec![Instruction::ForthAction(InpulseId::Act1)]);
+    task_db.insert(action1.clone(), vec![Instruction::ForthDrop, Instruction::ForthAction(InpulseId::Act1), Instruction::ForthReturn]);
 
     let action2 = "act2".to_owned();
-    bt.insert(action2.clone(), vec![Instruction::ForthAction(InpulseId::Act2)]);
+    task_db.insert(action2.clone(), vec![Instruction::ForthDrop, Instruction::ForthAction(InpulseId::Act2), Instruction::ForthReturn]);
     let action3 = "act3".to_owned();
-    bt.insert(action3.clone(), vec![Instruction::ForthAction(InpulseId::Act3)]);
+    task_db.insert(action3.clone(), vec![Instruction::ForthDrop, Instruction::ForthAction(InpulseId::Act3), Instruction::ForthReturn]);
 
     let sequence = "seq".to_owned();
-    bt.insert(
+    task_db.insert(
         sequence.clone(),
         vec![Instruction::Sequence(vec![
             action1.clone(),
@@ -28,18 +30,38 @@ fn step_test() {
     );
 
     let selector = "sel".to_owned();
-    bt.insert(
+    task_db.insert(
         selector.clone(),
         vec![Instruction::Selector(vec![sequence.clone(), action3])],
     );
 
+    /*
+    crate::sandbox::ai::task_testing_harness(
+        &selector,
+        task_db,
+        Vec::new(),
+        Vec::new(),
+        Vec::new(),
+        Vec::new(),
+        Vec::new(),
+        Vec::new(),
+        Vec::new(),
+        Vec::new(),
+        vec![true],
+        blackboard, 
+        HashMap::new(),
+    );
+}
+*/
     let mut cpu = CPU::load(selector.clone());
     //step 1 selectpr does its init and sets the cpu up to call its first child, sequence.
-    assert_eq!(cpu.step(&bt, &mut blackboard), Ok(Status::None));
+    pout!("ticking:{:?}", cpu.pc);
+    assert_eq!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
     assert_eq!(&cpu.stack, &vec![StackItem::selector(1), StackItem::init()]);
     assert_eq!(&cpu.return_stack, &vec![(selector.clone(), 0)]);
     //step 2 sequence intalized and set the cpu up to call its first child, action1
-    assert_eq!(cpu.step(&bt, &mut blackboard), Ok(Status::None));
+    pout!("ticking:{:?}", cpu.pc);
+    assert_eq!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
         &vec![
@@ -52,9 +74,28 @@ fn step_test() {
         &cpu.return_stack,
         &vec![(selector.clone(), 0), (sequence.clone(), 0)]
     );
-    //step 3 action1 puts it's state on the stack,Success, and prays Running(1)
+    //step 3
+    pout!("ticking:{:?}", cpu.pc);
     assert_eq!(
-        cpu.step(&bt, &mut blackboard),
+        cpu.step(&task_db, &mut blackboard),
+        Ok(Status::None)
+    );
+    assert_eq!(
+        &cpu.stack,
+        &vec![
+            StackItem::selector(1),
+            StackItem::sequence(1),
+        ]
+    );
+    assert_eq!(
+        &cpu.return_stack,
+        &vec![(selector.clone(), 0), (sequence.clone(), 0)]
+    );
+    assert_eq!(&cpu.pc, &Some((action1.clone(), 1)));
+    //step 4
+    pout!("ticking:{:?}", cpu.pc);
+    assert_eq!(
+        cpu.step(&task_db, &mut blackboard),
         Ok(Status::Running(InpulseId::Act1))
     );
     assert_eq!(
@@ -62,27 +103,29 @@ fn step_test() {
         &vec![
             StackItem::selector(1),
             StackItem::sequence(1),
-            StackItem::success()
         ]
     );
     assert_eq!(
         &cpu.return_stack,
         &vec![(selector.clone(), 0), (sequence.clone(), 0)]
     );
-    assert_eq!(&cpu.pc, &Some((action1, 0)));
-    //step 4 action1 sees it's status on the stack and returns it seting the cpu to return to the calling thread
-    assert_eq!(cpu.step(&bt, &mut blackboard), Ok(Status::None));
+    assert_eq!(&cpu.pc, &Some((action1, 2)));
+    cpu.stack.push(StackItem::success()); // push the asnswer to the prayer
+    //step 5
+    pout!("ticking:{:?}", cpu.pc);
+    assert_eq!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
         &vec![
             StackItem::selector(1),
             StackItem::sequence(1),
-            StackItem::success()
+            StackItem::success(),
         ]
     );
     assert_eq!(&cpu.return_stack, &vec![(selector.clone(), 0)]);
-    //step 5  sequence sets the cpu up to run it's second child, action2
-    assert_eq!(cpu.step(&bt, &mut blackboard), Ok(Status::None));
+    //step 6
+    pout!("ticking:{:?}", cpu.pc);
+    assert_eq!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
         &vec![
@@ -96,9 +139,27 @@ fn step_test() {
         &cpu.return_stack,
         &vec![(selector.clone(), 0), (sequence.clone(), 0)]
     );
-    //step 6 action2 intalizes and prays Running(2)
+    //step 7
+    pout!("ticking:{:?}", cpu.pc);
     assert_eq!(
-        cpu.step(&bt, &mut blackboard),
+        cpu.step(&task_db, &mut blackboard),
+        Ok(Status::None)
+    );
+    assert_eq!(
+        &cpu.stack,
+        &vec![
+            StackItem::selector(1),
+            StackItem::sequence(2),
+        ]
+    );
+    assert_eq!(
+        &cpu.return_stack,
+        &vec![(selector.clone(), 0), (sequence.clone(), 0)]
+    );
+    //step 8
+    pout!("ticking:{:?}", cpu.pc);
+    assert_eq!(
+        cpu.step(&task_db, &mut blackboard),
         Ok(Status::Running(InpulseId::Act2))
     );
     assert_eq!(
@@ -106,15 +167,16 @@ fn step_test() {
         &vec![
             StackItem::selector(1),
             StackItem::sequence(2),
-            StackItem::failure()
         ]
     );
     assert_eq!(
         &cpu.return_stack,
         &vec![(selector.clone(), 0), (sequence, 0)]
     );
-    //step 7 action2 returns to sequence
-    assert_eq!(cpu.step(&bt, &mut blackboard), Ok(Status::None));
+    cpu.stack.push(StackItem::failure());// push answer to prayer onto stack
+    //step 9
+    pout!("ticking:{:?}", cpu.pc);
+    assert_eq!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
         &vec![
@@ -124,40 +186,58 @@ fn step_test() {
         ]
     );
     assert_eq!(&cpu.return_stack, &vec![(selector.clone(), 0)]);
-    //step 8 sequence sees it's last child has returned failure to returns failure to select
-    assert_eq!(cpu.step(&bt, &mut blackboard), Ok(Status::None));
+    //step 10
+    pout!("ticking:{:?}", cpu.pc);
+    assert_eq!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
         &vec![StackItem::selector(1), StackItem::failure()]
     );
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
-    //step 9 selector sees it's first child has returned failure so puts it's new state and then init on the stack and set up the cpu to run it's second child, action3
-    assert_eq!(cpu.step(&bt, &mut blackboard), Ok(Status::None));
+    //step 11
+    pout!("ticking:{:?}", cpu.pc);
+    assert_eq!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
     assert_eq!(&cpu.stack, &vec![StackItem::selector(2), StackItem::init()]);
     assert_eq!(&cpu.return_stack, &vec![(selector.clone(), 0)]);
-    //step 10 action3 sees init and puts Success on tha stack and prays Running(3)
+    //step 12
+    pout!("ticking:{:?}", cpu.pc);
     assert_eq!(
-        cpu.step(&bt, &mut blackboard),
+        cpu.step(&task_db, &mut blackboard),
+        Ok(Status::None)
+    );
+    assert_eq!(
+        &cpu.stack,
+        &vec![StackItem::selector(2)]
+    );
+    assert_eq!(&cpu.return_stack, &vec![(selector.clone(), 0)]);
+    //step 13
+    pout!("ticking:{:?}", cpu.pc);
+    assert_eq!(
+        cpu.step(&task_db, &mut blackboard),
         Ok(Status::Running(InpulseId::Act3))
     );
     assert_eq!(
         &cpu.stack,
-        &vec![StackItem::selector(2), StackItem::success()]
+        &vec![StackItem::selector(2)]
     );
     assert_eq!(&cpu.return_stack, &vec![(selector, 0)]);
-    //step 11 action3 sees the success on the stack and returns it to the calling function
-    assert_eq!(cpu.step(&bt, &mut blackboard), Ok(Status::None));
+    cpu.stack.push(StackItem::success());//answer the prayer
+    //step 14
+    pout!("ticking:{:?}", cpu.pc);
+    assert_eq!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
         &vec![StackItem::selector(2), StackItem::success()]
     );
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
-    //step 12 selection sees its it's child return success then seens its' has no calling function so holts execution and prays Success
-    assert_eq!(cpu.step(&bt, &mut blackboard), Ok(Status::Success));
+    //step 15
+    pout!("ticking:{:?}", cpu.pc);
+    assert_eq!(cpu.step(&task_db, &mut blackboard), Ok(Status::Success));
     assert_eq!(&cpu.stack, &vec![StackItem::success()]);
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
-    //step 13 the program has is holted
-    assert_eq!(cpu.step(&bt, &mut blackboard), Err("program halted".into()));
+    //step 16
+    pout!("ticking:{:?}", cpu.pc);
+    assert_eq!(cpu.step(&task_db, &mut blackboard), Err("program halted".into()));
     assert_eq!(&cpu.stack, &vec![StackItem::success()]);
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
 }
@@ -166,17 +246,17 @@ fn step_test() {
 fn test() {
     let mut blackboard = Blackboard::new();
 
-    let mut bt = HashMap::<ThreadName, Thread>::new();
+    let mut task_db = HashMap::<ThreadName, Thread>::new();
     let action1 = "a1".to_owned();
-    bt.insert(action1.clone(), vec![Instruction::ForthAction(InpulseId::Act1)]);
+    task_db.insert(action1.clone(), vec![Instruction::ForthAction(InpulseId::Act1)]);
 
     let action2 = "a2".to_owned();
-    bt.insert(action2.clone(), vec![Instruction::ForthAction(InpulseId::Act2)]);
+    task_db.insert(action2.clone(), vec![Instruction::ForthAction(InpulseId::Act2)]);
     let action3 = "a3".to_owned();
-    bt.insert(action3.clone(), vec![Instruction::ForthAction(InpulseId::Act3)]);
+    task_db.insert(action3.clone(), vec![Instruction::ForthAction(InpulseId::Act3)]);
 
     let sequence = "seq".to_owned();
-    bt.insert(
+    task_db.insert(
         sequence.clone(),
         vec![Instruction::Sequence(vec![
             action1.clone(),
@@ -185,7 +265,7 @@ fn test() {
     );
 
     let selector = "sel".to_owned();
-    bt.insert(
+    task_db.insert(
         selector.clone(),
         vec![Instruction::Selector(vec![
             sequence.clone(),
@@ -197,7 +277,7 @@ fn test() {
 
     for _ in 0..13 {
         //            println!("----\nStack:{stack:?}\nreturn_stack:{rs:?}");
-        match cpu.step(&bt, &mut blackboard) {
+        match cpu.step(&task_db, &mut blackboard) {
             Ok(ok) => {
                 println!("{ok:?}");
             }
