@@ -40,8 +40,6 @@ clear_for_garden /* (coord -- bool) */ = forth{
     take_all
     swap
     drop
-    lit(Success)
-    eq
     return
 };
 set_garden = forth {
