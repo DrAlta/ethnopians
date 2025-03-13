@@ -210,13 +210,15 @@ fn main2(
                     retain_entities_of_type_idx += 1;
                 },
                 Status::Running(inpulse_id) => {
+                    logy!("log", "doing dummy inpule {running_idx}. : {inpulse_id:?}");
                     match &inpulse_id {
                         ethnolib::sandbox::ai::InpulseId::EatClass(_) =>(),
+                        ethnolib::sandbox::ai::InpulseId::Use |
                         ethnolib::sandbox::ai::InpulseId::Take |
                         ethnolib::sandbox::ai::InpulseId::GoTo => {
                             cpu.stack.pop();
                         }
-                        _ => panic!()
+                        _ => panic!("unhandled inpulse")
                     }
                     prayers.push((running_idx, Player::Running(inpulse_id)));
                     

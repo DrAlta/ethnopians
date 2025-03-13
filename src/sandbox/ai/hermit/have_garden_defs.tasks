@@ -1,4 +1,4 @@
-get_my_home_location = forth {
+get_my_home_location /* ( -- coord ) */ = forth {
     lit("self")
     get_blackboard
     some_entity_id
@@ -31,11 +31,6 @@ check_if_clear_for_garden /* (coord -- bool) */ = forth{
     is_empty
     swap
     drop
-    if
-        lit(Success)
-        return
-    then
-    lit(Failure)
     return
 };
 clear_for_garden /* (coord -- bool) */ = forth{

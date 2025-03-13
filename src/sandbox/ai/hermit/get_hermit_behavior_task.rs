@@ -34,7 +34,7 @@ take_entity = forth{
     then
 
 };
-take_all /* (table -- Success/Failure) */ = forth{
+take_all /* (table -- bool) */ = forth{
     pop_last
     some_entity_id
     if
@@ -48,12 +48,8 @@ take_all /* (table -- Success/Failure) */ = forth{
     then
     lit(False)
     eq
-    if
-        lit(Success)
-        return
-    then
+    swap
     drop
-    lit(Failure)
     return
 }"#
     };
