@@ -1,18 +1,10 @@
 use std::collections::HashMap;
 
 
-use ethnolib::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, Instruction, StackItem, Variable}, EntityId, Item};
+use crate::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, Instruction, StackItem, Variable}, EntityId, Item};
 
-/*
-enum Prayer{
-    FindInInventory { item_class},
-
-}
-*/
-fn main(){
-    have_garden_test()
-}
-fn have_garden_test(){
+#[test]
+fn check_if_clear_for_garden_false_test(){
     // Set up the world
     let my_self = EntityId::from_raw(0);
     let house = EntityId::from_raw(5);
@@ -70,7 +62,7 @@ fn have_garden_test(){
     task_testing_harness(
         "check_if_clear_for_garden_test",
         task_db,
-        vec![StackItem::success()],
+        vec![StackItem::False],
         find_in_inventory,
         find_nearest,
         get_entities,
@@ -82,10 +74,10 @@ fn have_garden_test(){
         blackboard, 
         item_types,
     )
-
 }
-#[allow(dead_code)]
-fn foofoo(){
+#[test]
+fn check_if_clear_for_garden_true_test(){
+    // Set up the world
     let my_self = EntityId::from_raw(0);
     let house = EntityId::from_raw(5);
     let garden_1 = EntityId::from_raw(51);
@@ -95,10 +87,10 @@ fn foofoo(){
     let item_types: HashMap<bevy::ecs::entity::Entity, Item> = HashMap::from([
         (my_self, Item::Agent),
         (house, Item::House),
-        (garden_1, Item::Stone),
-        (garden_2, Item::Stone),
-        (garden_3, Item::Stone),
-        (garden_4, Item::Stone),
+        (garden_1, Item::Veggie),
+        (garden_2, Item::Agent),
+        (garden_3, Item::Veggie),
+        (garden_4, Item::Agent),
     ]);
 
     let mut blackboard: Blackboard<String, BlackboardValue> = Blackboard::new();
@@ -110,6 +102,8 @@ fn foofoo(){
         "food".to_owned(),
         Variable::Chit(BlackboardValue::String("Veggie".to_owned())),
     );
+
+    // set up  the dummy values
     let find_in_inventory = vec![];
     let find_nearest = vec![house];
     let get_entities = vec![
@@ -120,21 +114,27 @@ fn foofoo(){
             (StackItem::Int(3), StackItem::EntityId(garden_4)),
         ].try_into().unwrap()
     ];
-    let get_energy = vec![7];
+    let get_energy = vec![4];
 
     let get_location = vec![
         (6,9),
     ];
     let get_hp= vec![4];
-    let get_is_inventory_ge = vec![true];
+    let get_is_inventory_ge = vec![false];
     let running = vec![true];
 
-    let task_db = get_hermit_behavior_task();
+    let mut task_db = get_hermit_behavior_task();
+
+    task_db.insert("check_if_clear_for_garden_test".to_owned(), vec![
+        Instruction::ForthDrop,
+        Instruction::ForthLit(StackItem::Coord { x: 4, y: 2 }),
+        Instruction::ForthJump("check_if_clear_for_garden".to_owned(), 0),
+    ]);
 
     task_testing_harness(
-        "hermit",
+        "check_if_clear_for_garden_test",
         task_db,
-        Vec::new(),
+        vec![StackItem::True],
         find_in_inventory,
         find_nearest,
         get_entities,
