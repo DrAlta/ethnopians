@@ -55,7 +55,7 @@ impl Clone for StackItem {
             //StackItem::Init => StackItem::Init,
             StackItem::Int(x) => StackItem::Int(x.clone()),
             StackItem::True => StackItem::True,
-            StackItem::False => StackItem::True,
+            StackItem::False => StackItem::False,
             StackItem::Coord { x, y } => StackItem::Coord {
                 x: x.clone(),
                 y: y.clone(),
