@@ -128,6 +128,7 @@ have_garden /* ( -- Success/Failure) */ = forth {
         dup
         lit(x: -10, y: 5)
         add
+        dup
         clear_for_garden
         if
             set_garden
@@ -139,6 +140,7 @@ have_garden /* ( -- Success/Failure) */ = forth {
         dup
         lit(x: 5, y: -10)
         add
+        dup
         clear_for_garden
         if
             set_garden
@@ -150,6 +152,7 @@ have_garden /* ( -- Success/Failure) */ = forth {
         dup
         lit(x: -25, y: -10)
         add
+        dup
         clear_for_garden
         if
             set_garden
@@ -161,6 +164,7 @@ have_garden /* ( -- Success/Failure) */ = forth {
         dup
         lit(x: -10, y: -25)
         add
+        dup
         clear_for_garden
         if
             set_garden
