@@ -456,20 +456,21 @@ impl Instruction {
                 stack.push(x);
                 Self::next(Status::None, pc)
             }
+            // like "!"'s stack diagram is "( n adr -- ). This uses TOS of the key and stores NOS under it
             Instruction::ForthSetBlackboard => {
                 if stack.len() < 2 {
                     return Err("less that 2 items on stack".to_owned());
                 };
-                let Some(StackItem::String(_)) = stack.get(stack.len() - 2) else {
-                    return Err("no nos".to_owned());
-                };
-                let Some(tos) = stack.pop() else {
-                    unreachable!()
+                let Some(StackItem::String(_)) = stack.last() else {
+                    return Err("tos not a string".to_owned());
                 };
                 let Some(StackItem::String(key)) = stack.pop() else {
                     unreachable!()
                 };
-                blackboard.insert(key, crate::sandbox::ai::Variable::Chit(tos.into()));
+                let Some(nos) = stack.pop() else {
+                    unreachable!()
+                };
+                blackboard.insert(key, crate::sandbox::ai::Variable::Chit(nos.into()));
                 Self::next(Status::None, pc)
             }
             Instruction::ForthStuff => {

@@ -61,7 +61,7 @@ pub enum Instruction {
     ForthPopLast,
     ForthRem,
     ForthReturn,
-    //(v, String) puts v into the blackboard under String
+    //(v, String -- ) puts v into the blackboard under String
     ForthSetBlackboard,
     //(Table, v, k -- bool) stuffs v into the table under k returns true if the stuffing was successful false other wise
     ForthStuff,
