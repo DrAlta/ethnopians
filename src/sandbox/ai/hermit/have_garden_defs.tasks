@@ -45,4 +45,5 @@ clear_for_garden /* (coord -- bool) */ = forth{
 set_garden = forth {
     lit("garden_location")
     set_blackboard
+    return
 }
