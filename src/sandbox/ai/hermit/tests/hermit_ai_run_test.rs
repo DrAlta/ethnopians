@@ -28,6 +28,9 @@ fn hermit_ai_run_test() {
         );
         match cpu.step(&task_db, &mut blackboard) {
             Ok(status) => match status {
+                Status::UseOn(_a, _b) =>{
+                    todo!()
+                }
                 Status::FindInInventory { item_class: _ } =>{
                     todo!()
                 }

@@ -66,6 +66,10 @@ pub fn task_testing_harness(
         );
         match cpu.step(&task_db, &mut blackboard) {
             Ok(status) => match status {
+                Status::UseOn(_a, _b) => {
+                    logy!("log", "givving Succes for using {_a} on {_b}");
+                    cpu.stack.push(StackItem::success());
+                }
                 Status::FindInInventory { item_class } =>{
                     prayers.push((find_in_inventory_idx, Prayer::FindInInventory { item_class}));
 

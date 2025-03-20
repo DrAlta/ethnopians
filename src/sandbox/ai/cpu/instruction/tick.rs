@@ -25,13 +25,18 @@ impl Instruction {
                     pc
                 );
             },
-            Instruction::Combine(_, _) => todo!(),
+            Instruction::Combine(a, b) => {
+                *pc = return_stack.pop();
+                stack.pop();
+                Ok(Status::UseOn(a.clone(), b.clone()))
+            },
             Instruction::Eat(x) => {
 
                 let Some(class_id) = blackboard.get(x) else {
                     return Err(format!("couldn't find {x} in blackboard"))
                 };
                 match class_id {
+                    BlackboardValue::Coord {.. } |
                     BlackboardValue::EntityId(_) => {
                         Err(format!("{x} was an EntityId not a class"))
                     },
@@ -315,10 +320,7 @@ impl Instruction {
                 });
                 */
                 stack.push(match blackboard.get(&key) {
-                    Some(x) => StackItem::Option(match x {
-                        BlackboardValue::EntityId(y) => Box::new(StackItem::EntityId(y.clone())),
-                        BlackboardValue::String(a) => Box::new(StackItem::String(a.clone())),
-                    }),
+                    Some(x) => StackItem::Option(Box::new(x.into())),
                     None => StackItem::none(),
                 });
                 Self::next(Status::None, pc)

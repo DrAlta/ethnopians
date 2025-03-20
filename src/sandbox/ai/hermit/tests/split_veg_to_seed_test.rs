@@ -1,18 +1,11 @@
 use std::collections::HashMap;
 
 
-use ethnolib::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, StackItem, Variable}, EntityId, Item};
+use crate::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, StackItem, Variable}, EntityId, Item};
 
-/*
-enum Prayer{
-    FindInInventory { item_class},
 
-}
-*/
-fn main(){
-    plant_vegs_test()
-}
-fn plant_vegs_test(){
+#[test]
+fn split_veg_to_seed_test(){
     // Set up the world
     let my_self = EntityId::from_raw(0);
     let house = EntityId::from_raw(5);

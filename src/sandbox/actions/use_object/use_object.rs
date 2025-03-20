@@ -100,6 +100,8 @@ pub fn use_object(
         Item::Agent => todo!(),
         Item::Axe => todo!(),
         Item::Food => todo!(),
+        Item::Knife => todo!(),
+        Item::Seed => todo!(),
         Item::Stone => todo!(),
         Item::Stick => todo!(),
         Item::Wood => todo!(),

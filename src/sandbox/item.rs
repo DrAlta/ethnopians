@@ -9,6 +9,8 @@ pub enum Item {
     Wood,
 
     House,
+    Knife,
+    Seed,
     Tree,
     Veggie,
 }
@@ -22,6 +24,8 @@ impl std::fmt::Display for Item {
                 Item::Agent => "Agent",
                 Item::Axe => "Axe",
                 Item::Food => "Food",
+                Item::Knife => "Knife",
+                Item::Seed => "Seed",
                 Item::Stone => "Stone",
                 Item::Stick => "Stick",
                 Item::Wood => "Wood",
@@ -50,6 +54,8 @@ impl TryFrom<&str> for Item {
             Item::Axe
         } else if value.eq_ignore_ascii_case("Food") {
             Item::Food
+        } else if value.eq_ignore_ascii_case("Knife") {
+            Item::Knife
         } else if value.eq_ignore_ascii_case("Stone") {
             Item::Stone
         } else if value.eq_ignore_ascii_case("Stick") {
@@ -58,6 +64,8 @@ impl TryFrom<&str> for Item {
             Item::Wood
         } else if value.eq_ignore_ascii_case("House") {
             Item::House
+        } else if value.eq_ignore_ascii_case("Seed") {
+            Item::Seed
         } else if value.eq_ignore_ascii_case("Tree") {
             Item::Tree
         } else if value.eq_ignore_ascii_case("Veggie") {

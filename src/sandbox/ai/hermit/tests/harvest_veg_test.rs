@@ -1,18 +1,10 @@
 use std::collections::HashMap;
 
 
-use ethnolib::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, StackItem, Variable}, EntityId, Item};
+use crate::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, StackItem, Variable}, EntityId, Item};
 
-/*
-enum Prayer{
-    FindInInventory { item_class},
-
-}
-*/
-fn main(){
-    plant_vegs_test()
-}
-fn plant_vegs_test(){
+#[test]
+fn harvest_veg_test(){
     // Set up the world
     let my_self = EntityId::from_raw(0);
     let house = EntityId::from_raw(5);
@@ -34,17 +26,13 @@ fn plant_vegs_test(){
         "self".to_owned(),
         Variable::Chit(BlackboardValue::EntityId(my_self)),
     );
-    blackboard.insert(// I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
-        "knife".to_owned(),
-        Variable::Chit(BlackboardValue::String("Knife".to_owned())),
-    );
-    blackboard.insert(// I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
-        "stone".to_owned(),
-        Variable::Chit(BlackboardValue::String("Stone".to_owned())),
+    blackboard.insert(
+        "garden_location".to_owned(),
+        Variable::Chit(BlackboardValue::Coord{x: 4, y: 2}),
     );
 
     // set up  the dummy values
-    let find_in_inventory = vec![ EntityId::from_raw(70)];
+    let find_in_inventory = vec![];
     let find_nearest = vec![house];
     let get_entities = vec![
         [
@@ -60,13 +48,13 @@ fn plant_vegs_test(){
         (6,9),
     ];
     let get_hp= vec![4];
-    let get_is_inventory_ge = vec![false, true];
+    let get_is_inventory_ge = vec![false];
     let running = vec![true];
 
     let task_db = get_hermit_behavior_task();
 
     task_testing_harness(
-        "split_veg_to_seed",
+        "harvest_veg",
         task_db,
         vec![StackItem::success()],
         find_in_inventory,

@@ -179,6 +179,7 @@ have_garden /* ( -- Success/Failure) */ = forth {
 };
 harvest_veg = forth{
     lit("garden_location")
+    get_blackboard
     some_coord
     if
         lit(x: 20, y: 20)
@@ -186,8 +187,11 @@ harvest_veg = forth{
         lit("Veggie")
         retain_entities_of_type
         take_all
-        swap
-        drop
+        if
+            lit(Success)
+            return
+        then
+        lit(Failure)
         return
     then
     drop

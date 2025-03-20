@@ -163,18 +163,3 @@ impl<const N: usize> TryFrom<[(&str, StackItem); N]> for StackItem {
     }
 }
 
-impl From<i32> for StackItem {
-    fn from(value: i32) -> Self {
-        Self::Int(value)
-    }
-}
-impl From<String> for StackItem {
-    fn from(value: String) -> Self {
-        Self::String(value)
-    }
-}
-impl From<&str> for StackItem {
-    fn from(value: &str) -> Self {
-        Self::String(value.to_owned())
-    }
-}

@@ -37,7 +37,7 @@ impl CPU {
             return Err("failed to get thread {token}".into());
         };
         let Some(i) = thread.get(*idx) else {
-            return Err("failed to get instruction{idx} from thread {token}".into());
+            return Err(format!("failed to get instruction{idx} from thread {token}"));
         };
         i.tick(
             &mut self.stack,

@@ -1,4 +1,4 @@
-have_2_stone_02 = sel{
+have_2_stone_02 /* ( -- Success/Failure) */= sel{
     inventory_have_ge(stone, 2),
     forth {
         lit("self")
@@ -13,6 +13,7 @@ have_2_stone_02 = sel{
                 some_entity_id
                 if
                     dup
+                    get_location
                     some_coord
                     if
                         go_to
@@ -26,6 +27,7 @@ have_2_stone_02 = sel{
                 then
             then
         then
+        drop
         lit(Failure)
         return
     }
