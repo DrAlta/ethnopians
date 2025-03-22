@@ -7,11 +7,22 @@ use crate::sandbox::{ai::{Blackboard, BlackboardValue, InpulseId, StackItem, Sta
 
 type Prayer = Status;
 
+#[derive(Debug)]
+enum Info {
+    Result,
+    Standard,
+}
+impl std::cmp::PartialEq for Info{
+    fn eq(&self, other: &Self) -> bool {
+        true
+    }
+}
+
 
 pub fn task_testing_harness(
     task: &str,
     task_db: HashMap<String, Vec<super::Instruction>>,
-    final_stack: crate::sandbox::ai::Stack,
+    what_final_stack_should_be: crate::sandbox::ai::Stack,
     find_in_inventory: Vec<EntityId>,
     find_nearest: Vec<EntityId>,
     get_entities: Vec<StackItem>,
@@ -53,7 +64,7 @@ pub fn task_testing_harness(
             for x in prayers {
                 pout!("{x:?}");
             };
-            assert_eq!(final_stack, cpu.stack);
+            assert_eq!((Info::Result, cpu.stack), (Info::Standard, what_final_stack_should_be));
             return
         }
 

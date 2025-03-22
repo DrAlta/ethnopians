@@ -66,7 +66,7 @@ fn plant_vegs_test(){
     let task_db = get_hermit_behavior_task();
 
     task_testing_harness(
-        "split_veg_to_seed",
+        "plant_vegs",
         task_db,
         vec![StackItem::success()],
         find_in_inventory,

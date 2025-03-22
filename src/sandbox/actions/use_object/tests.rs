@@ -4,13 +4,13 @@ use crate::{
     sandbox::{
         actions::{use_object::UseRequest, PosibleActionsRequest, PosibleActionsResponce},
         world::Type,
-        EntityId, Item, Location,
+        Item, Location,
     },
     types::ActionId,
 };
 
 use super::*;
-
+/*
 #[derive(Component)]
 struct AgentIdObjectId(EntityId, EntityId);
 fn test_system(
@@ -26,7 +26,7 @@ fn test_system(
         commands.entity(id).despawn();
     }
 }
-
+*/
 #[test]
 pub fn no_agent_test() {
     std::env::set_var("RUST_BACKTRACE", "1");
@@ -34,11 +34,14 @@ pub fn no_agent_test() {
     app.add_event::<UseRequest>();
     app.add_event::<PosibleActionsRequest>();
     app.add_event::<PosibleActionsResponce>();
-    app.add_systems(Update, (test_system, use_object_system).chain());
+    app.add_systems(Update, use_object_system);
     let target_id = app.world_mut().spawn(Type(Item::Food)).id();
 
     app.world_mut()
-        .spawn(AgentIdObjectId(Entity::from_raw(0), target_id));
+        .send_event(PosibleActionsRequest {
+            agent_id: Entity::from_raw(0),
+            target_id,
+        });
 
     app.update();
 
@@ -54,7 +57,7 @@ pub fn someones_else_object_test() {
     app.add_event::<UseRequest>();
     app.add_event::<PosibleActionsRequest>();
     app.add_event::<PosibleActionsResponce>();
-    app.add_systems(Update, (test_system, use_object_system).chain());
+    app.add_systems(Update, use_object_system);
     let owner_id = app.world_mut().spawn(Type(Item::Food)).id();
     let target_id = app
         .world_mut()
@@ -62,7 +65,10 @@ pub fn someones_else_object_test() {
         .id();
     let agent_id = app.world_mut().spawn(Type(Item::Agent)).id();
 
-    app.world_mut().spawn(AgentIdObjectId(agent_id, target_id));
+    app.world_mut().send_event(PosibleActionsRequest {
+        agent_id,
+        target_id,
+    });
 
     app.update();
 
@@ -77,7 +83,7 @@ pub fn agent_in_another_world_test() {
     app.add_event::<UseRequest>();
     app.add_event::<PosibleActionsRequest>();
     app.add_event::<PosibleActionsResponce>();
-    app.add_systems(Update, (test_system, use_object_system).chain());
+    app.add_systems(Update, use_object_system);
     let world_id = app.world_mut().spawn(Type(Item::House)).id();
     let agent_id = app
         .world_mut()
@@ -88,7 +94,11 @@ pub fn agent_in_another_world_test() {
         .spawn((Type(Item::Veggie), Location::World { x: 1.0, y: 1.0 }))
         .id();
 
-    app.world_mut().spawn(AgentIdObjectId(agent_id, target_id));
+    app.world_mut()
+        .send_event(PosibleActionsRequest {
+            agent_id,
+            target_id,
+        });
 
     app.update();
 
@@ -103,7 +113,7 @@ pub fn too_far_test() {
     app.add_event::<UseRequest>();
     app.add_event::<PosibleActionsRequest>();
     app.add_event::<PosibleActionsResponce>();
-    app.add_systems(Update, (test_system, use_object_system).chain());
+    app.add_systems(Update, use_object_system);
     let target_id = app
         .world_mut()
         .spawn((Type(Item::Veggie), Location::World { x: 0.0, y: 0.0 }))
@@ -113,8 +123,10 @@ pub fn too_far_test() {
         .spawn((Type(Item::Agent), Location::World { x: 0.0, y: 100.0 }))
         .id();
 
-    app.world_mut().spawn(AgentIdObjectId(agent_id, target_id));
-
+    app.world_mut().send_event(PosibleActionsRequest {
+        agent_id,
+        target_id,
+    });
     app.update();
 
     let response_events = app.world().resource::<Events<PosibleActionsResponce>>();
@@ -128,14 +140,18 @@ pub fn no_object_location_test() {
     app.add_event::<UseRequest>();
     app.add_event::<PosibleActionsRequest>();
     app.add_event::<PosibleActionsResponce>();
-    app.add_systems(Update, (test_system, use_object_system).chain());
+    app.add_systems(Update, use_object_system);
     let target_id = app.world_mut().spawn(Type(Item::Veggie)).id();
     let agent_id = app
         .world_mut()
         .spawn((Type(Item::Agent), Location::World { x: 0.0, y: 0.0 }))
         .id();
 
-    app.world_mut().spawn(AgentIdObjectId(agent_id, target_id));
+    app.world_mut()
+    .send_event(PosibleActionsRequest {
+        agent_id,
+        target_id,
+    });
 
     app.update();
 
@@ -150,7 +166,7 @@ pub fn no_object_type_test() {
     app.add_event::<UseRequest>();
     app.add_event::<PosibleActionsRequest>();
     app.add_event::<PosibleActionsResponce>();
-    app.add_systems(Update, (test_system, use_object_system).chain());
+    app.add_systems(Update, use_object_system);
     let target_id = app
         .world_mut()
         .spawn(Location::World { x: 0.0, y: 0.0 })
@@ -160,7 +176,10 @@ pub fn no_object_type_test() {
         .spawn((Type(Item::Agent), Location::World { x: 0.0, y: 0.0 }))
         .id();
 
-    app.world_mut().spawn(AgentIdObjectId(agent_id, target_id));
+    app.world_mut().send_event(PosibleActionsRequest {
+        agent_id,
+        target_id,
+    });
 
     app.update();
 
@@ -175,7 +194,7 @@ pub fn use_test() {
     app.add_event::<UseRequest>();
     app.add_event::<PosibleActionsRequest>();
     app.add_event::<PosibleActionsResponce>();
-    app.add_systems(Update, (test_system, use_object_system).chain());
+    app.add_systems(Update, use_object_system);
 
     let agent_id = app
         .world_mut()
@@ -186,7 +205,10 @@ pub fn use_test() {
         .spawn((Type(Item::Veggie), Location::Inventory(agent_id)))
         .id();
 
-    app.world_mut().spawn(AgentIdObjectId(agent_id, target_id));
+    app.world_mut().send_event(PosibleActionsRequest {
+        agent_id,
+        target_id,
+    });
 
     app.update();
 

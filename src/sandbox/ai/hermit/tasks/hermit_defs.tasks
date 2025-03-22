@@ -237,6 +237,7 @@ plant_vegs = forth {
             return
         then
     then
+    drop
     lit(Failure)
     return
 }
