@@ -210,7 +210,8 @@ plant_vegs = forth {
         swap /* coord True*/
         dup /* True coord */
         plant_row /* True coord coord */
-        plant_vegs_02 /* True coord True/False */
+        plant_vegs_02 /* True coord TrueFalse */
+        debug("what is here")
         dup
         lit(x:0, y: 5)
         add
@@ -237,6 +238,7 @@ plant_vegs = forth {
             return
         then
     then
+    drop
     drop
     lit(Failure)
     return

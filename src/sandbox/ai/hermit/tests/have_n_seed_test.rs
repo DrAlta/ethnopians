@@ -1,18 +1,11 @@
 use std::collections::HashMap;
 
 
-use ethnolib::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, Instruction, StackItem, Variable}, EntityId, Item};
+use crate::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, Instruction, StackItem, Variable}, EntityId, Item};
 
-/*
-enum Prayer{
-    FindInInventory { item_class},
 
-}
-*/
-fn main(){
-    plant_vegs_test()
-}
-fn plant_vegs_test(){
+#[test]
+fn have_n_seed_test(){
     // Set up the world
     let my_self = EntityId::from_raw(0);
     let house = EntityId::from_raw(5);
@@ -67,13 +60,14 @@ fn plant_vegs_test(){
     task_db.insert("have_n_seed_test".to_owned(), vec![
         Instruction::ForthDrop,
         Instruction::ForthLit(StackItem::Int(1)),
-        Instruction::ForthCall("have_n_seed".to_owned(), 0)
+        Instruction::ForthCall("have_n_seed".to_owned(), 0),
+        Instruction::ForthReturn,
     ]);
     
     task_testing_harness(
         "have_n_seed_test",
         task_db,
-        vec![StackItem::success()],
+        vec![StackItem::True],
         find_in_inventory,
         find_nearest,
         get_entities,

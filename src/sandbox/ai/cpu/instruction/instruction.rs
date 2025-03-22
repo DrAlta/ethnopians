@@ -74,6 +74,7 @@ pub enum Instruction {
     //(x -- (x false or Int true))
     ForthSomeInt,
     ForthSwap,
+    // (??? -- Succes/Failure)  Should change this to True/False but currently it uses the same prayer as the BT's InventortGE
     ForthInventoryGE,
     ForthIsEmpty,
     ForthRemoveEntitiesOfType,

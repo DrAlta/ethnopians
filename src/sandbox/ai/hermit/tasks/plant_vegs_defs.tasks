@@ -1,17 +1,20 @@
-have_n_seed = forth{
+have_n_seed /*( int == True/False ) */ = forth{
     dup
     lit("Seed")
     inventory_have_ge
+    lit(Success)
+    eq
     if
         drop
-        lit(Success)
+        lit(True)
         return
     then
-    split_veg_to_seed
-    lit(Success)
-    not_true
+    split_veg_to_seed  /*int */
+    lit(Success)  /*int success/failure*/
+    eq /*int success/failure Sucess*/
+    not_true /*int true/false */
     if
-        lit(Failure)
+        lit(False)
         return
     then
     jump(have_n_seed)

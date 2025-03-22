@@ -104,7 +104,7 @@ pub fn forth_threadette_parser<'a>(
                     logy!("error", "we shouldn't find a 'then'");
                     return Err(());
                 }
-                "if" | "lit" | "jump" => return Err(()),
+                "if" | "lit" | "jump" | "debug" => return Err(()),
                 _ => (),
             };
             let a = tuple((forth_threadette_parser_2, eof))(x);
@@ -131,6 +131,13 @@ mod tests {
         let (tail, (head, _pool)) = forth_threadette_parser(source).unwrap();
         assert_eq!(tail, "");
         assert_eq!(head, vec![Instruction::ForthCall("gfoo".to_owned(), 0)])
+    }
+    #[test]
+    fn debug_test() {
+        let source = r#"debug("test")"#;
+        let (tail, (head, _pool)) = forth_threadette_parser(source).unwrap();
+        assert_eq!(tail, "");
+        assert_eq!(head, vec![Instruction::Debug("test".to_owned())])
     }
     #[test]
     fn jump_test() {
