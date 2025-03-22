@@ -14,6 +14,7 @@ use crate::sandbox::ai::{
 pub enum Instruction {
     // takes two Blackboard keys that points to ItemClass
     Combine(BlackboardKey, BlackboardKey),
+    Debug(String),
     // takes a Blackboard key that points to an ItemClass
     Eat(BlackboardKey),
     // takes a Blackboard key that points to an ItemClass and u8 of the number to compare to

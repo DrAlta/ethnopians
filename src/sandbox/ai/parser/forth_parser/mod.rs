@@ -7,6 +7,8 @@ pub use comparison::{
     eq_parser, ge_parser, gt_parser, is_int_parser, le_parser, lt_parser, not_true_parser,
     or_parser, some_coord_parser, some_entity_id_parser, some_int_parser,
 };
+mod debug_statement_parser;
+pub use debug_statement_parser::debug_statement_parser;
 mod distance_parser;
 pub use distance_parser::distance_parser;
 mod forth_parser;

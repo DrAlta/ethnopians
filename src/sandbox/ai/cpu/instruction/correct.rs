@@ -71,6 +71,7 @@ impl Instruction {
             | Instruction::ForthNotTrue
             | Instruction::ForthInventoryGE
             | Instruction::ForthRot
+            | Instruction::Debug(_)
             | Instruction::ForthIf(_) => (),
         }
     }

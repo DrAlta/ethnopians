@@ -1,4 +1,4 @@
-plant_row_02 /*(Coord Int -- Succes/Failure) plants seed  at Int multiples of  [x:5,Y:0] from coord  */= forth{
+plant_row_02 /*(Coord Int -- True/False) plants seed  at Int multiples of  [x:5,Y:0] from coord  */= forth{
     dup
     lit(4)
     lt
@@ -16,10 +16,10 @@ plant_row_02 /*(Coord Int -- Succes/Failure) plants seed  at Int multiples of  [
             sub
             jump(plant_row_02)
         then
-        lit(Failure)
+        lit(False)
         return
     then
     drop
-    lit(Success)
+    lit(True)
     return
 }

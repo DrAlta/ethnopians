@@ -206,11 +206,11 @@ plant_vegs = forth {
     get_blackboard
     some_coord
     if
-        lit(True)
-        swap
-        dup
-        plant_row
-        plant_vegs_02
+        lit(True) /* coord */
+        swap /* coord True*/
+        dup /* True coord */
+        plant_row /* True coord coord */
+        plant_vegs_02 /* True coord True/False */
         dup
         lit(x:0, y: 5)
         add

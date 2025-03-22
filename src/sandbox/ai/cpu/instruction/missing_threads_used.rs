@@ -73,6 +73,7 @@ impl Instruction {
             | Instruction::ForthNotTrue
             | Instruction::ForthInventoryGE
             | Instruction::ForthRot
+            | Instruction::Debug(_)
             | Instruction::ForthIf(_) => (),
             Instruction::ForthTree(token) => {
                 if !bt.contains_key(token) {

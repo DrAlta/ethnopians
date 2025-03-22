@@ -16,15 +16,20 @@ have_n_seed = forth{
     then
     jump(have_n_seed)
 };
-plant_row = forth{
+plant_row /* ( coord -- True/False ) */ = forth{
     dup
     plant_seed
-    lit(0)
-    plant_row_02
-};
-plant_vegs_02 = forth{
     lit(Success)
     eq
+    if
+        lit(0)
+        plant_row_02
+        return
+    then
+    lit(False)
+    return
+};
+plant_vegs_02 /* ( bool x bool -- bool x ) or the tos and 3rd item on the stack then returns the result in nos with the nos when called the new tos */ = forth{
     rot
     or
     swap

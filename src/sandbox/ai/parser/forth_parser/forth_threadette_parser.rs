@@ -25,10 +25,13 @@ use crate::sandbox::ai::{
     Instruction, Thread, TreePool,
 };
 
+use super::debug_statement_parser;
+
 pub fn forth_threadette_parser_2<'a>(
     input: &'a str,
 ) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
     alt((
+        debug_statement_parser,
         //table
         alt((
             is_empty_parser,

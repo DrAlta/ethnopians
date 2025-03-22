@@ -30,6 +30,10 @@ impl Instruction {
                 stack.pop();
                 Ok(Status::UseOn(a.clone(), b.clone()))
             },
+            Instruction::Debug(x) => {
+                logy!("debug", "{x}");
+                Self::next(Status::None, pc)
+            }
             Instruction::Eat(x) => {
 
                 let Some(class_id) = blackboard.get(x) else {
