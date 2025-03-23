@@ -8,8 +8,9 @@ pub fn plant_parser<'a>(
     let (tail, _body) = tag("plant")(input)?;
     Ok((
         tail,
-        (vec![
-            Instruction::ForthAction(InpulseId::Plant),
-        ], TreePool::new()),
+        (
+            vec![Instruction::ForthAction(InpulseId::Plant)],
+            TreePool::new(),
+        ),
     ))
 }

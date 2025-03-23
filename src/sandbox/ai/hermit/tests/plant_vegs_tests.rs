@@ -1,11 +1,15 @@
 use std::collections::HashMap;
 
-
-use crate::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, StackItem, Variable}, EntityId, Item};
-
+use crate::sandbox::{
+    ai::{
+        get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, StackItem,
+        Variable,
+    },
+    EntityId, Item,
+};
 
 #[test]
-fn plant_vegs_fail_to_read_garden_from_blackboard_test(){
+fn plant_vegs_fail_to_read_garden_from_blackboard_test() {
     // Set up the world
     let my_self = EntityId::from_raw(0);
     let house = EntityId::from_raw(5);
@@ -27,37 +31,37 @@ fn plant_vegs_fail_to_read_garden_from_blackboard_test(){
         "self".to_owned(),
         Variable::Chit(BlackboardValue::EntityId(my_self)),
     );
-    blackboard.insert(// I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
+    blackboard.insert(
+        // I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
         "knife".to_owned(),
         Variable::Chit(BlackboardValue::String("Knife".to_owned())),
     );
-    blackboard.insert(// I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
+    blackboard.insert(
+        // I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
         "stone".to_owned(),
         Variable::Chit(BlackboardValue::String("Stone".to_owned())),
     );
 
     // set up  the dummy values
-    let find_in_inventory = vec![ EntityId::from_raw(70)];
+    let find_in_inventory = vec![EntityId::from_raw(70)];
     let find_nearest = vec![house];
-    let get_entities = vec![
-        [
-            (StackItem::Int(0), StackItem::EntityId(garden_1)),
-            (StackItem::Int(1), StackItem::EntityId(garden_2)),
-            (StackItem::Int(2), StackItem::EntityId(garden_3)),
-            (StackItem::Int(3), StackItem::EntityId(garden_4)),
-        ].try_into().unwrap()
-    ];
+    let get_entities = vec![[
+        (StackItem::Int(0), StackItem::EntityId(garden_1)),
+        (StackItem::Int(1), StackItem::EntityId(garden_2)),
+        (StackItem::Int(2), StackItem::EntityId(garden_3)),
+        (StackItem::Int(3), StackItem::EntityId(garden_4)),
+    ]
+    .try_into()
+    .unwrap()];
     let get_energy = vec![4];
 
-    let get_location = vec![
-        (6,9),
-    ];
-    let get_hp= vec![4];
+    let get_location = vec![(6, 9)];
+    let get_hp = vec![4];
     let get_is_inventory_ge = vec![false, true, true, true];
     let running = vec![true];
 
     let task_db = get_hermit_behavior_task();
-    
+
     task_testing_harness(
         "plant_vegs",
         task_db,
@@ -70,7 +74,7 @@ fn plant_vegs_fail_to_read_garden_from_blackboard_test(){
         get_hp,
         get_is_inventory_ge,
         running,
-        blackboard, 
+        blackboard,
         item_types,
     )
 }

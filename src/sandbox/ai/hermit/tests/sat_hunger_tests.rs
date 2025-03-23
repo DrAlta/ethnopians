@@ -1,12 +1,16 @@
 use std::collections::HashMap;
 
-
-use crate::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, StackItem, Variable}, EntityId, Item};
-
+use crate::sandbox::{
+    ai::{
+        get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, StackItem,
+        Variable,
+    },
+    EntityId, Item,
+};
 
 // "energy is grather that 5"
 #[test]
-fn sat_hunger_test_t(){
+fn sat_hunger_test_t() {
     // set up the world
     let my_self = EntityId::from_raw(0);
     let house = EntityId::from_raw(5);
@@ -36,20 +40,18 @@ fn sat_hunger_test_t(){
     // set up  the dummy values
     let find_in_inventory = vec![];
     let find_nearest = vec![house];
-    let get_entities = vec![
-        [
-            (StackItem::Int(0), StackItem::EntityId(garden_1)),
-            (StackItem::Int(1), StackItem::EntityId(garden_2)),
-            (StackItem::Int(2), StackItem::EntityId(garden_3)),
-            (StackItem::Int(3), StackItem::EntityId(garden_4)),
-        ].try_into().unwrap()
-    ];
+    let get_entities = vec![[
+        (StackItem::Int(0), StackItem::EntityId(garden_1)),
+        (StackItem::Int(1), StackItem::EntityId(garden_2)),
+        (StackItem::Int(2), StackItem::EntityId(garden_3)),
+        (StackItem::Int(3), StackItem::EntityId(garden_4)),
+    ]
+    .try_into()
+    .unwrap()];
     let get_energy = vec![7];
 
-    let get_location = vec![
-        (6,9),
-    ];
-    let get_hp= vec![4];
+    let get_location = vec![(6, 9)];
+    let get_hp = vec![4];
     let get_is_inventory_ge = vec![true];
     let running = vec![true];
 
@@ -67,14 +69,13 @@ fn sat_hunger_test_t(){
         get_hp,
         get_is_inventory_ge,
         running,
-        blackboard, 
+        blackboard,
         item_types,
     )
-
 }
 // 'got 4 for energy', "energy not greater than 5", 'greater than or equal than 1 food in invitory', 'eat successful'
 #[test]
-fn sat_hunger_test_ft(){
+fn sat_hunger_test_ft() {
     // Set up the world
     let my_self = EntityId::from_raw(0);
     let house = EntityId::from_raw(5);
@@ -104,20 +105,18 @@ fn sat_hunger_test_ft(){
     // set up  the dummy values
     let find_in_inventory = vec![];
     let find_nearest = vec![house];
-    let get_entities = vec![
-        [
-            (StackItem::Int(0), StackItem::EntityId(garden_1)),
-            (StackItem::Int(1), StackItem::EntityId(garden_2)),
-            (StackItem::Int(2), StackItem::EntityId(garden_3)),
-            (StackItem::Int(3), StackItem::EntityId(garden_4)),
-        ].try_into().unwrap()
-    ];
+    let get_entities = vec![[
+        (StackItem::Int(0), StackItem::EntityId(garden_1)),
+        (StackItem::Int(1), StackItem::EntityId(garden_2)),
+        (StackItem::Int(2), StackItem::EntityId(garden_3)),
+        (StackItem::Int(3), StackItem::EntityId(garden_4)),
+    ]
+    .try_into()
+    .unwrap()];
     let get_energy = vec![4];
 
-    let get_location = vec![
-        (6,9),
-    ];
-    let get_hp= vec![4];
+    let get_location = vec![(6, 9)];
+    let get_hp = vec![4];
     let get_is_inventory_ge = vec![true];
     let running = vec![true];
 
@@ -135,14 +134,13 @@ fn sat_hunger_test_ft(){
         get_hp,
         get_is_inventory_ge,
         running,
-        blackboard, 
+        blackboard,
         item_types,
     )
-
 }
 // 'got 4 for energy', "energy not greater than 5", 'not greater than or equal than 1 food in invitory', 'eat successful'
 #[test]
-fn sat_hunger_test_ff(){
+fn sat_hunger_test_ff() {
     // Set up the world
     let my_self = EntityId::from_raw(0);
     let house = EntityId::from_raw(5);
@@ -175,11 +173,8 @@ fn sat_hunger_test_ff(){
     let get_entities = vec![];
     let get_energy = vec![4];
 
-    let get_location = vec![
-        (6,1),
-        (6,2),
-    ];
-    let get_hp= vec![];
+    let get_location = vec![(6, 1), (6, 2)];
+    let get_hp = vec![];
     let get_is_inventory_ge = vec![false, false];
     let running = vec![true, true, true];
     // done setting up dummy values
@@ -189,7 +184,7 @@ fn sat_hunger_test_ff(){
     task_testing_harness(
         "sat_hunger",
         task_db,
-    vec![StackItem::success()],
+        vec![StackItem::success()],
         find_in_inventory,
         find_nearest,
         get_entities,
@@ -198,7 +193,7 @@ fn sat_hunger_test_ff(){
         get_hp,
         get_is_inventory_ge,
         running,
-        blackboard, 
+        blackboard,
         item_types,
     )
 }

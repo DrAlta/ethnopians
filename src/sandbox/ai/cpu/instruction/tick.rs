@@ -2,9 +2,10 @@ use qol::logy;
 
 use crate::sandbox::ai::{
     cpu::{
-        Instruction, instruction::{tick_selector, tick_sequence}, Prayer, ProgramCounter,
-        ReturnStack, Stack,
-    }, Blackboard, BlackboardKey, BlackboardValue, InpulseId, StackItem, Status
+        instruction::{tick_selector, tick_sequence},
+        Instruction, Prayer, ProgramCounter, ReturnStack, Stack,
+    },
+    Blackboard, BlackboardKey, BlackboardValue, InpulseId, StackItem, Status,
 };
 
 impl Instruction {
@@ -18,50 +19,38 @@ impl Instruction {
         logy!("debug", "ticking:{self:?}");
         match self {
             Instruction::ForthAction(action_id) => {
-//                *pc = return_stack.pop();
+                //                *pc = return_stack.pop();
 
-                return Self::next(
-                    Status::Running(action_id.clone()), 
-                    pc
-                );
-            },
+                return Self::next(Status::Running(action_id.clone()), pc);
+            }
             Instruction::Combine(a, b) => {
                 *pc = return_stack.pop();
                 stack.pop();
                 Ok(Status::UseOn(a.clone(), b.clone()))
-            },
+            }
             Instruction::Debug(x) => {
                 logy!("debug", "{x}");
                 Self::next(Status::None, pc)
             }
             Instruction::Eat(x) => {
-
                 let Some(class_id) = blackboard.get(x) else {
-                    return Err(format!("couldn't find {x} in blackboard"))
+                    return Err(format!("couldn't find {x} in blackboard"));
                 };
                 match class_id {
-                    BlackboardValue::Coord {.. } |
-                    BlackboardValue::EntityId(_) => {
+                    BlackboardValue::Coord { .. } | BlackboardValue::EntityId(_) => {
                         Err(format!("{x} was an EntityId not a class"))
-                    },
+                    }
                     BlackboardValue::String(y) => {
-                        assert_eq!(
-                            Some(StackItem::init()),
-                            stack.pop()
-                        ); // popping in init off the stack
+                        assert_eq!(Some(StackItem::init()), stack.pop()); // popping in init off the stack
                         let Some(parent_token) = return_stack.pop() else {
                             return Err("nothing to return to".to_owned());
                         };
                         // return to calling fuction
                         *pc = Some(parent_token);
-                        Ok(
-                            Status::Running(
-                                InpulseId::EatClass(y.clone())
-                            )
-                        )
-                    },
+                        Ok(Status::Running(InpulseId::EatClass(y.clone())))
+                    }
                 }
-            },
+            }
             Instruction::InventoryGE(key, amount) => {
                 let Some(StackItem::String(x)) = stack.last() else {
                     return Err("tos was not an Init".to_owned());
@@ -157,7 +146,7 @@ impl Instruction {
             }
             Instruction::ForthEq => {
                 if stack.len() < 2 {
-                    return Err("less that two items on the stack".to_owned())
+                    return Err("less that two items on the stack".to_owned());
                 };
                 let tos = stack.pop().unwrap();
                 let nos = stack.pop().unwrap();

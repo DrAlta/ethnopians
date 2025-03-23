@@ -8,7 +8,7 @@ pub struct EmotionalState {
     rage: f32,
     /// fear is the response to the detection of threats to our survival and set into motion a biobehavioral response that would facilitate fighting or fleeing
     fear: f32,
-    /// 
+    ///
     lust: f32,
     /// care_activation = (perceived_need_the_suject_has_for_protection * kawaii_of_subject) +  (perceived_need_the_suject_has_for_protection * emational_attachment_to_subject)
     care: f32,
@@ -34,7 +34,8 @@ impl EmotionalState {
         // Arousal computation:
         // We use the average level of all emotions as a proxy for arousal.
         // When all values are at 0.5, the result will be neutral.
-        let total = self.seeking + self.rage + self.fear + self.lust + self.care + self.panic + self.play;
+        let total =
+            self.seeking + self.rage + self.fear + self.lust + self.care + self.panic + self.play;
         let arousal_raw = total / 7.0;
         // Map raw arousal from [0, 1] to [-1, 1]:
         let mut arousal = 2.0 * arousal_raw - 1.0;

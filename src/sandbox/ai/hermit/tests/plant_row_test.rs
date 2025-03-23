@@ -1,11 +1,15 @@
 use std::collections::HashMap;
 
-
-use crate::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, Instruction, StackItem, Variable}, EntityId, Item};
-
+use crate::sandbox::{
+    ai::{
+        get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, Instruction,
+        StackItem, Variable,
+    },
+    EntityId, Item,
+};
 
 #[test]
-fn plant_row_test(){
+fn plant_row_test() {
     // Set up the world
     let my_self = EntityId::from_raw(0);
     let house = EntityId::from_raw(5);
@@ -27,15 +31,18 @@ fn plant_row_test(){
         "self".to_owned(),
         Variable::Chit(BlackboardValue::EntityId(my_self)),
     );
-    blackboard.insert(// I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
+    blackboard.insert(
+        // I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
         "knife".to_owned(),
         Variable::Chit(BlackboardValue::String("Knife".to_owned())),
     );
-    blackboard.insert(// I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
+    blackboard.insert(
+        // I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
         "stone".to_owned(),
         Variable::Chit(BlackboardValue::String("Stone".to_owned())),
     );
-    blackboard.insert(// I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
+    blackboard.insert(
+        // I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
         "garden_location".to_owned(),
         Variable::Chit(BlackboardValue::Coord { x: 6, y: 9 }),
     );
@@ -47,18 +54,21 @@ fn plant_row_test(){
     let get_energy = vec![];
 
     let get_location = vec![];
-    let get_hp= vec![];
+    let get_hp = vec![];
     let get_is_inventory_ge = vec![];
     let running = vec![true, true, true, true, true, true, true, true, true, true];
     // end setting up dummy values
 
     let mut task_db = get_hermit_behavior_task();
-    task_db.insert("plant_row_test".to_owned(), vec![
-        Instruction::ForthDrop,
-        Instruction::ForthLit(StackItem::Coord { x: 6, y: 9 }),
-        Instruction::ForthCall("plant_row".to_owned(), 0),
-        Instruction::ForthReturn,
-    ]);
+    task_db.insert(
+        "plant_row_test".to_owned(),
+        vec![
+            Instruction::ForthDrop,
+            Instruction::ForthLit(StackItem::Coord { x: 6, y: 9 }),
+            Instruction::ForthCall("plant_row".to_owned(), 0),
+            Instruction::ForthReturn,
+        ],
+    );
 
     task_testing_harness(
         "plant_row_test",
@@ -72,7 +82,7 @@ fn plant_row_test(){
         get_hp,
         get_is_inventory_ge,
         running,
-        blackboard, 
+        blackboard,
         item_types,
     )
 }

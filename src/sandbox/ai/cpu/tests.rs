@@ -13,12 +13,33 @@ fn step_test() {
 
     let mut task_db = TreePool::new();
     let action1 = "act1".to_owned();
-    task_db.insert(action1.clone(), vec![Instruction::ForthDrop, Instruction::ForthAction(InpulseId::Act1), Instruction::ForthReturn]);
+    task_db.insert(
+        action1.clone(),
+        vec![
+            Instruction::ForthDrop,
+            Instruction::ForthAction(InpulseId::Act1),
+            Instruction::ForthReturn,
+        ],
+    );
 
     let action2 = "act2".to_owned();
-    task_db.insert(action2.clone(), vec![Instruction::ForthDrop, Instruction::ForthAction(InpulseId::Act2), Instruction::ForthReturn]);
+    task_db.insert(
+        action2.clone(),
+        vec![
+            Instruction::ForthDrop,
+            Instruction::ForthAction(InpulseId::Act2),
+            Instruction::ForthReturn,
+        ],
+    );
     let action3 = "act3".to_owned();
-    task_db.insert(action3.clone(), vec![Instruction::ForthDrop, Instruction::ForthAction(InpulseId::Act3), Instruction::ForthReturn]);
+    task_db.insert(
+        action3.clone(),
+        vec![
+            Instruction::ForthDrop,
+            Instruction::ForthAction(InpulseId::Act3),
+            Instruction::ForthReturn,
+        ],
+    );
 
     let sequence = "seq".to_owned();
     task_db.insert(
@@ -36,23 +57,23 @@ fn step_test() {
     );
 
     /*
-    crate::sandbox::ai::task_testing_harness(
-        &selector,
-        task_db,
-        Vec::new(),
-        Vec::new(),
-        Vec::new(),
-        Vec::new(),
-        Vec::new(),
-        Vec::new(),
-        Vec::new(),
-        Vec::new(),
-        vec![true],
-        blackboard, 
-        HashMap::new(),
-    );
-}
-*/
+        crate::sandbox::ai::task_testing_harness(
+            &selector,
+            task_db,
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            vec![true],
+            blackboard,
+            HashMap::new(),
+        );
+    }
+    */
     let mut cpu = CPU::load(selector.clone());
     //step 1 selectpr does its init and sets the cpu up to call its first child, sequence.
     pout!("ticking:{:?}", cpu.pc);
@@ -76,16 +97,10 @@ fn step_test() {
     );
     //step 3
     pout!("ticking:{:?}", cpu.pc);
-    assert_eq!(
-        cpu.step(&task_db, &mut blackboard),
-        Ok(Status::None)
-    );
+    assert_eq!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
-        &vec![
-            StackItem::selector(1),
-            StackItem::sequence(1),
-        ]
+        &vec![StackItem::selector(1), StackItem::sequence(1),]
     );
     assert_eq!(
         &cpu.return_stack,
@@ -100,10 +115,7 @@ fn step_test() {
     );
     assert_eq!(
         &cpu.stack,
-        &vec![
-            StackItem::selector(1),
-            StackItem::sequence(1),
-        ]
+        &vec![StackItem::selector(1), StackItem::sequence(1),]
     );
     assert_eq!(
         &cpu.return_stack,
@@ -111,7 +123,7 @@ fn step_test() {
     );
     assert_eq!(&cpu.pc, &Some((action1, 2)));
     cpu.stack.push(StackItem::success()); // push the asnswer to the prayer
-    //step 5
+                                          //step 5
     pout!("ticking:{:?}", cpu.pc);
     assert_eq!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
     assert_eq!(
@@ -141,16 +153,10 @@ fn step_test() {
     );
     //step 7
     pout!("ticking:{:?}", cpu.pc);
-    assert_eq!(
-        cpu.step(&task_db, &mut blackboard),
-        Ok(Status::None)
-    );
+    assert_eq!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
     assert_eq!(
         &cpu.stack,
-        &vec![
-            StackItem::selector(1),
-            StackItem::sequence(2),
-        ]
+        &vec![StackItem::selector(1), StackItem::sequence(2),]
     );
     assert_eq!(
         &cpu.return_stack,
@@ -164,17 +170,14 @@ fn step_test() {
     );
     assert_eq!(
         &cpu.stack,
-        &vec![
-            StackItem::selector(1),
-            StackItem::sequence(2),
-        ]
+        &vec![StackItem::selector(1), StackItem::sequence(2),]
     );
     assert_eq!(
         &cpu.return_stack,
         &vec![(selector.clone(), 0), (sequence, 0)]
     );
-    cpu.stack.push(StackItem::failure());// push answer to prayer onto stack
-    //step 9
+    cpu.stack.push(StackItem::failure()); // push answer to prayer onto stack
+                                          //step 9
     pout!("ticking:{:?}", cpu.pc);
     assert_eq!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
     assert_eq!(
@@ -201,14 +204,8 @@ fn step_test() {
     assert_eq!(&cpu.return_stack, &vec![(selector.clone(), 0)]);
     //step 12
     pout!("ticking:{:?}", cpu.pc);
-    assert_eq!(
-        cpu.step(&task_db, &mut blackboard),
-        Ok(Status::None)
-    );
-    assert_eq!(
-        &cpu.stack,
-        &vec![StackItem::selector(2)]
-    );
+    assert_eq!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
+    assert_eq!(&cpu.stack, &vec![StackItem::selector(2)]);
     assert_eq!(&cpu.return_stack, &vec![(selector.clone(), 0)]);
     //step 13
     pout!("ticking:{:?}", cpu.pc);
@@ -216,13 +213,10 @@ fn step_test() {
         cpu.step(&task_db, &mut blackboard),
         Ok(Status::Running(InpulseId::Act3))
     );
-    assert_eq!(
-        &cpu.stack,
-        &vec![StackItem::selector(2)]
-    );
+    assert_eq!(&cpu.stack, &vec![StackItem::selector(2)]);
     assert_eq!(&cpu.return_stack, &vec![(selector, 0)]);
-    cpu.stack.push(StackItem::success());//answer the prayer
-    //step 14
+    cpu.stack.push(StackItem::success()); //answer the prayer
+                                          //step 14
     pout!("ticking:{:?}", cpu.pc);
     assert_eq!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
     assert_eq!(
@@ -237,7 +231,10 @@ fn step_test() {
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
     //step 16
     pout!("ticking:{:?}", cpu.pc);
-    assert_eq!(cpu.step(&task_db, &mut blackboard), Err("program halted".into()));
+    assert_eq!(
+        cpu.step(&task_db, &mut blackboard),
+        Err("program halted".into())
+    );
     assert_eq!(&cpu.stack, &vec![StackItem::success()]);
     assert_eq!(&cpu.return_stack, &ReturnStack::new());
 }
@@ -248,12 +245,21 @@ fn test() {
 
     let mut task_db = HashMap::<ThreadName, Thread>::new();
     let action1 = "a1".to_owned();
-    task_db.insert(action1.clone(), vec![Instruction::ForthAction(InpulseId::Act1)]);
+    task_db.insert(
+        action1.clone(),
+        vec![Instruction::ForthAction(InpulseId::Act1)],
+    );
 
     let action2 = "a2".to_owned();
-    task_db.insert(action2.clone(), vec![Instruction::ForthAction(InpulseId::Act2)]);
+    task_db.insert(
+        action2.clone(),
+        vec![Instruction::ForthAction(InpulseId::Act2)],
+    );
     let action3 = "a3".to_owned();
-    task_db.insert(action3.clone(), vec![Instruction::ForthAction(InpulseId::Act3)]);
+    task_db.insert(
+        action3.clone(),
+        vec![Instruction::ForthAction(InpulseId::Act3)],
+    );
 
     let sequence = "seq".to_owned();
     task_db.insert(

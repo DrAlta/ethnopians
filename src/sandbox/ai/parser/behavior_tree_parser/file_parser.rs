@@ -8,12 +8,8 @@ use crate::sandbox::ai::{
     Instruction, Thread, ThreadName, TreePool,
 };
 use nom::{
-    character::complete::char,
-    combinator::map_res,
-    error::ErrorKind,
-    multi::separated_list1,
-    sequence::tuple,
-    IResult,
+    character::complete::char, combinator::map_res, error::ErrorKind, multi::separated_list1,
+    sequence::tuple, IResult,
 };
 
 pub fn file_parser<'a>(

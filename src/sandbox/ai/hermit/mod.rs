@@ -13,7 +13,7 @@ pub const HERMIT_DEFS: &str = include_str!("tasks/hermit_defs.tasks");
 pub const PLANT_ROW_02_DEFS: &str = include_str!("tasks/plant_row_02_defs.tasks");
 pub const PLANT_ROW_DEFS: &str = include_str!("tasks/plant_row_defs.tasks");
 pub const PLANT_VEGS_DEFS: &str = include_str!("tasks/plant_vegs_defs.tasks");
-pub const SAT_HUNGER_DEFS: &str =  include_str!("tasks/sat_hunger_defs.tasks");
+pub const SAT_HUNGER_DEFS: &str = include_str!("tasks/sat_hunger_defs.tasks");
 
 #[cfg(test)]
 mod tests;

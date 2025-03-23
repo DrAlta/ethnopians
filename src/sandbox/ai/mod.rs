@@ -13,8 +13,8 @@ use std::collections::HashMap;
 
 mod cpu;
 pub use cpu::{
-    task_testing_harness,
-    Blackboard, BlackboardValue, Instruction, Stack, StackItem, TableGet, TableInterior, Variable, CPU,
+    task_testing_harness, Blackboard, BlackboardValue, Instruction, Stack, StackItem, TableGet,
+    TableInterior, Variable, CPU,
 };
 mod behavior_tree;
 pub use behavior_tree::Corrent;

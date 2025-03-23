@@ -24,7 +24,7 @@ impl fmt::Display for StackItem {
                         write!(f, ", {}: {}", key, value)?;
                     }
                 }
-                 // Close the object.
+                // Close the object.
                 write!(f, "}}")
             }
         }

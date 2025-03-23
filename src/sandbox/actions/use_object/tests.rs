@@ -37,11 +37,10 @@ pub fn no_agent_test() {
     app.add_systems(Update, use_object_system);
     let target_id = app.world_mut().spawn(Type(Item::Food)).id();
 
-    app.world_mut()
-        .send_event(PosibleActionsRequest {
-            agent_id: Entity::from_raw(0),
-            target_id,
-        });
+    app.world_mut().send_event(PosibleActionsRequest {
+        agent_id: Entity::from_raw(0),
+        target_id,
+    });
 
     app.update();
 
@@ -94,11 +93,10 @@ pub fn agent_in_another_world_test() {
         .spawn((Type(Item::Veggie), Location::World { x: 1.0, y: 1.0 }))
         .id();
 
-    app.world_mut()
-        .send_event(PosibleActionsRequest {
-            agent_id,
-            target_id,
-        });
+    app.world_mut().send_event(PosibleActionsRequest {
+        agent_id,
+        target_id,
+    });
 
     app.update();
 
@@ -147,8 +145,7 @@ pub fn no_object_location_test() {
         .spawn((Type(Item::Agent), Location::World { x: 0.0, y: 0.0 }))
         .id();
 
-    app.world_mut()
-    .send_event(PosibleActionsRequest {
+    app.world_mut().send_event(PosibleActionsRequest {
         agent_id,
         target_id,
     });

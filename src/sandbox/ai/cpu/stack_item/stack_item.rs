@@ -162,4 +162,3 @@ impl<const N: usize> TryFrom<[(&str, StackItem); N]> for StackItem {
         Ok(ret)
     }
 }
-

@@ -1,11 +1,15 @@
 use std::collections::HashMap;
 
-
-use crate::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, StackItem, Variable}, EntityId, Item};
-
+use crate::sandbox::{
+    ai::{
+        get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, StackItem,
+        Variable,
+    },
+    EntityId, Item,
+};
 
 #[test]
-fn have_knife_test(){
+fn have_knife_test() {
     // Set up the world
     let my_self = EntityId::from_raw(0);
     let house = EntityId::from_raw(5);
@@ -27,11 +31,13 @@ fn have_knife_test(){
         "self".to_owned(),
         Variable::Chit(BlackboardValue::EntityId(my_self)),
     );
-    blackboard.insert(// I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
+    blackboard.insert(
+        // I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
         "knife".to_owned(),
         Variable::Chit(BlackboardValue::String("Knife".to_owned())),
     );
-    blackboard.insert(// I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
+    blackboard.insert(
+        // I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
         "stone".to_owned(),
         Variable::Chit(BlackboardValue::String("Stone".to_owned())),
     );
@@ -42,12 +48,9 @@ fn have_knife_test(){
     let get_entities = vec![];
     let get_energy = vec![];
 
-    let get_location = vec![
-        (6,1),
-        (6,2),
-    ];
-    let get_hp= vec![];
-    let get_is_inventory_ge = vec![false, true, false, ];
+    let get_location = vec![(6, 1), (6, 2)];
+    let get_hp = vec![];
+    let get_is_inventory_ge = vec![false, true, false];
     let running = vec![true, true];
     // end seting up dummy values
 
@@ -65,7 +68,7 @@ fn have_knife_test(){
         get_hp,
         get_is_inventory_ge,
         running,
-        blackboard, 
+        blackboard,
         item_types,
     )
 }

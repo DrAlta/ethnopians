@@ -1,4 +1,12 @@
-use crate::sandbox::ai::{hermit::{HAVE_2_STONE_DEFS, HAVE_2_WOOD_02_DEFS, HAVE_2_WOOD_DEFS, HAVE_AXE_DEFS, HAVE_GARDEN_DEFS, HAVE_HOUSE_DEFS, HAVE_KNIFE_DEFS, HAVE_N_SEEDS_DEFS, HERMIT_DEFS, PLANT_ROW_02_DEFS, PLANT_ROW_DEFS, PLANT_VEGS_DEFS, SAT_HUNGER_DEFS}, parser::file_parser, TreePool};
+use crate::sandbox::ai::{
+    hermit::{
+        HAVE_2_STONE_DEFS, HAVE_2_WOOD_02_DEFS, HAVE_2_WOOD_DEFS, HAVE_AXE_DEFS, HAVE_GARDEN_DEFS,
+        HAVE_HOUSE_DEFS, HAVE_KNIFE_DEFS, HAVE_N_SEEDS_DEFS, HERMIT_DEFS, PLANT_ROW_02_DEFS,
+        PLANT_ROW_DEFS, PLANT_VEGS_DEFS, SAT_HUNGER_DEFS,
+    },
+    parser::file_parser,
+    TreePool,
+};
 macro_rules! foofoo {
     // `$x` followed by at least one `$y,`
     ($($y:expr,)+) => (
@@ -73,7 +81,8 @@ take_all /* (table -- bool) */ = forth{
         PLANT_ROW_DEFS,
         PLANT_ROW_02_DEFS,
     ]
-    .into_iter() {
+    .into_iter()
+    {
         let (tail, new_db) = file_parser(source).expect("{idx} didn't parse");
         assert_eq!((tail, idx), ("", idx));
         db.extend(new_db.into_iter());

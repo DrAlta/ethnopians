@@ -21,7 +21,10 @@ impl From<&BlackboardValue> for StackItem {
         match value {
             BlackboardValue::EntityId(entity) => Self::EntityId(entity.clone()),
             BlackboardValue::String(x) => Self::String(x.clone()),
-            BlackboardValue::Coord { x, y } =>Self::Coord { x: x.clone(), y: y.clone() },
+            BlackboardValue::Coord { x, y } => Self::Coord {
+                x: x.clone(),
+                y: y.clone(),
+            },
         }
     }
 }
@@ -30,7 +33,7 @@ impl From<BlackboardValue> for StackItem {
         match value {
             BlackboardValue::EntityId(entity) => Self::EntityId(entity),
             BlackboardValue::String(x) => Self::String(x),
-            BlackboardValue::Coord { x, y } =>Self::Coord { x, y: y },
+            BlackboardValue::Coord { x, y } => Self::Coord { x, y: y },
         }
     }
 }

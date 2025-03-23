@@ -1,9 +1,15 @@
 use std::collections::HashMap;
 
-use crate::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, Instruction, StackItem, Variable}, EntityId, Item};
+use crate::sandbox::{
+    ai::{
+        get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, Instruction,
+        StackItem, Variable,
+    },
+    EntityId, Item,
+};
 
 #[test]
-fn clear_for_garden_test(){
+fn clear_for_garden_test() {
     // Set up the world
     let my_self = EntityId::from_raw(0);
     let house = EntityId::from_raw(5);
@@ -33,23 +39,18 @@ fn clear_for_garden_test(){
     // set up  the dummy values
     let find_in_inventory = vec![];
     let find_nearest = vec![];
-    let get_entities = vec![
-        [
-            (StackItem::Int(0), StackItem::EntityId(garden_1)),
-            (StackItem::Int(1), StackItem::EntityId(garden_2)),
-            (StackItem::Int(2), StackItem::EntityId(garden_3)),
-            (StackItem::Int(3), StackItem::EntityId(garden_4)),
-        ].try_into().unwrap()
-    ];
+    let get_entities = vec![[
+        (StackItem::Int(0), StackItem::EntityId(garden_1)),
+        (StackItem::Int(1), StackItem::EntityId(garden_2)),
+        (StackItem::Int(2), StackItem::EntityId(garden_3)),
+        (StackItem::Int(3), StackItem::EntityId(garden_4)),
+    ]
+    .try_into()
+    .unwrap()];
     let get_energy = vec![];
 
-    let get_location = vec![
-        (6,1),
-        (6,2),
-        (6,3),
-        (6,4),
-    ];
-    let get_hp= vec![];
+    let get_location = vec![(6, 1), (6, 2), (6, 3), (6, 4)];
+    let get_hp = vec![];
     let get_is_inventory_ge = vec![];
     let running = vec![true, true, true, true, true, true, true, true];
 
@@ -57,11 +58,14 @@ fn clear_for_garden_test(){
 
     let mut task_db = get_hermit_behavior_task();
 
-    task_db.insert("clear_for_garden_test".to_owned(), vec![
-        Instruction::ForthDrop,
-        Instruction::ForthLit(StackItem::Coord { x: 4, y: 2 }),
-        Instruction::ForthJump("clear_for_garden".to_owned(), 0),
-    ]);
+    task_db.insert(
+        "clear_for_garden_test".to_owned(),
+        vec![
+            Instruction::ForthDrop,
+            Instruction::ForthLit(StackItem::Coord { x: 4, y: 2 }),
+            Instruction::ForthJump("clear_for_garden".to_owned(), 0),
+        ],
+    );
 
     task_testing_harness(
         "clear_for_garden_test",
@@ -75,7 +79,7 @@ fn clear_for_garden_test(){
         get_hp,
         get_is_inventory_ge,
         running,
-        blackboard, 
+        blackboard,
         item_types,
     )
 }

@@ -6,10 +6,7 @@ use nom::{
     IResult,
 };
 
-use crate::sandbox::ai::{
-    parser::space_parser,
-    Instruction, Thread, TreePool,
-};
+use crate::sandbox::ai::{parser::space_parser, Instruction, Thread, TreePool};
 
 pub fn debug_statement_parser<'a>(
     input: &'a str,
@@ -19,13 +16,16 @@ pub fn debug_statement_parser<'a>(
         space_parser,
         char('('),
         space_parser,
-        char('"'), 
+        char('"'),
         take_until("\""),
         char('"'),
         space_parser,
         char(')'),
     ))(input)?;
-    Ok((tail, (vec![Instruction::Debug(body.to_owned())], TreePool::new())))
+    Ok((
+        tail,
+        (vec![Instruction::Debug(body.to_owned())], TreePool::new()),
+    ))
 }
 
 #[cfg(test)]
@@ -39,12 +39,9 @@ mod tests {
         let (tail, body) = debug_statement_parser(input).unwrap();
         assert_eq!(tail, "");
         assert_eq!(
-            body, (
-                vec![
-                    Instruction::Debug(
-                        r#"This if some %$^#^ stuff"#.to_owned()
-                    )
-                ],
+            body,
+            (
+                vec![Instruction::Debug(r#"This if some %$^#^ stuff"#.to_owned())],
                 TreePool::new()
             )
         )

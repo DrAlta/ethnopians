@@ -8,8 +8,9 @@ pub fn use_parser<'a>(
     let (tail, _body) = tag("use")(input)?;
     Ok((
         tail,
-        (vec![
-            Instruction::ForthAction(InpulseId::Use),
-        ], TreePool::new()),
+        (
+            vec![Instruction::ForthAction(InpulseId::Use)],
+            TreePool::new(),
+        ),
     ))
 }
