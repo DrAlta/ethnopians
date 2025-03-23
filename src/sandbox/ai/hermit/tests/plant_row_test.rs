@@ -41,24 +41,16 @@ fn plant_row_test(){
     );
 
     // set up  the dummy values
-    let find_in_inventory = vec![ EntityId::from_raw(70), EntityId::from_raw(71)];
-    let find_nearest = vec![house];
-    let get_entities = vec![
-        [
-            (StackItem::Int(0), StackItem::EntityId(garden_1)),
-            (StackItem::Int(1), StackItem::EntityId(garden_2)),
-            (StackItem::Int(2), StackItem::EntityId(garden_3)),
-            (StackItem::Int(3), StackItem::EntityId(garden_4)),
-        ].try_into().unwrap()
-    ];
-    let get_energy = vec![4];
+    let find_in_inventory = vec![EntityId::from_raw(70), EntityId::from_raw(71)];
+    let find_nearest = vec![];
+    let get_entities = vec![];
+    let get_energy = vec![];
 
-    let get_location = vec![
-        (6,9),
-    ];
-    let get_hp= vec![4];
-    let get_is_inventory_ge = vec![false, true, true, true];
-    let running = vec![true];
+    let get_location = vec![];
+    let get_hp= vec![];
+    let get_is_inventory_ge = vec![];
+    let running = vec![true, true, true, true, true, true, true, true, true, true];
+    // end setting up dummy values
 
     let mut task_db = get_hermit_behavior_task();
     task_db.insert("plant_row_test".to_owned(), vec![
