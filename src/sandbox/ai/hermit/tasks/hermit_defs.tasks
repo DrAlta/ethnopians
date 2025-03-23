@@ -201,45 +201,47 @@ harvest_veg = forth{
 plant_vegs = forth {
     lit(12)
     have_n_seed
-    drop
-    lit("garden_location")
-    get_blackboard
-    some_coord
     if
-        lit(True) /* coord */
-        swap /* coord True*/
-        dup /* True coord */
-        plant_row /* True coord coord */
-        plant_vegs_02 /* True coord TrueFalse */
-        debug("what is here")
-        dup
-        lit(x:0, y: 5)
-        add
-        plant_row
-        plant_vegs_02
-        dup
-        lit(x:0, y: 5)
-        add
-        plant_row
-        plant_vegs_02
-        dup
-        lit(x:0, y: 5)
-        add
-        plant_row
-        plant_vegs_02
-        dup
-        lit(x:0, y: 5)
-        add
-        plant_row
-        plant_vegs_02
-        drop
+        lit("garden_location")
+        get_blackboard
+        some_coord
         if
-            lit(Success)
-            return
+            lit(True) /* coord */
+            swap /* coord True*/
+            dup /* True coord */
+            plant_row /* True coord coord */
+            plant_vegs_02 /* True coord TrueFalse */
+            if
+                debug("what is here")
+                dup
+                lit(x:0, y: 5)
+                add
+                plant_row
+                plant_vegs_02
+                dup
+                lit(x:0, y: 5)
+                add
+                plant_row
+                plant_vegs_02
+                dup
+                lit(x:0, y: 5)
+                add
+                plant_row
+                plant_vegs_02
+                dup
+                lit(x:0, y: 5)
+                add
+                plant_row
+                plant_vegs_02
+                drop
+                if
+                    lit(Success)
+                    return
+                then
+            then
         then
+        drop
     then
-    drop
-    drop
     lit(Failure)
     return
 }

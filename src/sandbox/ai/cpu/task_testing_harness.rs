@@ -189,12 +189,15 @@ pub fn task_testing_harness(
                         InpulseId::Act2 |
                         InpulseId::Act3 |
                         InpulseId::EatClass(_) =>(),
+
                         InpulseId::Use |
                         InpulseId::Take |
+                        InpulseId::Plant |
                         InpulseId::GoTo => {
                             cpu.stack.pop();
                         }
-                        _ => panic!("unhandled inpulse")
+
+                        //_ => panic!("unhandled inpulse")
                     }
                     prayers.push((running_idx, Prayer::Running(inpulse_id)));
                     

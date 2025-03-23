@@ -1,18 +1,11 @@
 use std::collections::HashMap;
 
 
-use ethnolib::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, StackItem, Variable}, EntityId, Item};
+use crate::sandbox::{ai::{get_hermit_behavior_task, task_testing_harness, Blackboard, BlackboardValue, StackItem, Variable}, EntityId, Item};
 
-/*
-enum Prayer{
-    FindInInventory { item_class},
 
-}
-*/
-fn main(){
-    plant_vegs_test()
-}
-fn plant_vegs_test(){
+#[test]
+fn plant_vegs_fail_to_read_garden_from_blackboard_test(){
     // Set up the world
     let my_self = EntityId::from_raw(0);
     let house = EntityId::from_raw(5);
@@ -42,13 +35,9 @@ fn plant_vegs_test(){
         "stone".to_owned(),
         Variable::Chit(BlackboardValue::String("Stone".to_owned())),
     );
-    blackboard.insert(// I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
-        "garden_location".to_owned(),
-        Variable::Chit(BlackboardValue::Coord { x: 6, y: 9 }),
-    );
 
     // set up  the dummy values
-    let find_in_inventory = vec![ EntityId::from_raw(70), EntityId::from_raw(71)];
+    let find_in_inventory = vec![ EntityId::from_raw(70)];
     let find_nearest = vec![house];
     let get_entities = vec![
         [
@@ -68,12 +57,11 @@ fn plant_vegs_test(){
     let running = vec![true];
 
     let task_db = get_hermit_behavior_task();
-
-
+    
     task_testing_harness(
         "plant_vegs",
         task_db,
-        vec![StackItem::success()],
+        vec![StackItem::failure()],
         find_in_inventory,
         find_nearest,
         get_entities,
