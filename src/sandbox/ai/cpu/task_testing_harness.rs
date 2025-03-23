@@ -84,6 +84,14 @@ pub fn task_testing_harness(
                 Status::FindInInventory { item_class } =>{
                     prayers.push((find_in_inventory_idx, Prayer::FindInInventory { item_class}));
 
+                    if find_in_inventory_idx >= find_in_inventory.len() {
+                        panic!(
+                            "only had {} items in find_in_inventory tried to access {}.", 
+                            find_in_inventory.len(),
+                            find_in_inventory_idx + 1
+                        );
+                    };
+
                     let new_stack_item = StackItem::some(
                         StackItem::EntityId(
                             find_in_inventory[find_in_inventory_idx].clone()
@@ -102,7 +110,16 @@ pub fn task_testing_harness(
                 Status::FindNearest { x, y, item_class} => {
                     logy!("log", "giving dummy value for nearest {item_class:?} to [{x}:{y}]");
                     prayers.push((find_nearest_idx, Prayer::FindNearest { x, y, item_class}));
-                    let new_stack_item = StackItem::some(StackItem::EntityId(find_nearest[find_nearest_idx % find_nearest.len()].clone()));
+
+                    if find_nearest_idx >= find_nearest.len() {
+                        panic!(
+                            "only had {} items in find_nearest tried to access {}.", 
+                            find_nearest.len(),
+                            find_nearest_idx + 1
+                        );
+                    };
+
+                    let new_stack_item = StackItem::some(StackItem::EntityId(find_nearest[find_nearest_idx].clone()));
                     find_nearest_idx += 1;
                     cpu.stack.push(new_stack_item);
                 },
@@ -110,7 +127,15 @@ pub fn task_testing_harness(
                     logy!("log", "giving dummy value for GetEnergy on {entity}");
                     prayers.push((get_energy_idx, Prayer::GetEnergy(entity)));
 
-                    let new_stack_item = StackItem::some(StackItem::Int(get_energy[get_energy_idx % get_energy.len()].clone()));
+                    if get_energy_idx >= get_energy.len() {
+                        panic!(
+                            "only had {} items in get_energy tried to access {}.", 
+                            get_energy.len(),
+                            get_energy_idx + 1
+                        );
+                    };
+
+                    let new_stack_item = StackItem::some(StackItem::Int(get_energy[get_energy_idx].clone()));
                     get_energy_idx += 1;
                     cpu.stack.push(new_stack_item);
                 },
@@ -118,7 +143,15 @@ pub fn task_testing_harness(
                     logy!("log", "giving dummy value for location of {entity}");
                     prayers.push((get_location_idx, Prayer::GetLocation(entity)));
 
-                    let loc = get_location[get_location_idx % get_location.len()];
+                    if get_location_idx >= get_location.len() {
+                        panic!(
+                            "only had {} items in get_location tried to access {}.", 
+                            get_location.len(),
+                            get_location_idx + 1
+                        );
+                    };
+
+                    let loc = get_location[get_location_idx];
                     let new_stack_item = StackItem::some(StackItem::Coord { x:loc.0, y:loc.1 });
                     get_location_idx += 1;
                     cpu.stack.push(new_stack_item);
@@ -127,7 +160,15 @@ pub fn task_testing_harness(
                     logy!("log", "giving dummy value for GetHp on {entity}");
                     prayers.push((get_hp_idx, Prayer::GetHp(entity)));
 
-                    let new_stack_item = StackItem::some(StackItem::Int(get_hp[get_hp_idx % get_hp.len()].clone()));
+                    if get_hp_idx >= get_hp.len() {
+                        panic!(
+                            "only had {} items in get_hp tried to access {}.", 
+                            get_hp.len(),
+                            get_hp_idx + 1
+                        );
+                    };
+
+                    let new_stack_item = StackItem::some(StackItem::Int(get_hp[get_hp_idx].clone()));
                     get_hp_idx += 1;
                     cpu.stack.push(new_stack_item);
                 },
@@ -135,7 +176,15 @@ pub fn task_testing_harness(
                     logy!("log", "giving dummy value for if {agent} has GE {amount} of {item_class:?}");
                     prayers.push((get_is_inventory_ge_idx, Prayer::GetIsInventoryGE { agent, item_class, amount }));
 
-                    let new_stack_item = if get_is_inventory_ge[get_is_inventory_ge_idx % get_is_inventory_ge.len()] {StackItem::success()} else {StackItem::failure()};
+                    if get_is_inventory_ge_idx >= get_is_inventory_ge.len() {
+                        panic!(
+                            "only had {} items in get_is_inventory_ge tried to access {}.", 
+                            get_is_inventory_ge.len(),
+                            get_is_inventory_ge_idx + 1
+                        );
+                    };
+
+                    let new_stack_item = if get_is_inventory_ge[get_is_inventory_ge_idx] {StackItem::success()} else {StackItem::failure()};
                     get_is_inventory_ge_idx += 1;
                     cpu.stack.push(new_stack_item);
 
@@ -144,7 +193,15 @@ pub fn task_testing_harness(
                     logy!("log", "giving dummy value for entities in [{min_x} : {min_y}] to [{max_x} : {max_y}]");
                     prayers.push((get_entities_idx, Prayer::GetEntities { min_x, min_y, max_x, max_y }));
 
-                    let new_stack_item = get_entities[get_entities_idx % get_entities.len()].clone();
+                    if get_entities_idx >= get_entities.len() {
+                        panic!(
+                            "only had {} items in get_entities tried to access {}.", 
+                            get_entities.len(),
+                            get_entities_idx + 1
+                        );
+                    };
+
+                    let new_stack_item = get_entities[get_entities_idx].clone();
                     get_entities_idx += 1;
                     cpu.stack.push(new_stack_item);
                 },
@@ -201,9 +258,15 @@ pub fn task_testing_harness(
                     }
                     prayers.push((running_idx, Prayer::Running(inpulse_id)));
                     
-                    
+                    if running_idx >= running.len() {
+                        panic!(
+                            "only had {} items in running tried to access {}.", 
+                            running.len(),
+                            running_idx + 1
+                        );
+                    };
 
-                    let new_stack_item = if running[running_idx % running.len()] {StackItem::success()} else {StackItem::failure()};
+                    let new_stack_item = if running[running_idx] {StackItem::success()} else {StackItem::failure()};
                     running_idx += 1;
                     cpu.stack.push(new_stack_item);
 

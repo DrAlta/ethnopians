@@ -32,7 +32,7 @@ fn clear_for_garden_test(){
 
     // set up  the dummy values
     let find_in_inventory = vec![];
-    let find_nearest = vec![house];
+    let find_nearest = vec![];
     let get_entities = vec![
         [
             (StackItem::Int(0), StackItem::EntityId(garden_1)),
@@ -41,14 +41,19 @@ fn clear_for_garden_test(){
             (StackItem::Int(3), StackItem::EntityId(garden_4)),
         ].try_into().unwrap()
     ];
-    let get_energy = vec![4];
+    let get_energy = vec![];
 
     let get_location = vec![
-        (6,9),
+        (6,1),
+        (6,2),
+        (6,3),
+        (6,4),
     ];
-    let get_hp= vec![4];
-    let get_is_inventory_ge = vec![false];
-    let running = vec![true];
+    let get_hp= vec![];
+    let get_is_inventory_ge = vec![];
+    let running = vec![true, true, true, true, true, true, true, true];
+
+    // done setting up dummy values
 
     let mut task_db = get_hermit_behavior_task();
 
