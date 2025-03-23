@@ -40,16 +40,46 @@ fn have_garden_test(){
             (StackItem::Int(1), StackItem::EntityId(garden_2)),
             (StackItem::Int(2), StackItem::EntityId(garden_3)),
             (StackItem::Int(3), StackItem::EntityId(garden_4)),
-        ].try_into().unwrap()
+        ].try_into().unwrap(),
+        [
+            (StackItem::Int(0), StackItem::EntityId(garden_1)),
+            (StackItem::Int(1), StackItem::EntityId(garden_2)),
+            (StackItem::Int(2), StackItem::EntityId(garden_3)),
+            (StackItem::Int(3), StackItem::EntityId(garden_4)),
+        ].try_into().unwrap(),
+        [
+            (StackItem::Int(0), StackItem::EntityId(garden_1)),
+            (StackItem::Int(1), StackItem::EntityId(garden_2)),
+            (StackItem::Int(2), StackItem::EntityId(garden_3)),
+            (StackItem::Int(3), StackItem::EntityId(garden_4)),
+        ].try_into().unwrap(),
+        [
+            (StackItem::Int(0), StackItem::EntityId(garden_1)),
+            (StackItem::Int(1), StackItem::EntityId(garden_2)),
+            (StackItem::Int(2), StackItem::EntityId(garden_3)),
+            (StackItem::Int(3), StackItem::EntityId(garden_4)),
+        ].try_into().unwrap(),
+        [
+            (StackItem::Int(0), StackItem::EntityId(garden_1)),
+            (StackItem::Int(1), StackItem::EntityId(garden_2)),
+            (StackItem::Int(2), StackItem::EntityId(garden_3)),
+            (StackItem::Int(3), StackItem::EntityId(garden_4)),
+        ].try_into().unwrap(),
     ];
-    let get_energy = vec![4];
-
+    let get_energy = vec![];
     let get_location = vec![
-        (6,9),
+        (6,1),
+        (6,2),
+        (6,3),
+        (6,4),
+        (6,5),
+        (6,6),
     ];
-    let get_hp= vec![4];
-    let get_is_inventory_ge = vec![false];
-    let running = vec![true];
+    let get_hp= vec![];
+    let get_is_inventory_ge = vec![];
+    let running = vec![true, true, true, true, true, true, true, true];
+    
+    // done setting up dummy values
 
     let task_db = get_hermit_behavior_task();
 
