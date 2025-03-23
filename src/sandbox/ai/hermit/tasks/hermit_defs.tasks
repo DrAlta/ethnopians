@@ -211,32 +211,39 @@ plant_vegs = forth {
             dup /* True coord */
             plant_row /* True coord coord */
             plant_vegs_02 /* True coord TrueFalse */
-            if
-                debug("what is here")
+            dup /* coord TrueFalse */
+            if 
+                swap /* coord TrueFalse */
                 dup
-                lit(x:0, y: 5)
-                add
-                plant_row
-                plant_vegs_02
-                dup
-                lit(x:0, y: 5)
-                add
-                plant_row
-                plant_vegs_02
-                dup
-                lit(x:0, y: 5)
-                add
-                plant_row
-                plant_vegs_02
-                dup
-                lit(x:0, y: 5)
-                add
-                plant_row
-                plant_vegs_02
-                drop
-                if
-                    lit(Success)
-                    return
+                lit(x:0, y: 5) /* TrueFalse coord coord */
+                add /* TrueFalse coord coord coord */
+                plant_row /* TrueFalse coord coord */
+                plant_vegs_02 /* TrueFalse coord TrueFalse */
+                dup /* coord TrueFalse */
+                if 
+                    swap /* coord TrueFalse */
+                    dup /* TrueFalse coord */
+                    lit(x:0, y: 5) /* TrueFalse coord coord */
+                    add /* TrueFalse coord coord coord */
+                    plant_row /* TrueFalse coord coord */
+                    plant_vegs_02 /* TrueFalse coord TrueFalse */
+                    dup /* coord TrueFalse */
+                    if 
+                        swap /* coord TrueFalse */
+                        dup /* TrueFalse coord*/
+                        lit(x:0, y: 5) /* TrueFalse coord coord */
+                        add /* TrueFalse coord coord coord*/
+                        plant_row /* TrueFalse coord coord */
+                        plant_vegs_02 /* TrueFalse coord TrueFalse */
+                        swap /* coord TrueFasle*/
+                        drop /* TrueFasle coord */
+                        if
+                            lit(Success)
+                            return
+                        then
+                        lit(Failure)
+                        return
+                    then
                 then
             then
         then

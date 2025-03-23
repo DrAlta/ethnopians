@@ -38,7 +38,7 @@ fn harvest_veg_test() {
 
     // set up  the dummy values
     let find_in_inventory = vec![];
-    let find_nearest = vec![house];
+    let find_nearest = vec![];
     let get_entities = vec![[
         (StackItem::Int(0), StackItem::EntityId(garden_1)),
         (StackItem::Int(1), StackItem::EntityId(garden_2)),
@@ -47,12 +47,12 @@ fn harvest_veg_test() {
     ]
     .try_into()
     .unwrap()];
-    let get_energy = vec![4];
+    let get_energy = vec![];
 
-    let get_location = vec![(6, 9)];
-    let get_hp = vec![4];
-    let get_is_inventory_ge = vec![false];
-    let running = vec![true];
+    let get_location = vec![];
+    let get_hp = vec![];
+    let get_is_inventory_ge = vec![];
+    let running = vec![];
 
     let task_db = get_hermit_behavior_task();
 

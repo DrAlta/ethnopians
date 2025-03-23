@@ -32,9 +32,8 @@ plant_row /* ( coord -- True/False ) */ = forth{
     lit(False)
     return
 };
-plant_vegs_02 /* ( bool x bool -- bool x ) or the tos and 3rd item on the stack then returns the result in nos with the nos when called the new tos */ = forth{
+plant_vegs_02 /* ( bool x bool -- x bool ) or the tos and 3rd item on the stack then returns the result in tos with nos untouched */ = forth{
     rot
     or
-    swap
     return
 }

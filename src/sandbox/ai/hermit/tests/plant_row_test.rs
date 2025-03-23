@@ -48,7 +48,13 @@ fn plant_row_test() {
     );
 
     // set up  the dummy values
-    let find_in_inventory = vec![EntityId::from_raw(70), EntityId::from_raw(71)];
+    let find_in_inventory = vec![
+        EntityId::from_raw(71),
+        EntityId::from_raw(72),
+        EntityId::from_raw(73),
+        EntityId::from_raw(74),
+        EntityId::from_raw(75),
+    ];
     let find_nearest = vec![];
     let get_entities = vec![];
     let get_energy = vec![];

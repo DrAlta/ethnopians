@@ -69,6 +69,14 @@ pub fn task_testing_harness(
             for x in prayers {
                 pout!("{x:?}");
             }
+            assert_eq!(find_in_inventory.len(), find_in_inventory_idx);
+            assert_eq!(find_nearest.len(), find_nearest_idx);
+            assert_eq!(get_entities.len(), get_entities_idx);
+            assert_eq!(get_energy.len(), get_energy_idx);
+            assert_eq!(get_location.len(), get_location_idx);
+            assert_eq!(get_hp.len(), get_hp_idx);
+            assert_eq!(get_is_inventory_ge.len(), get_is_inventory_ge_idx);
+            assert_eq!(running.len(), running_idx);
             assert_eq!(
                 (Info::Result, cpu.stack),
                 (Info::Standard, what_final_stack_should_be)
@@ -109,7 +117,7 @@ pub fn task_testing_harness(
                     let new_stack_item = StackItem::some(StackItem::EntityId(
                         find_in_inventory[find_in_inventory_idx].clone(),
                     ));
-                    find_in_inventory_idx = (find_in_inventory_idx + 1) & find_in_inventory.len();
+                    find_in_inventory_idx += 1;
                     cpu.stack.push(new_stack_item);
                 }
                 Status::Success => {

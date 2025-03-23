@@ -19,7 +19,7 @@ impl Instruction {
         logy!("debug", "ticking:{self:?}");
         match self {
             Instruction::ForthAction(action_id) => {
-                //                *pc = return_stack.pop();
+                //*pc = return_stack.pop();
 
                 return Self::next(Status::Running(action_id.clone()), pc);
             }
