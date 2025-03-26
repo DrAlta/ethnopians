@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use qol::{logy, pout, Vecna};
 
@@ -264,7 +264,7 @@ pub fn task_testing_harness(
                 }
                 Status::RemoveEntitiesOfType(item) => {
                     if let Some(StackItem::Table(ref mut inner)) = cpu.stack.last_mut() {
-                        inner.map.write().unwrap().retain(|_k, v| {
+                        Arc::make_mut(inner).map.retain(|_k, v| {
                             let StackItem::EntityId(id) = v else {
                                 return true;
                             };
@@ -282,7 +282,7 @@ pub fn task_testing_harness(
                 }
                 Status::RetainEntitiesOfType(item) => {
                     if let Some(StackItem::Table(ref mut inner)) = cpu.stack.last_mut() {
-                        inner.map.write().unwrap().retain(|_k, v| {
+                        Arc::make_mut(inner).map.retain(|_k, v| {
                             let StackItem::EntityId(id) = v else {
                                 return false;
                             };

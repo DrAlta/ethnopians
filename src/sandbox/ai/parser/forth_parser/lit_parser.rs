@@ -52,7 +52,7 @@ pub fn lit_parser<'a>(
                 Ok::<Instruction, ()>(Instruction::ForthLit(StackItem::False))
             }),
             map_res(tuple((char('"'), ident_parser, char('"'))), |(_, x, _)| {
-                Ok::<Instruction, ()>(Instruction::ForthLit(StackItem::String(x.to_owned())))
+                Ok::<Instruction, ()>(Instruction::ForthLit(x.into()))
             }),
         )),
         space_parser,
@@ -151,7 +151,7 @@ mod tests {
         assert_eq!(used, TreePool::new());
         assert_eq!(
             body,
-            vec![Instruction::ForthLit(StackItem::String("one".to_owned()))]
+            vec![Instruction::ForthLit("one".into())]
         )
     }
 }

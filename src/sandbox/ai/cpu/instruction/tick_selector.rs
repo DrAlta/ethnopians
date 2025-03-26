@@ -45,17 +45,16 @@ pub fn tick_selector(
         logy!("debug", "{stack:#?}");
         return Err("Selector state not found on stack".into());
     };
-    let TableInterior { map, parents: _ } = x.as_ref();
-    let map2 = map.read().unwrap();
+    let TableInterior { map } = x.as_ref();
 
-    let Some(StackItem::Int(idx)) = map2.table_get("Selector") else {
+    let Some(StackItem::Int(idx)) = map.table_get("Selector") else {
         logy!("debug", "{map:#?}");
         return Err("Selector state not found on stack".into());
     };
 
     match (*idx as usize >= children.len(), tos) {
         // if we had a success then we succeed
-        (_, StackItem::String(x)) if x == "Success" => {
+        (_, StackItem::String(x)) if *x == "Success" => {
             stack.push(StackItem::success());
             let status = if pc.is_none() {
                 Status::None
@@ -64,7 +63,7 @@ pub fn tick_selector(
             };
             Instruction::exit(status, return_stack, pc)
         }
-        (true, StackItem::String(x)) if x == "Failure" => {
+        (true, StackItem::String(x)) if *x == "Failure" => {
             // if we reached the end without a Success then we fail
             stack.push(StackItem::failure());
             if let Some(parent_token) = return_stack.pop() {
@@ -78,7 +77,7 @@ pub fn tick_selector(
             };
         }
         // if we haven't reached the end and received a Failure then try the next child
-        (false, StackItem::String(x)) if x == "Failure" => {
+        (false, StackItem::String(x)) if *x == "Failure" => {
             let child_token: &ExecutionToken = children
                 .get(*idx as usize)
                 .expect("we already check they it was within range");

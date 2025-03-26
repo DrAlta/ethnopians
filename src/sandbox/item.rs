@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub enum Item {
     Agent,
@@ -41,6 +43,14 @@ impl TryFrom<String> for Item {
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
         let str: &str = &value;
+        str.try_into()
+    }
+}
+impl TryFrom<Arc<String>> for Item {
+    type Error = ();
+
+    fn try_from(value: Arc<String>) -> Result<Self, Self::Error> {
+        let str: &str = &*value;
         str.try_into()
     }
 }

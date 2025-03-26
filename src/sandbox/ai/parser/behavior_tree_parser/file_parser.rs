@@ -162,7 +162,7 @@ mod tests {
                 (
                     "footest@0".to_owned(),
                     vec![
-                        Instruction::ForthLit(StackItem::String("self".to_owned())),
+                        Instruction::ForthLit("self".into()),
                         Instruction::ForthGetEnergy,
                         Instruction::ForthSomeInt,
                         Instruction::ForthIf(5),

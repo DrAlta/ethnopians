@@ -29,6 +29,8 @@ pub mod ai;
 
 pub mod actions;
 mod acts;
+use std::sync::Arc;
+
 pub use acts::Acts;
 pub mod change_request;
 //pub mod collision;
@@ -52,4 +54,4 @@ pub use use_object::UseObject;
 pub mod world;
 
 pub type EntityId = bevy::prelude::Entity;
-pub type ItemClass = String;
+pub type ItemClass = Arc<String>;

@@ -69,7 +69,7 @@ mod tests {
         assert_eq!(
             used.get("@0").unwrap(),
             &vec![
-                Instruction::ForthLit(StackItem::String("self".to_owned())),
+                Instruction::ForthLit("self".into()),
                 Instruction::ForthGetEnergy,
                 Instruction::ForthIsInt,
                 Instruction::ForthIf(5),

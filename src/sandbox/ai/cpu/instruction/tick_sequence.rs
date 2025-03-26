@@ -11,11 +11,18 @@ pub fn tick_sequence(
     return_stack: &mut ReturnStack,
     pc: &mut ProgramCounter,
 ) -> Result<Status, String> {
+    println!("");
     let Some(tos) = stack.pop() else {
         return Err("Nothing on stack when checking result of child".into());
     };
 
-    if if let StackItem::String(x)/*Init*/ = &tos {x == "Init"} else {false} {
+    if 
+        if let StackItem::String(x)/*Init*/ = &tos {
+            **x == "Init"
+        } else {
+            false
+        }
+    {
         // this runs the first child
         stack.push(StackItem::sequence(1));
         stack.push(StackItem::init());
@@ -38,15 +45,15 @@ pub fn tick_sequence(
         logy!("debug", "{stack:#?}");
         return Err("Sequence state not found on stack".into());
     };
-    let TableInterior { map, parents: _ } = x.as_ref();
-    let map2 = map.read().unwrap();
-    let Some(StackItem::Int(idx)) = map2.table_get("Sequence") else {
+    let TableInterior { map } = x.as_ref();
+    let Some(StackItem::Int(idx)) = map.table_get("Sequence") else {
         logy!("debug", "{map:#?}");
         return Err("Sequence state not found on stack".into());
     };
 
     match (*idx as usize >= children.len(), tos) {
-        (_, StackItem::String(x)) if x == "Failure" => {
+        (_, StackItem::String(x)) if *x == "Failure" => {
+            println!("Got Failure");
             stack.push(StackItem::failure());
             if let Some(parent_token) = return_stack.pop() {
                 // return to calling fuction
@@ -58,7 +65,8 @@ pub fn tick_sequence(
                 return Ok(Status::Failure);
             };
         }
-        (true, StackItem::String(x)) if x == "Success" => {
+        (true, StackItem::String(x)) if *x == "Success" => {
+            println!("got success and reached end");
             stack.push(StackItem::success());
             if let Some(parent_token) = return_stack.pop() {
                 // return to calling fuction
@@ -70,7 +78,8 @@ pub fn tick_sequence(
                 return Ok(Status::Success);
             };
         }
-        (false, StackItem::String(x)) if x == "Success" => {
+        (false, StackItem::String(x)) if *x == "Success" => {
+            println!("got success and have not reached end");
             let child_token = children
                 .get(*idx as usize)
                 .expect("we already check they it was within range");
@@ -105,6 +114,7 @@ mod tests {
     }
     #[test]
     pub fn sequence_step_test() {
+        println!("-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n-\n");
         let mut stack = vec![StackItem::sequence(0), StackItem::success()];
         let mut rs = Vec::new();
         let mut pc = Some(("1".to_owned(), 0));

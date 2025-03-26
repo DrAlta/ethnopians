@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use crate::sandbox::{
     ai::{
@@ -33,7 +33,7 @@ fn check_if_clear_for_garden_false_test() {
     );
     blackboard.insert(
         "food".to_owned(),
-        Variable::Chit(BlackboardValue::String("Veggie".to_owned())),
+        Variable::Chit(BlackboardValue::String(Arc::new("Veggie".to_owned()))),
     );
 
     // set up  the dummy values
@@ -106,7 +106,7 @@ fn check_if_clear_for_garden_true_test() {
     );
     blackboard.insert(
         "food".to_owned(),
-        Variable::Chit(BlackboardValue::String("Veggie".to_owned())),
+        Variable::Chit(BlackboardValue::String(Arc::new("Veggie".to_owned()))),
     );
 
     // set up  the dummy values

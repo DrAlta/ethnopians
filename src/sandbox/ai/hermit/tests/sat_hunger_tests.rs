@@ -34,7 +34,7 @@ fn sat_hunger_test_t() {
     );
     blackboard.insert(
         "food".to_owned(),
-        Variable::Chit(BlackboardValue::String("Veggie".to_owned())),
+        Variable::Chit("Veggie".into()),
     );
 
     // set up  the dummy values
@@ -92,7 +92,7 @@ fn sat_hunger_test_ft() {
     );
     blackboard.insert(
         "food".to_owned(),
-        Variable::Chit(BlackboardValue::String("Veggie".to_owned())),
+        Variable::Chit("Veggie".into()),
     );
 
     // set up  the dummy values
@@ -150,7 +150,7 @@ fn sat_hunger_test_ff() {
     );
     blackboard.insert(
         "food".to_owned(),
-        Variable::Chit(BlackboardValue::String("Veggie".to_owned())),
+        Variable::Chit("Veggie".into()),
     );
 
     // set up  the dummy values

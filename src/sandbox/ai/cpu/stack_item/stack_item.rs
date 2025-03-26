@@ -1,28 +1,10 @@
-use std::{collections::BTreeMap, sync::{Arc, RwLock}};
+use std::{collections::BTreeMap, sync::{Arc, OnceLock}};
 
 use crate::sandbox::EntityId;
 
-use super::table::{ParentTables, TableInterior};
+use super::table::TableInterior;
 
-impl StackItem {
-    pub fn success() -> StackItem {
-        StackItem::String("Success".to_owned())
-    }
-    pub fn failure() -> StackItem {
-        StackItem::String("Failure".to_owned())
-    }
-    pub fn init() -> StackItem {
-        StackItem::String("Init".to_owned())
-    }
-    pub fn selector(value: i32) -> Self {
-        StackItem::try_from([("Selector", value.into())]).unwrap()
-    }
-    pub fn sequence(value: i32) -> Self {
-        StackItem::try_from([("Sequence", value.into())]).unwrap()
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Hash)]
 pub enum StackItem {
     /*
     //Behaior states
@@ -41,55 +23,65 @@ pub enum StackItem {
     //    Todo(Vec<EntityId>),
     // vvv sure to keep these vvvv
     Option(Box<StackItem>),
-    String(String),
+    String(Arc<String>),
     Table(Arc<TableInterior>),
 }
-impl Clone for StackItem {
-    fn clone(&self) -> Self {
-        match self {
-            StackItem::Table(rc) => StackItem::Table(Arc::clone(rc)),
-            //StackItem::Sequence(x) => StackItem::Sequence(x.clone()),
-            //StackItem::Selector(x) => StackItem::Selector(x.clone()),
-            //StackItem::Success => StackItem::Success,
-            //StackItem::Failure => StackItem::Failure,
-            //StackItem::Init => StackItem::Init,
-            StackItem::Int(x) => StackItem::Int(x.clone()),
-            StackItem::True => StackItem::True,
-            StackItem::False => StackItem::False,
-            StackItem::Coord { x, y } => StackItem::Coord {
-                x: x.clone(),
-                y: y.clone(),
-            },
-            StackItem::String(x) => StackItem::String(x.clone()),
-            StackItem::EntityId(entity) => StackItem::EntityId(entity.clone()),
-            StackItem::Option(stack_item) => StackItem::Option(stack_item.clone()),
-        }
+impl StackItem {
+    pub fn success() -> StackItem {
+        static SUCCESS: OnceLock<StackItem> = OnceLock::new();
+        SUCCESS.get_or_init(|| {
+            StackItem::String(Arc::new("Success".to_owned()))
+        }).clone()
+        
+    }
+    pub fn failure() -> StackItem {
+        static FAILURE: OnceLock<StackItem> = OnceLock::new();
+        FAILURE.get_or_init(|| {
+            StackItem::String(Arc::new("Failure".to_owned()))
+        }).clone()
+    }
+    pub fn init() -> StackItem {
+       // static INIT: OnceLock<StackItem> = OnceLock::new();
+      //  INIT.get_or_init(|| {
+            StackItem::String(Arc::new("Init".to_owned()))
+       // }).clone()
+    }
+    pub fn selector(value: i32) -> Self {
+        static SELECTOR: OnceLock<StackItem> = OnceLock::new();
+        
+
+        let inner = TableInterior{
+            map: BTreeMap::from(
+                [
+                    (
+                        SELECTOR.get_or_init(|| {
+                            "Selector".into()
+                        }).clone(),
+                        value.into()
+                    )
+                ]
+            )
+        };
+        Self::Table(Arc::new(inner))
+    }
+    pub fn sequence(value: i32) -> Self {
+        static SEQUENCE: OnceLock<StackItem> = OnceLock::new();
+        let inner = TableInterior{
+            map: BTreeMap::from(
+                [
+                    (
+                        SEQUENCE.get_or_init(|| {
+                            "Sequence".into()
+                        }).clone(),
+                        value.into()
+                    )
+                ]
+            )
+        };
+        Self::Table(Arc::new(inner))
     }
 }
-impl std::hash::Hash for StackItem {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        match self {
-            StackItem::Table(rc) => {
-                rc.hash(state);
-            }
-            /*
-            StackItem::Sequence(x) => x.hash(state),
-            StackItem::Selector(x) => x.hash(state),
-            StackItem::Success => "Success".hash(state),
-            StackItem::Failure => "Failure".hash(state),
-            StackItem::Init => "Init".hash(state),
-            */
-            StackItem::Int(x) => x.hash(state),
-            StackItem::True => true.hash(state),
-            StackItem::False => false.hash(state),
-            StackItem::Coord { x, y } => (x, y).hash(state),
-            StackItem::String(x) => x.hash(state),
-            StackItem::EntityId(x) => x.hash(state),
-            StackItem::Option(x) => x.hash(state),
-            //            StackItem::Todo(items) => todo!(),
-        }
-    }
-}
+
 
 impl StackItem {
     pub fn some(value: StackItem) -> StackItem {
@@ -99,41 +91,16 @@ impl StackItem {
         Self::False
     }
     pub fn new_table() -> StackItem {
-        StackItem::Table(Arc::new(TableInterior {
-            map: RwLock::new(BTreeMap::new()),
-            parents: RwLock::new(ParentTables::new()),
-        }))
+        StackItem::Table(Arc::new(TableInterior::new()))
     }
 }
 
 impl StackItem {
-    pub fn same(&self, other: &Self) -> bool {
-        if let (StackItem::Table(self_rc), StackItem::Table(other_rc)) = (self, other) {
-            return Arc::ptr_eq(&self_rc, &other_rc);
-        }
-        self.eq(other)
-    }
-    pub fn stuff(&mut self, stuffing: StackItem, key: StackItem) -> Result<(), String> {
-        match (self, stuffing) {
-            (StackItem::Table(stuffee), StackItem::Table(stuffing_rc)) => {
-                if stuffee.has_ancester(&stuffing_rc) {
-                    Err("ForthKind::CyclesNotAllowed".to_owned())
-                } else {
-                    stuffing_rc
-                        .parents
-                        .write().unwrap()
-                        .push(Arc::downgrade(&stuffee));
-
-                    stuffee
-                        .map
-                        .write().unwrap()
-                        .insert(key, StackItem::Table(stuffing_rc));
-                    Ok(())
-                }
-            }
-            (StackItem::Table(stuffee), value) => {
-                stuffee.map.write().unwrap().insert(key, value);
-                Ok(())
+    pub fn stuff(&mut self, stuffing: StackItem, key: StackItem) -> Result<Option<StackItem>, String> {
+        match self {
+            StackItem::Table(stuffee) => {
+                let x = Arc::make_mut(stuffee);
+                Ok(x.insert(key, stuffing))
             }
             _ => Err("ForthKind::StuffeeNotTable".to_owned()),
         }
@@ -144,21 +111,30 @@ impl<const N: usize> TryFrom<[(StackItem, StackItem); N]> for StackItem {
     type Error = String;
 
     fn try_from(value: [(StackItem, StackItem); N]) -> Result<StackItem, Self::Error> {
-        let mut ret = StackItem::new_table();
+        let mut inner = TableInterior::new();
         for (key, stuffing) in value.into_iter() {
-            ret.stuff(stuffing, key)?
+            inner.insert(key, stuffing);
         }
-        Ok(ret)
+        Ok(Self::Table(Arc::new(inner)))
     }
 }
 impl<const N: usize> TryFrom<[(&str, StackItem); N]> for StackItem {
     type Error = String;
 
     fn try_from(value: [(&str, StackItem); N]) -> Result<StackItem, Self::Error> {
-        let mut ret = StackItem::new_table();
+        let mut inner = TableInterior::new();
         for (key, stuffing) in value.into_iter() {
-            ret.stuff(stuffing, Self::String(key.to_owned()))?
+            inner.insert( key.into(), stuffing);
         }
-        Ok(ret)
+        Ok(Self::Table(Arc::new(inner)))
     }
+}
+
+#[test]
+fn fo(){
+    assert_eq!(
+        StackItem::success(),
+        StackItem::success(),
+        
+    )
 }

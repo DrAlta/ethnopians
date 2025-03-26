@@ -33,12 +33,12 @@ fn plant_vegs_test() {
     blackboard.insert(
         // I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
         "knife".to_owned(),
-        Variable::Chit(BlackboardValue::String("Knife".to_owned())),
+        Variable::Chit("Knife".into()),
     );
     blackboard.insert(
         // I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
         "stone".to_owned(),
-        Variable::Chit(BlackboardValue::String("Stone".to_owned())),
+        Variable::Chit("Stone".into()),
     );
     blackboard.insert(
         // I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
@@ -131,12 +131,12 @@ fn plant_vegs_fail_to_read_garden_from_blackboard_test() {
     blackboard.insert(
         // I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
         "knife".to_owned(),
-        Variable::Chit(BlackboardValue::String("Knife".to_owned())),
+        Variable::Chit("Knife".into()),
     );
     blackboard.insert(
         // I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
         "stone".to_owned(),
-        Variable::Chit(BlackboardValue::String("Stone".to_owned())),
+        Variable::Chit("Stone".into()),
     );
 
     // set up  the dummy values

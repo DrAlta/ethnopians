@@ -1,4 +1,3 @@
-mod deep_copy;
 mod display;
 mod from;
 mod stack_item;

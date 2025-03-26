@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use crate::sandbox::{
     ai::{
@@ -34,12 +34,12 @@ fn have_n_seed_test() {
     blackboard.insert(
         // I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
         "knife".to_owned(),
-        Variable::Chit(BlackboardValue::String("Knife".to_owned())),
+        Variable::Chit(BlackboardValue::String(Arc::new("Knife".to_owned()))),
     );
     blackboard.insert(
         // I should change the GetIsInventoryGE to hold a BlackBoardValue instadt of a key
         "stone".to_owned(),
-        Variable::Chit(BlackboardValue::String("Stone".to_owned())),
+        Variable::Chit(BlackboardValue::String(Arc::new("Stone".to_owned()))),
     );
 
     // set up  the dummy values

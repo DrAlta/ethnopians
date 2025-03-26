@@ -4,9 +4,17 @@ Notable changes to the "Ethnopians" crate will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.2.3] - 2025-03-25
+
+### Changed
+
+- made StackItem:Table COWs
+
 ## [0.2.2] - 2025-03-25
 
-### Change replaced RefCell with RwLock
+### Change 
+
+- replaced RefCell with RwLock
 
 ## [0.2.1] - 2025-03-25
 

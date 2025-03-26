@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use qol::logy;
 
 use crate::sandbox::ai::{
@@ -55,7 +57,7 @@ impl Instruction {
                 let Some(StackItem::String(x)) = stack.last() else {
                     return Err("tos was not an Init".to_owned());
                 };
-                if x != "Init" {
+                if **x != "Init" {
                     return Err("tos was not an Init".to_owned());
                 };
                 stack.pop();
@@ -312,7 +314,7 @@ impl Instruction {
                     None => StackItem::False
                 });
                 */
-                stack.push(match blackboard.get(&key) {
+                stack.push(match blackboard.get(&*key) {
                     Some(x) => StackItem::Option(Box::new(x.into())),
                     None => StackItem::none(),
                 });
@@ -465,7 +467,7 @@ impl Instruction {
                 let Some(nos) = stack.pop() else {
                     unreachable!()
                 };
-                blackboard.insert(key, crate::sandbox::ai::Variable::Chit(nos.into()));
+                blackboard.insert((*key).clone(), crate::sandbox::ai::Variable::Chit(nos.into()));
                 Self::next(Status::None, pc)
             }
             Instruction::ForthStuff => {
@@ -530,7 +532,7 @@ impl Instruction {
                 let Some(StackItem::Table(x)) = stack.last() else {
                     return Err("TOS wasn't a table".to_owned());
                 };
-                let map_empty_ka = x.map.read().unwrap().is_empty();
+                let map_empty_ka = x.map.is_empty();
                 stack.push(if map_empty_ka {
                     StackItem::True
                 } else {
@@ -539,10 +541,10 @@ impl Instruction {
                 Self::next(Status::None, pc)
             }
             Instruction::ForthPopLast => {
-                let Some(StackItem::Table(x)) = stack.last() else {
+                let Some(StackItem::Table(x)) = stack.last_mut() else {
                     return Err("TOS wasn't a table".to_owned());
                 };
-                let last_maybe = x.map.write().unwrap().pop_last();
+                let last_maybe = Arc::make_mut(x).map.pop_last();
 
                 if let Some((_, last)) = last_maybe {
                     stack.push(StackItem::some(last));
@@ -696,7 +698,7 @@ impl Instruction {
                 let Some(StackItem::String(x)) = stack.last() else {
                     return Err("top was not init".to_owned());
                 };
-                if x != "Init" {
+                if **x != "Init" {
                     return Err("top was not init".to_owned());
                 };
                 stack.pop();

@@ -1,6 +1,6 @@
 [package]
 name = "ethnopians"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 
 [lib]
@@ -30,7 +30,7 @@ opt-level = 3
 
 [features]
 default = ["defaults", "sandbox"]
-defaults = ["log", "debug", "error", "todo", "trace-tests"]
+defaults = ["log", "debug", "error", "todo", "trace", "trace-tests"]
 sandbox = ["bevy"]
 bevy = ["dep:bevy"]
 debug = []
@@ -41,7 +41,7 @@ todo = []
 trace = ["trace-behavior-tree", "trace-tick"]
 trace-behavior-tree = []
 trace-tests = []
-trace-tick= []#"trace-tick-selector", "trace-tick-sequence"]
+trace-tick= ["trace-tick-selector", "trace-tick-sequence"]
 trace-tick-selector = []
 trace-tick-sequence = []
 trace-moveit = []

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::sandbox::ai::{BlackboardValue, StackItem};
 
 impl From<i32> for StackItem {
@@ -7,12 +9,12 @@ impl From<i32> for StackItem {
 }
 impl From<String> for StackItem {
     fn from(value: String) -> Self {
-        Self::String(value)
+        Self::String(Arc::new(value))
     }
 }
 impl From<&str> for StackItem {
     fn from(value: &str) -> Self {
-        Self::String(value.to_owned())
+        Self::String(Arc::new(value.to_owned()))
     }
 }
 
