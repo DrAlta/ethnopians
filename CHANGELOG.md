@@ -4,6 +4,20 @@ Notable changes to the "Ethnopians" crate will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.2.1] - 2025-03-25
+
+### Added
+
+- Instructions needed for tha HermitAI
+
+### Changed
+
+- debuged the hermitAI
+
+- changed StackItem::Ref use a Arc instead of an Rc
+
+- changed StackItem::Table use a Arc instead of an Rc
+
 ## [0.2.0] - 2025-02-05
 
 ### Changed
