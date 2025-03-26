@@ -21,15 +21,14 @@ impl From<StackItem> for BlackboardValue {
             StackItem::String(x) => BlackboardValue::String(x),
             StackItem::True => {
                 static TRUE: OnceLock<BlackboardValue> = OnceLock::new();
-                TRUE.get_or_init(|| {
-                    BlackboardValue::String(Arc::new("True".to_owned()))
-                }).clone()
+                TRUE.get_or_init(|| BlackboardValue::String(Arc::new("True".to_owned())))
+                    .clone()
             }
             StackItem::False => {
                 static FALSE: OnceLock<BlackboardValue> = OnceLock::new();
-                FALSE.get_or_init(|| {
-                    BlackboardValue::String(Arc::new("False".to_owned()))
-                }).clone()
+                FALSE
+                    .get_or_init(|| BlackboardValue::String(Arc::new("False".to_owned())))
+                    .clone()
             }
             StackItem::Coord { x, y } => BlackboardValue::Coord { x, y },
             x @ StackItem::Int(_) | x @ StackItem::Option(_) | x @ StackItem::Table(_) => {

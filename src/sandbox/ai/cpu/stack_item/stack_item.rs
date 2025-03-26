@@ -1,4 +1,7 @@
-use std::{collections::BTreeMap, sync::{Arc, OnceLock}};
+use std::{
+    collections::BTreeMap,
+    sync::{Arc, OnceLock},
+};
 
 use crate::sandbox::EntityId;
 
@@ -29,59 +32,44 @@ pub enum StackItem {
 impl StackItem {
     pub fn success() -> StackItem {
         static SUCCESS: OnceLock<StackItem> = OnceLock::new();
-        SUCCESS.get_or_init(|| {
-            StackItem::String(Arc::new("Success".to_owned()))
-        }).clone()
-        
+        SUCCESS
+            .get_or_init(|| StackItem::String(Arc::new("Success".to_owned())))
+            .clone()
     }
     pub fn failure() -> StackItem {
         static FAILURE: OnceLock<StackItem> = OnceLock::new();
-        FAILURE.get_or_init(|| {
-            StackItem::String(Arc::new("Failure".to_owned()))
-        }).clone()
+        FAILURE
+            .get_or_init(|| StackItem::String(Arc::new("Failure".to_owned())))
+            .clone()
     }
     pub fn init() -> StackItem {
-       // static INIT: OnceLock<StackItem> = OnceLock::new();
-      //  INIT.get_or_init(|| {
-            StackItem::String(Arc::new("Init".to_owned()))
-       // }).clone()
+        // static INIT: OnceLock<StackItem> = OnceLock::new();
+        //  INIT.get_or_init(|| {
+        StackItem::String(Arc::new("Init".to_owned()))
+        // }).clone()
     }
     pub fn selector(value: i32) -> Self {
         static SELECTOR: OnceLock<StackItem> = OnceLock::new();
-        
 
-        let inner = TableInterior{
-            map: BTreeMap::from(
-                [
-                    (
-                        SELECTOR.get_or_init(|| {
-                            "Selector".into()
-                        }).clone(),
-                        value.into()
-                    )
-                ]
-            )
+        let inner = TableInterior {
+            map: BTreeMap::from([(
+                SELECTOR.get_or_init(|| "Selector".into()).clone(),
+                value.into(),
+            )]),
         };
         Self::Table(Arc::new(inner))
     }
     pub fn sequence(value: i32) -> Self {
         static SEQUENCE: OnceLock<StackItem> = OnceLock::new();
-        let inner = TableInterior{
-            map: BTreeMap::from(
-                [
-                    (
-                        SEQUENCE.get_or_init(|| {
-                            "Sequence".into()
-                        }).clone(),
-                        value.into()
-                    )
-                ]
-            )
+        let inner = TableInterior {
+            map: BTreeMap::from([(
+                SEQUENCE.get_or_init(|| "Sequence".into()).clone(),
+                value.into(),
+            )]),
         };
         Self::Table(Arc::new(inner))
     }
 }
-
 
 impl StackItem {
     pub fn some(value: StackItem) -> StackItem {
@@ -96,7 +84,11 @@ impl StackItem {
 }
 
 impl StackItem {
-    pub fn stuff(&mut self, stuffing: StackItem, key: StackItem) -> Result<Option<StackItem>, String> {
+    pub fn stuff(
+        &mut self,
+        stuffing: StackItem,
+        key: StackItem,
+    ) -> Result<Option<StackItem>, String> {
         match self {
             StackItem::Table(stuffee) => {
                 let x = Arc::make_mut(stuffee);
@@ -124,17 +116,13 @@ impl<const N: usize> TryFrom<[(&str, StackItem); N]> for StackItem {
     fn try_from(value: [(&str, StackItem); N]) -> Result<StackItem, Self::Error> {
         let mut inner = TableInterior::new();
         for (key, stuffing) in value.into_iter() {
-            inner.insert( key.into(), stuffing);
+            inner.insert(key.into(), stuffing);
         }
         Ok(Self::Table(Arc::new(inner)))
     }
 }
 
 #[test]
-fn fo(){
-    assert_eq!(
-        StackItem::success(),
-        StackItem::success(),
-        
-    )
+fn fo() {
+    assert_eq!(StackItem::success(), StackItem::success(),)
 }

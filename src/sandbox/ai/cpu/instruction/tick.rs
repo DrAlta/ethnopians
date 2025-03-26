@@ -467,7 +467,10 @@ impl Instruction {
                 let Some(nos) = stack.pop() else {
                     unreachable!()
                 };
-                blackboard.insert((*key).clone(), crate::sandbox::ai::Variable::Chit(nos.into()));
+                blackboard.insert(
+                    (*key).clone(),
+                    crate::sandbox::ai::Variable::Chit(nos.into()),
+                );
                 Self::next(Status::None, pc)
             }
             Instruction::ForthStuff => {

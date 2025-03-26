@@ -16,8 +16,7 @@ pub fn tick_sequence(
         return Err("Nothing on stack when checking result of child".into());
     };
 
-    if 
-        if let StackItem::String(x)/*Init*/ = &tos {
+    if if let StackItem::String(x)/*Init*/ = &tos {
             **x == "Init"
         } else {
             false

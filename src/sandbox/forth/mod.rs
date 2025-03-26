@@ -19,7 +19,12 @@
 //! [{a:&1}, &1] | @
 //! [{a:&1}, 1]
 //!
-use std::{cell::RefCell, cmp::Ordering::{Equal, Greater, Less}, collections::BTreeMap, sync::Arc};
+use std::{
+    cell::RefCell,
+    cmp::Ordering::{Equal, Greater, Less},
+    collections::BTreeMap,
+    sync::Arc,
+};
 
 #[derive(Debug, Eq)]
 pub enum Value {

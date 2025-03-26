@@ -149,9 +149,6 @@ mod tests {
         let (tail, (body, used)) = lit_parser(input).unwrap();
         assert_eq!(tail, "");
         assert_eq!(used, TreePool::new());
-        assert_eq!(
-            body,
-            vec![Instruction::ForthLit("one".into())]
-        )
+        assert_eq!(body, vec![Instruction::ForthLit("one".into())])
     }
 }

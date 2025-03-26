@@ -7,11 +7,13 @@ use crate::sandbox::ai::StackItem as Value;
 #[derive(Debug, Hash, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TableInterior {
     //map holds the key, value pairs of the table
-    pub map:BTreeMap<Value, Value>,
+    pub map: BTreeMap<Value, Value>,
 }
-impl TableInterior{
+impl TableInterior {
     pub fn new() -> Self {
-        Self { map: BTreeMap::new() }
+        Self {
+            map: BTreeMap::new(),
+        }
     }
     pub fn insert(&mut self, k: Value, v: Value) -> Option<Value> {
         self.map.insert(k, v)

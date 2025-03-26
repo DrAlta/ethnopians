@@ -32,10 +32,7 @@ fn sat_hunger_test_t() {
         "self".to_owned(),
         Variable::Chit(BlackboardValue::EntityId(my_self)),
     );
-    blackboard.insert(
-        "food".to_owned(),
-        Variable::Chit("Veggie".into()),
-    );
+    blackboard.insert("food".to_owned(), Variable::Chit("Veggie".into()));
 
     // set up  the dummy values
     let find_in_inventory = vec![];
@@ -90,10 +87,7 @@ fn sat_hunger_test_ft() {
         "self".to_owned(),
         Variable::Chit(BlackboardValue::EntityId(my_self)),
     );
-    blackboard.insert(
-        "food".to_owned(),
-        Variable::Chit("Veggie".into()),
-    );
+    blackboard.insert("food".to_owned(), Variable::Chit("Veggie".into()));
 
     // set up  the dummy values
     let find_in_inventory = vec![];
@@ -148,10 +142,7 @@ fn sat_hunger_test_ff() {
         "self".to_owned(),
         Variable::Chit(BlackboardValue::EntityId(my_self)),
     );
-    blackboard.insert(
-        "food".to_owned(),
-        Variable::Chit("Veggie".into()),
-    );
+    blackboard.insert("food".to_owned(), Variable::Chit("Veggie".into()));
 
     // set up  the dummy values
     let find_in_inventory = vec![];
