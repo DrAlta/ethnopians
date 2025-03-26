@@ -6,7 +6,7 @@ item from the value associated with the source item
 
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::sandbox::ai::StackItem as Value;
 
@@ -20,7 +20,7 @@ trait DeepDeepCopy {
 }
 
 #[derive(Debug)]
-struct ValueRef(Rc<Value>);
+struct ValueRef(Arc<Value>);
 impl Eq for ValueRef {}
 impl PartialEq for ValueRef {
     fn eq(&self, other: &Self) -> bool {
@@ -36,7 +36,7 @@ impl Hash for ValueRef {
 impl ValueRef {
     #[allow(dead_code)]
     fn dup(&self) -> Self {
-        ValueRef(Rc::clone(&self.0))
+        ValueRef(Arc::clone(&self.0))
     }
 }
 impl Value {
@@ -51,7 +51,7 @@ impl DeepDeepCopy for Value {
             Value::Table(rc) => {
                 let mut dolly_the_clone = Value::new_table();
                 for (key, value) in &*rc.map.borrow_mut() {
-                    let key_as_value_ref = ValueRef(Rc::new(key.clone()));
+                    let key_as_value_ref = ValueRef(Arc::new(key.clone()));
                     if let Some(previous_copy) = seen.get(&key_as_value_ref) {
                         dolly_the_clone
                             .stuff(previous_copy.clone(), key.clone())

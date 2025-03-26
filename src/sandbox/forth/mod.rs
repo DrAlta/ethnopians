@@ -19,16 +19,15 @@
 //! [{a:&1}, &1] | @
 //! [{a:&1}, 1]
 //!
-use std::cmp::Ordering::{Equal, Greater, Less};
-use std::{cell::RefCell, collections::BTreeMap, rc::Rc};
+use std::{cell::RefCell, cmp::Ordering::{Equal, Greater, Less}, collections::BTreeMap, sync::Arc};
 
 #[derive(Debug, Eq)]
 pub enum Value {
     Bool(bool),
     Int(i64),
-    Ref(Rc<RefCell<Value>>),
+    Ref(Arc<RefCell<Value>>),
     Str(String),
-    Table(BTreeMap<Value, Rc<RefCell<Value>>>),
+    Table(BTreeMap<Value, Arc<RefCell<Value>>>),
 }
 impl PartialOrd for Value {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
@@ -103,7 +102,7 @@ impl PartialEq for Value {
                     let Some(r_value) = r0.get(l_key) else {
                         return false
                     };
-                    if ! Rc::ptr_eq(l_value, r_value) {
+                    if ! Arc::ptr_eq(l_value, r_value) {
                         return false
                     }
                 }

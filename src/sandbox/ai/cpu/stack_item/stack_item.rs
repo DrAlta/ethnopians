@@ -1,4 +1,4 @@
-use std::{cell::RefCell, collections::BTreeMap, rc::Rc};
+use std::{cell::RefCell, collections::BTreeMap, sync::Arc};
 
 use crate::sandbox::EntityId;
 
@@ -42,12 +42,12 @@ pub enum StackItem {
     // vvv sure to keep these vvvv
     Option(Box<StackItem>),
     String(String),
-    Table(Rc<TableInterior>),
+    Table(Arc<TableInterior>),
 }
 impl Clone for StackItem {
     fn clone(&self) -> Self {
         match self {
-            StackItem::Table(rc) => StackItem::Table(Rc::clone(rc)),
+            StackItem::Table(rc) => StackItem::Table(Arc::clone(rc)),
             //StackItem::Sequence(x) => StackItem::Sequence(x.clone()),
             //StackItem::Selector(x) => StackItem::Selector(x.clone()),
             //StackItem::Success => StackItem::Success,
@@ -99,7 +99,7 @@ impl StackItem {
         Self::False
     }
     pub fn new_table() -> StackItem {
-        StackItem::Table(Rc::new(TableInterior {
+        StackItem::Table(Arc::new(TableInterior {
             map: RefCell::new(BTreeMap::new()),
             parents: RefCell::new(ParentTables::new()),
         }))
@@ -109,7 +109,7 @@ impl StackItem {
 impl StackItem {
     pub fn same(&self, other: &Self) -> bool {
         if let (StackItem::Table(self_rc), StackItem::Table(other_rc)) = (self, other) {
-            return Rc::ptr_eq(&self_rc, &other_rc);
+            return Arc::ptr_eq(&self_rc, &other_rc);
         }
         self.eq(other)
     }
@@ -122,7 +122,7 @@ impl StackItem {
                     stuffing_rc
                         .parents
                         .borrow_mut()
-                        .push(Rc::downgrade(&stuffee));
+                        .push(Arc::downgrade(&stuffee));
 
                     stuffee
                         .map

@@ -2,6 +2,7 @@ use std::{borrow::Borrow, collections::HashMap, fmt::Debug, hash::Hash};
 
 use super::Variable;
 
+#[derive(Debug)]
 pub struct Blackboard<K: Debug, V: Debug> {
     stack: Vec<HashMap<K, Variable<K, V>>>,
 }

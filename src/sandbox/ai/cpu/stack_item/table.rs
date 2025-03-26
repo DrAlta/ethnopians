@@ -1,14 +1,14 @@
 use std::cell::RefCell;
 use std::collections::BTreeMap;
 use std::hash::{Hash, Hasher};
-use std::rc::{Rc, Weak};
+use std::sync::{Arc, Weak};
 
 use crate::sandbox::ai::StackItem as Value;
 
 // ParentTables is the type in the RefCell of TableInterior's parents proporty
 pub(super) type ParentTables = Vec<Weak<TableInterior>>;
 
-// TableInterior is the type that the Value::Table has in its Rc
+// TableInterior is the type that the Value::Table has in its Arc
 #[derive(Debug)]
 pub struct TableInterior {
     //map holds the key, value pairs of the table
@@ -39,11 +39,11 @@ impl PartialEq for TableInterior {
 }
 impl Eq for TableInterior {}
 impl TableInterior {
-    pub fn has_ancester(&self, other: &Rc<TableInterior>) -> bool {
+    pub fn has_ancester(&self, other: &Arc<TableInterior>) -> bool {
         self.parents.borrow().iter().any(|x| match x.upgrade() {
             None => false,
             Some(rc) => {
-                if Rc::ptr_eq(&rc, other) {
+                if Arc::ptr_eq(&rc, other) {
                     true
                 } else {
                     rc.has_ancester(other)
