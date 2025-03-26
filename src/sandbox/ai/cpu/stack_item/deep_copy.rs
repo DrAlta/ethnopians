@@ -50,7 +50,7 @@ impl DeepDeepCopy for Value {
         match self {
             Value::Table(rc) => {
                 let mut dolly_the_clone = Value::new_table();
-                for (key, value) in &*rc.map.borrow_mut() {
+                for (key, value) in &*rc.map.read().unwrap() {
                     let key_as_value_ref = ValueRef(Arc::new(key.clone()));
                     if let Some(previous_copy) = seen.get(&key_as_value_ref) {
                         dolly_the_clone

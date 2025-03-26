@@ -1,4 +1,4 @@
-use std::{cell::RefCell, collections::BTreeMap, sync::Arc};
+use std::{collections::BTreeMap, sync::{Arc, RwLock}};
 
 use crate::sandbox::EntityId;
 
@@ -100,8 +100,8 @@ impl StackItem {
     }
     pub fn new_table() -> StackItem {
         StackItem::Table(Arc::new(TableInterior {
-            map: RefCell::new(BTreeMap::new()),
-            parents: RefCell::new(ParentTables::new()),
+            map: RwLock::new(BTreeMap::new()),
+            parents: RwLock::new(ParentTables::new()),
         }))
     }
 }
@@ -121,18 +121,18 @@ impl StackItem {
                 } else {
                     stuffing_rc
                         .parents
-                        .borrow_mut()
+                        .write().unwrap()
                         .push(Arc::downgrade(&stuffee));
 
                     stuffee
                         .map
-                        .borrow_mut()
+                        .write().unwrap()
                         .insert(key, StackItem::Table(stuffing_rc));
                     Ok(())
                 }
             }
             (StackItem::Table(stuffee), value) => {
-                stuffee.map.borrow_mut().insert(key, value);
+                stuffee.map.write().unwrap().insert(key, value);
                 Ok(())
             }
             _ => Err("ForthKind::StuffeeNotTable".to_owned()),

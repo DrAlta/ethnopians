@@ -39,7 +39,7 @@ pub fn tick_sequence(
         return Err("Sequence state not found on stack".into());
     };
     let TableInterior { map, parents: _ } = x.as_ref();
-    let map2 = map.borrow();
+    let map2 = map.read().unwrap();
     let Some(StackItem::Int(idx)) = map2.table_get("Sequence") else {
         logy!("debug", "{map:#?}");
         return Err("Sequence state not found on stack".into());

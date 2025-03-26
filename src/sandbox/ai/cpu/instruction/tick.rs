@@ -530,7 +530,7 @@ impl Instruction {
                 let Some(StackItem::Table(x)) = stack.last() else {
                     return Err("TOS wasn't a table".to_owned());
                 };
-                let map_empty_ka = x.map.borrow().is_empty();
+                let map_empty_ka = x.map.read().unwrap().is_empty();
                 stack.push(if map_empty_ka {
                     StackItem::True
                 } else {
@@ -542,7 +542,7 @@ impl Instruction {
                 let Some(StackItem::Table(x)) = stack.last() else {
                     return Err("TOS wasn't a table".to_owned());
                 };
-                let last_maybe = x.map.borrow_mut().pop_last();
+                let last_maybe = x.map.write().unwrap().pop_last();
 
                 if let Some((_, last)) = last_maybe {
                     stack.push(StackItem::some(last));

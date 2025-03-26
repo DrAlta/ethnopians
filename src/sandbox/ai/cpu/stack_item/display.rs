@@ -14,7 +14,7 @@ impl fmt::Display for StackItem {
             StackItem::String(s) => write!(f, "“{}”", s),
             StackItem::Table(table_rc) => {
                 // Borrow the table's map.
-                let inner_map = table_rc.map.borrow();
+                let inner_map = table_rc.map.read().unwrap();
 
                 let mut table_iter = inner_map.iter();
                 write!(f, "{{",)?;
