@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use nom::{
     branch::alt, bytes::complete::tag, character::complete::char, error::ErrorKind,
@@ -13,7 +13,7 @@ use crate::sandbox::ai::{
 use super::Thingie;
 
 pub fn sequence_parser<'a, 'b>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
-    let mut hash = HashMap::new();
+    let mut hash = BTreeMap::new();
     let (tail, (_, _, _, _, head, _, _)) = tuple((
         alt((tag("sequence"), tag("seq"))),
         space_parser,
@@ -64,7 +64,7 @@ mod tests {
         );
         assert_eq!(
             db,
-            HashMap::from([
+            BTreeMap::from([
                 (
                     "@1".to_owned(),
                     vec![Instruction::Sequence(vec![
@@ -97,7 +97,7 @@ mod tests {
         );
         assert_eq!(
             db,
-            HashMap::new() /*from([
+            BTreeMap::new() /*from([
                                ("@2".to_owned(), Instruction::Action(InpulseId::Act1)),
                                ("@3".to_owned(), Instruction::Action(InpulseId::Act2)),
                                ("@4".to_owned(), Instruction::Action(InpulseId::Act3)),

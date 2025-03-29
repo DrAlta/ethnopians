@@ -4,7 +4,7 @@ use bevy::prelude::*;
 
 use crate::sandbox::{change_request::Changes, EntityId};
 
-#[derive(Debug, Event, PartialEq)]
+#[derive(Event, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ChangeRequest {
     pub hash: u64,
     pub contentious_entities: BTreeSet<EntityId>,

@@ -43,12 +43,12 @@ use qol::pout;
 mod psych;
 
 // Define an enum to represent emotional experience types
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum TraumaExperienceType {
     Humiliation, // Add more types as needed
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Event {
     // Type of trauma experience
     trauma_type: TraumaExperienceType,

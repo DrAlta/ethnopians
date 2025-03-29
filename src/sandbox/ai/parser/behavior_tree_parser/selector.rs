@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use nom::{
     branch::alt, bytes::complete::tag, character::complete::char, error::ErrorKind,
@@ -13,7 +13,7 @@ use crate::sandbox::ai::{
 use super::Thingie;
 
 pub fn selector_parser<'a, 'b>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
-    let mut hash = HashMap::new();
+    let mut hash = BTreeMap::new();
     let (tail, (_, _, _, _, head, _, _)) = //map_res(
         tuple((
             alt((
@@ -75,7 +75,7 @@ mod tests {
         );
         assert_eq!(
             db,
-            HashMap::from([
+            BTreeMap::from([
                 (
                     "@1".to_owned(),
                     vec![Instruction::Selector(vec![
@@ -106,7 +106,7 @@ mod tests {
                 "act3".to_owned()
             ])],
         );
-        assert_eq!(db, HashMap::new());
+        assert_eq!(db, BTreeMap::new());
     }
     #[test]
     fn selector_eats_test() {
@@ -125,7 +125,7 @@ mod tests {
         );
         assert_eq!(
             db,
-            HashMap::from([
+            BTreeMap::from([
                 ("@1".to_owned(), vec![Instruction::Eat("pizza".to_owned())]),
                 ("@2".to_owned(), vec![Instruction::Eat("pizza".to_owned())]),
                 ("@3".to_owned(), vec![Instruction::Eat("pizza".to_owned())]),

@@ -34,14 +34,14 @@ impl Steering {
         };
 
         // Calculate interpolation factor
-        let a = (direction as Number - *prev_key as Number).rem_euclid(256.0);
+        let a = (direction as f32 - *prev_key as f32).rem_euclid(256.0);
 
-        let b = (*next_key as Number - *prev_key as Number).rem_euclid(256.0);
+        let b = (*next_key as f32 - *prev_key as f32).rem_euclid(256.0);
 
         let t = a / b;
 
         // Interpolate between the two closest values
-        Some(lerp(*prev, *next, t))
+        Some(lerp(*prev, *next, Into::<Number>::into(t)))
     }
     pub fn max<T: Degrees>(&self) -> Option<Number> {
         Some(*(&self.0).values().max_by(|a, b| a.total_cmp(b))?)
@@ -78,19 +78,19 @@ mod tests {
 
     #[test]
     pub fn over_test() {
-        let map = Steering::from(BTreeMap::from([(0, 10.0), (5, 5.0), (9, 10.0)]));
+        let map = Steering::from(BTreeMap::from([(0, Number::TEN), (5, Number::FIVE), (9, Number::TEN)]));
 
         assert_eq!(map.get(20).unwrap(), 10.0);
     }
     #[test]
     pub fn under_test() {
-        let map = Steering::from(BTreeMap::from([(3, 10.0), (5, 5.0), (9, 10.0)]));
+        let map = Steering::from(BTreeMap::from([(3, Number::TEN), (5, Number::FIVE), (9, Number::TEN)]));
 
         assert_eq!(map.get(1).unwrap(), 10.0);
     }
     #[test]
     pub fn mid_test() {
-        let map = Steering::from(BTreeMap::from([(3, 5.0), (5, 10.0), (100, 10.0)]));
+        let map = Steering::from(BTreeMap::from([(3, Number::FIVE), (5, Number::TEN), (100, Number::TEN)]));
 
         assert_eq!(map.get(50).unwrap(), 10.0);
     }

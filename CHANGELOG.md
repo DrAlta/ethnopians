@@ -4,6 +4,16 @@ Notable changes to the "Ethnopians" crate will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.2.4] - 2025-03-28
+
+### Changed
+
+- replaced floats with orderedF32
+
+### Added
+
+- 'Debug, Clone, PartialEq, Eq, PartialOrd, Ord' to everything
+
 ## [0.2.3] - 2025-03-25
 
 ### Changed

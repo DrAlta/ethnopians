@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use crate::sandbox::ai::{
     parser::{
@@ -20,7 +20,7 @@ use nom::{
 pub fn blackboard_parser<'a, 'b>(
     input: &'a str,
 ) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
-    let mut hash = HashMap::new();
+    let mut hash = BTreeMap::new();
     //                1  2  3  4  5       6  7  8  9 10, 11,  12 13
     let (tail, (_, _, _, _, values, _, _, _, _, _, tree, _, _)) = //map_res(
         tuple((
@@ -60,7 +60,7 @@ pub fn blackboard_parser<'a, 'b>(
             space_parser,//12
             char('}'),//13
         ))(input)?;
-    let _: HashMap<BlackboardKey, Variable<BlackboardKey, BlackboardValue>> = values
+    let _: BTreeMap<BlackboardKey, Variable<BlackboardKey, BlackboardValue>> = values
         .into_iter()
         .map(|(k, _, v)| (k.to_owned(), Variable::Defer(v.to_owned())))
         .collect();

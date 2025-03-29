@@ -1,4 +1,4 @@
-use crate::Number;
+use crate::{Number, IOTA};
 /// A structure for tracking the running envelope of a signal.
 ///
 /// This struct maintains smoothed estimates for the overall signal's:
@@ -77,7 +77,7 @@ impl RunningEnvelope {
     /// - `new_sample`: The most recent sample from the signal.
     pub fn update(&mut self, new_sample: Number) -> Number {
         // Calculate the weight for previous values (e.g., if decay is 10, then weight_old = 9).
-        let weight_old = 1.0 - self.decay;
+        let weight_old = Number::ONE - self.decay;
 
         // Update the running average.
         self.avg = (self.avg * weight_old) + (new_sample * self.decay);
@@ -88,7 +88,7 @@ impl RunningEnvelope {
         self.fast_attack_high = if new_sample > self.fast_attack_high {
             new_sample
         } else {
-            self.fast_attack_high * (1.0 - self.max_release)
+            self.fast_attack_high * (Number::ONE - self.max_release)
                 + (new_sample.max(self.avg) * self.max_release)
         };
 
@@ -101,7 +101,7 @@ impl RunningEnvelope {
         self.fast_attack_low = if new_sample < self.fast_attack_low {
             new_sample
         } else {
-            self.fast_attack_low * (1.0 - self.min_release)
+            self.fast_attack_low * (Number::ONE - self.min_release)
                 + (new_sample.min(self.avg) * self.min_release)
         };
 
@@ -131,26 +131,26 @@ impl RunningEnvelope {
     pub fn position(&self, value: Number) -> Number {
         // Use the envelope's low and high as the endpoints.
         let range = self.high - self.low;
-        if range.abs() < Number::EPSILON {
-            return 0.0;
+        if range.abs() < IOTA {
+            return Number::ZERO;
         }
         // Normalize the input value: t in [0,1]
-        let t = ((value - self.low) / range).clamp(0.0, 1.0);
+        let t = ((value - self.low) / range).clamp(Number::ZERO, Number::ONE);
         // Normalize the average's location
-        let t_avg = ((self.avg - self.low) / range).clamp(0.0, 1.0);
+        let t_avg = ((self.avg - self.low) / range).clamp(Number::ZERO, Number::ONE);
 
         // Avoid division-by-zero if avg is extremely close to low or high.
-        if t_avg.abs() < Number::EPSILON || (1.0 - t_avg).abs() < Number::EPSILON {
+        if t_avg.abs() < IOTA || (Number::ONE - t_avg).abs() < IOTA {
             // Fall back to a simple linear mapping from -1 to 1.
-            return 2.0 * t - 1.0;
+            return Number::TWO * t - Number::ONE;
         }
 
         // Compute the control point P₁ so that B(t_avg) = 0.
-        let p1 = (1.0 - 2.0 * t_avg) / (2.0 * t_avg * (1.0 - t_avg));
+        let p1 = (Number::ONE - Number::TWO * t_avg) / (Number::TWO * t_avg * (Number::ONE - t_avg));
 
         // Quadratic Bézier curve:
         // B(t) = (1-t)² * (-1) + 2*(1-t)*t * p1 + t² * (1)
-        let subjective = (1.0 - t).powi(2) * (-1.0) + 2.0 * (1.0 - t) * t * p1 + t.powi(2) * 1.0;
+        let subjective = (Number::ONE - t).powi(2) * (Number::NEG_ONE) + Number::TWO * (Number::ONE - t) * t * p1 + t.powi(2) * Number::ONE;
         subjective
     }
     /*
@@ -171,7 +171,7 @@ impl RunningEnvelope {
             let range = self.high - self.avg;
 
             // If range is too close to zero, return 0.0 to avoid division errors.
-            if range.abs() < Number::EPSILON {
+            if range.abs() < IOTA {
                 return 0.0;
             }
 

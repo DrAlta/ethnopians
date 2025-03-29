@@ -30,8 +30,8 @@ impl Instruction {
                 stack.pop();
                 Ok(Status::UseOn(a.clone(), b.clone()))
             }
-            Instruction::Debug(x) => {
-                logy!("debug", "{x}");
+            Instruction::Debug(_x) => {
+                logy!("debug", "{_x}");
                 Self::next(Status::None, pc)
             }
             Instruction::Eat(x) => {

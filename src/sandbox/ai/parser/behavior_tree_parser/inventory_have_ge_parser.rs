@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
@@ -27,7 +27,7 @@ pub fn inventory_have_ge_parser<'a>(
         tail,
         Thingie::Tree(
             vec![Instruction::InventoryGE(item.to_owned(), number)],
-            HashMap::new(),
+            BTreeMap::new(),
         ),
     ))
 }

@@ -35,7 +35,7 @@ pub use tree_parser::tree_parser;
 mod use_parser;
 pub use use_parser::use_parser;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Thingie {
     Token(String),
     Tree(Thread, TreesUsed),

@@ -4,7 +4,7 @@ use std::hash::Hash;
 use crate::sandbox::ai::StackItem as Value;
 
 // TableInterior is the type that the Value::Table has in its Arc
-#[derive(Debug, Hash, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct TableInterior {
     //map holds the key, value pairs of the table
     pub map: BTreeMap<Value, Value>,

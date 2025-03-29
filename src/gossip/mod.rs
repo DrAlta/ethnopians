@@ -1,58 +1,60 @@
 //! this was coded by Chad.  I''m reveiw it when I migrate it bevy
 use std::collections::HashMap;
 
+use crate::Number;
+
 /// A unique identifier type for each character in the game.
 type CharId = usize;
 /// Represents the personality traits of a character that influence their behavior and reactions
 /// in the gossip system.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct PersonalityTraits {
     /// How forgiving the character is when others share commonly held beliefs, even if untrue.
     /// Range: 0.0 (not forgiving) to 1.0 (very forgiving).
-    forgiveness_for_common_beliefs: f32,
+    forgiveness_for_common_beliefs: Number,
 
     /// The extent to which the character prefers information that confirms their own beliefs.
     /// Range: 0.0 (objective/open-minded) to 1.0 (strongly biased towards confirmation).
-    confirmation_bias: f32,
+    confirmation_bias: Number,
 
     /// How easily the character's trust increases when they hear information that confirms
     /// their existing beliefs.
     /// Range: 0.0 (skeptical) to 1.0 (very gullible).
-    gullibility_for_confirmation: f32,
+    gullibility_for_confirmation: Number,
 
     /// The tendency of the character to align with the opinions of others (conformity).
     /// Range: 0.0 (non-conformist) to 1.0 (highly conformist).
-    conformity: f32,
+    conformity: Number,
 
     /// The character's natural skepticism towards new or contradicting information.
     /// Range: 0.0 (not skeptical/gullible) to 1.0 (highly skeptical).
-    skepticism: f32,
+    skepticism: Number,
 
     /// Determines whether the character weighs affection or trust more when considering others'
     /// opinions. Range: -1.0 (prioritize trust) to 1.0 (prioritize affection).
-    opinion_weight_bias: f32,
+    opinion_weight_bias: Number,
 }
 /// Represents the direct relationship between this character and another character.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct Relationship {
     /// The affection level towards the other character.
     /// Range: -1.0 (strong dislike) to 1.0 (strong liking).
-    affection: f32,
+    affection: Number,
 
     /// The trust level towards the other character.
     /// Range: 0.0 (no trust) to 1.0 (complete trust).
-    trust: f32,
+    trust: Number,
 }
 /// Represents this character's perception of how one character feels about another character.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct Opinion {
     /// The believed affection that the subject character has towards the target character.
     /// Range: -1.0 (believes the subject strongly dislikes the target) to 1.0 (believes the
     /// subject strongly likes the target).
-    affection: f32,
+    affection: Number,
 }
 /// Represents a character in the game, including their personality, relationships, and perceptions.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct Character {
     /// Unique identifier for the character.
     id: CharId,

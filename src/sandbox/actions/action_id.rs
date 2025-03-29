@@ -1,4 +1,5 @@
-#[derive(Debug, Eq, PartialEq, PartialOrd, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ActionId {
     UseObject,
+    TakeObject,
 }

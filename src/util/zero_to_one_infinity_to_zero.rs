@@ -1,4 +1,3 @@
-use crate::Consts;
 /// this is for calculating first inpressions
 /// you calc some `diffrance_in_personalities`
 /// then `let first_impression = how_well_their_interaction_when * zero2one_infinity_to_zero_throught_point(diffrance_in_personalities, 0.01, max_diffrance_in_personalities);`

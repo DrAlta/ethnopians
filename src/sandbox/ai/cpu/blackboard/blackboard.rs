@@ -1,16 +1,16 @@
-use std::{borrow::Borrow, collections::HashMap, fmt::Debug, hash::Hash};
+use std::{borrow::Borrow, collections::BTreeMap, fmt::Debug, hash::Hash};
 
 use super::Variable;
 
-#[derive(Debug)]
-pub struct Blackboard<K: Debug, V: Debug> {
-    stack: Vec<HashMap<K, Variable<K, V>>>,
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Blackboard<K: Debug + std::cmp::Eq + std::hash::Hash, V: Debug> {
+    stack: Vec<BTreeMap<K, Variable<K, V>>>,
 }
 
-impl<K: Debug + std::cmp::Eq + std::hash::Hash, V: Debug> Blackboard<K, V> {
+impl<K: Debug + std::cmp::Eq + std::hash::Hash + Ord, V: Debug> Blackboard<K, V> {
     pub fn insert(&mut self, k: K, v: Variable<K, V>) -> Option<Variable<K, V>> {
         if self.stack.is_empty() {
-            self.stack.push(HashMap::new());
+            self.stack.push(BTreeMap::new());
         };
         self.stack
             .last_mut()
@@ -19,8 +19,8 @@ impl<K: Debug + std::cmp::Eq + std::hash::Hash, V: Debug> Blackboard<K, V> {
     }
     pub fn get<Q>(&self, k: &Q) -> Option<&V>
     where
-        Q: ?Sized + Hash + Eq,
-        K: Borrow<Q>,
+        Q: ?Sized + Hash + Eq + Ord,
+        K: Borrow<Q> + Ord,
     {
         let mut current_key = k;
         for i in 1..self.stack.len() + 1 {
@@ -35,19 +35,19 @@ impl<K: Debug + std::cmp::Eq + std::hash::Hash, V: Debug> Blackboard<K, V> {
         None
     }
 }
-impl<K: Debug, V: Debug> Blackboard<K, V> {
-    pub fn from(hash: HashMap<K, Variable<K, V>>) -> Self {
+impl<K: Debug + Eq + std::hash::Hash, V: Debug> Blackboard<K, V> {
+    pub fn from(hash: BTreeMap<K, Variable<K, V>>) -> Self {
         Self { stack: vec![hash] }
     }
     pub fn new() -> Self {
         Self {
-            stack: vec![HashMap::new()],
+            stack: vec![BTreeMap::new()],
         }
     }
-    pub fn pop(&mut self) -> Option<HashMap<K, Variable<K, V>>> {
+    pub fn pop(&mut self) -> Option<BTreeMap<K, Variable<K, V>>> {
         self.stack.pop()
     }
-    pub fn push(&mut self, hash: HashMap<K, Variable<K, V>>) {
+    pub fn push(&mut self, hash: BTreeMap<K, Variable<K, V>>) {
         self.stack.push(hash)
     }
 }
@@ -58,28 +58,28 @@ mod tests {
 
     #[test]
     pub fn defer_some_test() {
-        let mut blackboard = Blackboard::from(HashMap::from([("a", Variable::Chit(1))]));
-        blackboard.push(HashMap::from([("b", Variable::Defer("a"))]));
+        let mut blackboard = Blackboard::from(BTreeMap::from([("a", Variable::Chit(1))]));
+        blackboard.push(BTreeMap::from([("b", Variable::Defer("a"))]));
 
         assert_eq!(blackboard.get(&"b"), Some(&1))
     }
     #[test]
     pub fn defer_none_test() {
-        let mut blackboard = Blackboard::from(HashMap::from([("a", Variable::Chit(1))]));
-        blackboard.push(HashMap::from([("b", Variable::Defer("c"))]));
+        let mut blackboard = Blackboard::from(BTreeMap::from([("a", Variable::Chit(1))]));
+        blackboard.push(BTreeMap::from([("b", Variable::Defer("c"))]));
 
         assert_eq!(blackboard.get(&"b"), None)
     }
     #[test]
     pub fn chit_some_test() {
-        let mut blackboard = Blackboard::from(HashMap::from([("a", Variable::Chit(1))]));
-        blackboard.push(HashMap::from([("b", Variable::Chit(2))]));
+        let mut blackboard = Blackboard::from(BTreeMap::from([("a", Variable::Chit(1))]));
+        blackboard.push(BTreeMap::from([("b", Variable::Chit(2))]));
 
         assert_eq!(blackboard.get(&"b"), Some(&2))
     }
     #[test]
     pub fn chit_none_test() {
-        let blackboard = Blackboard::from(HashMap::from([("a", Variable::Chit(1))]));
+        let blackboard = Blackboard::from(BTreeMap::from([("a", Variable::Chit(1))]));
         assert_eq!(blackboard.get(&"b"), None)
     }
 }

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
@@ -22,7 +22,7 @@ pub fn forth_tree_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a s
     //    Ok((tail, Thingie::Tree(body, used)))
     //vvv new vvv
     let thread_name = "@0";
-    let mut hash = HashMap::new();
+    let mut hash = BTreeMap::new();
     for (k, mut v) in db.into_iter() {
         v.iter_mut().for_each(|x| x.correct(thread_name));
         assert_eq!(hash.insert(format!("{k}"), v), None,);

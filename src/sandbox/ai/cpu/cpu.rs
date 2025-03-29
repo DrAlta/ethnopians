@@ -1,11 +1,9 @@
-use std::collections::HashMap;
-
 use crate::sandbox::ai::{
     cpu::{ProgramCounter, ReturnStack, Stack, StackItem},
-    Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, Status, Thread,
+    Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, Status, TreePool,
 };
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct CPU {
     pub pc: ProgramCounter,
     pub stack: Stack,
@@ -26,7 +24,7 @@ impl CPU {
     }
     pub fn step(
         &mut self,
-        bt: &HashMap<ExecutionToken, Thread>,
+        bt: &TreePool,
         blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
     ) -> Result<Status, String> {
         let Some((token, idx)) = &self.pc else {

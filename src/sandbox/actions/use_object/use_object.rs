@@ -61,8 +61,8 @@ pub fn use_object(
             let (agent_center_x, agent_center_y) =
                 if let Ok((_, _, _, Some(size), _)) = query.get(agent_id) {
                     (
-                        agent_x + (size.width as Number * 0.5),
-                        agent_y + (size.height as Number * 0.5),
+                        agent_x + (Into::<Number>::into(size.width) * Number::HALF),
+                        agent_y + (Into::<Number>::into(size.height) * Number::HALF),
                     )
                 } else {
                     (*agent_x, *agent_y)
@@ -70,8 +70,8 @@ pub fn use_object(
             let (object_center_x, object_center_y) =
                 if let Ok((_, _, _, Some(size), _)) = query.get(agent_id) {
                     (
-                        object_x + (size.width as Number * 0.5),
-                        object_y + (size.height as Number * 0.5),
+                        object_x + (Into::<Number>::into(size.width) * Number::HALF),
+                        object_y + (Into::<Number>::into(size.height) * Number::HALF),
                     )
                 } else {
                     (*object_x, *object_y)
@@ -81,7 +81,7 @@ pub fn use_object(
                 agent_center_y,
                 object_center_x,
                 object_center_y,
-                20.0,
+                Into::<Number>::into(20.0),
             ) {
                 return Err("object is too far away!".to_owned());
             };

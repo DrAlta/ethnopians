@@ -1,6 +1,6 @@
 use crate::sandbox::{ai::InpulseId, EntityId, Item};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Status {
     Success,
     Failure,

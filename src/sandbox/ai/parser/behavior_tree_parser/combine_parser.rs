@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
@@ -25,7 +25,7 @@ pub fn combine_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str,
         tail,
         Thingie::Tree(
             vec![Instruction::Combine(item_a.to_owned(), item_b.to_owned())],
-            HashMap::new(),
+            BTreeMap::new(),
         ),
     ))
 }

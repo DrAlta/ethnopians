@@ -5,7 +5,7 @@ use bevy::{
     prelude::{Commands, Query},
 };
 
-use crate::{types::AARect, Number};
+use crate::{types::AARect, Number, IOTA};
 
 use qol::logy;
 
@@ -20,14 +20,16 @@ use crate::{
 /// I changed it to go thou the query and build a
 /// Hashmap<EntityId, Vec2> of the normalized direction of traval
 /// then just look inot that to see who collides with who
+/// 
+
 pub fn process_movement(
     mut query: Query<(EntityId, Option<&Movement>, Option<&mut Location>, &Size)>,
     mut collision_events: EventWriter<Collision>,
     mut travel_completed_events: EventWriter<TravelCompleted>,
     mut commands: Commands,
 ) {
-    let max_step = 5.0;
-    let time_step = 1.0;
+    let max_step = Number::FIVE;
+    let time_step = Number::ONE;
     /*
         #[cfg(feature = "move_history")]
         logy!("debug-process-movement", "Going tosaving histoy");
@@ -45,7 +47,7 @@ pub fn process_movement(
         })
         .collect();
 
-    let number_of_substeps = query.iter().fold(1.0, |x, (_, movement_maybe, _, _)| {
+    let number_of_substeps = query.iter().fold(Number::ONE, |x, (_, movement_maybe, _, _)| {
         if let Some(Movement { target: _, speed }) = movement_maybe {
             let step_dist = speed * time_step;
             logy!(
@@ -71,8 +73,8 @@ pub fn process_movement(
                     let entity = AARect {
                         min_x: *x,
                         min_y: *y,
-                        width: size.width as Number,
-                        height: size.height as Number,
+                        width: Into::<Number>::into(size.width),
+                        height: Into::<Number>::into(size.height),
                     };
                     Some((id, entity))
                 }
@@ -86,7 +88,7 @@ pub fn process_movement(
     //#[cfg(feature = "move_history")]
     //let mut history = Vec::new();
     let mut last_froms = HashMap::<EntityId, (Number, Number)>::new();
-    for step_number in 1..(number_of_substeps as usize + 1) {
+    for step_number in 1..(Into::<f32>::into(number_of_substeps) as usize + 1) { // Todo: Make in Into usize for Number?
         logy!("debug-process-movement", "processing step {step_number}");
         let desired = query.iter().filter_map(
             |
@@ -106,12 +108,12 @@ pub fn process_movement(
                         logy!("debug-process-movement", "the unit doesn't have a location in the world");
                         return None;
                     };
-                    let step_dist = speed * time_substep * step_number as Number;
+                    let step_dist = speed * time_substep * Into::<Number>::into(step_number as i128); // Todo: make From<usize> for Number
                     let target_vec= Vec2{x: *tx, y: *ty};
                     let origin_vec = Vec2{x:*x, y:*y};
 
                     let delta = (target_vec - origin_vec).normalize() * step_dist;
-                    if (target_vec - origin_vec).length_squared() < (step_dist * step_dist) + Number::EPSILON {
+                    if (target_vec - origin_vec).length_squared() < (step_dist * step_dist) + IOTA {
                         logy!("debug-process-movement", " the unit is moving more that the distance to the target so returning the target");
                         Some((unit_id.clone(), (target_vec.x, target_vec.y)))
                     } else {
@@ -135,7 +137,7 @@ pub fn process_movement(
                 sizes: query
                     .iter()
                     .filter_map(|(id, _, _, Size { width, height })| {
-                        Some((id, (*width as Number, *height as Number)))
+                        Some((id, (Into::<Number>::into(*width), Into::<Number>::into(*height))))
                     })
                     .collect(),
                 locations: &last_froms,
@@ -145,7 +147,7 @@ pub fn process_movement(
         temp_collies.into_iter().for_each(|(a,b)| {
             match (normalize_dir_of_travel.get(&a), normalize_dir_of_travel.get(&b)){
                 (Some((a_dir, a_speed)), Some((b_dir, b_speed))) => {
-                    match (a_speed.abs() < 0.0001, b_speed.abs() < 0.0001) {
+                    match (a_speed.abs() < IOTA, b_speed.abs() < IOTA) {
                         (true, true) => {
                             collies.insert((a,b));
                             collies.insert((b,a));
@@ -165,7 +167,7 @@ pub fn process_movement(
                         (false, false) => {
                             let  dot = a_dir.dot(b_dir);
 
-                            match(dot.abs() < 0.0001, a_speed.abs().total_cmp(&b_speed.abs()), (dot * a_speed).total_cmp(b_speed)){
+                            match(dot.abs() < IOTA, a_speed.abs().total_cmp(&b_speed.abs()), (dot * a_speed).total_cmp(b_speed)){
                                 // they aren't moving at right angle to each other and the component of A's speed in B's direction is less that B's speed
                                 (false, _, std::cmp::Ordering::Less) |
                                 // or they are moving at right able and A's speed is less that B's speed
@@ -224,14 +226,14 @@ pub fn process_movement(
         let Some((x, y)) = query.get_location(unit_id) else {
             continue;
         };
-        if (min_x - x).abs() > Number::EPSILON || (min_y - y).abs() > Number::EPSILON {
+        if (min_x - x).abs() > IOTA || (min_y - y).abs() > IOTA {
             moves.push((unit_id, (min_x, min_y)));
         }
     }
     for (id, (x, y)) in moves {
         // see if the entity reached it's destication
         if let Ok((_, Some(Movement { target, speed: _ }), _, _)) = query.get(id) {
-            if (x - target.x).abs() <= 0.0001 && (y - target.y).abs() <= 0.0001 {
+            if (x - target.x).abs() <= IOTA && (y - target.y).abs() <= IOTA {
                 // it reached it's destination so...
                 // send the TravelComplated event
                 travel_completed_events.send(TravelCompleted { entity_id: id });

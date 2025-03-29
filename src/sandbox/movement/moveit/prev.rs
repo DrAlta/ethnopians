@@ -34,6 +34,6 @@ impl<'a, 'b, 'c, 'd, 'e> Prev
 
     fn get_size(&self, id: EntityId) -> Option<(Number, Number)> {
         let (_, _, _, Size { width, height }) = self.get(id).ok()?;
-        Some((*width as Number, *height as Number))
+        Some((Into::<Number>::into(*width), Into::<Number>::into(*height)))
     }
 }

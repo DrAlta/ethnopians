@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
@@ -21,7 +21,7 @@ pub fn eat_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, Err
     ))(input)?;
     Ok((
         tail,
-        Thingie::Tree(vec![Instruction::Eat(item_a.to_owned())], HashMap::new()),
+        Thingie::Tree(vec![Instruction::Eat(item_a.to_owned())], BTreeMap::new()),
     ))
 }
 #[cfg(test)]

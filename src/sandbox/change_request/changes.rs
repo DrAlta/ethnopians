@@ -5,7 +5,7 @@ use crate::sandbox::{change_request::Dispatch, EntityId, Item, Location};
 
 //use super::dispatch::Dispatch2;
 
-#[derive(Debug, Clone, PartialEq, Structs)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Structs)]
 pub enum Changes {
     Despawn(EntityId),
     Energy { entity_id: EntityId, delta: i32 },

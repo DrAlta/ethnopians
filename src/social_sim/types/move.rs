@@ -1,6 +1,6 @@
 use crate::social_sim::{ActionId, ActorId};
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Move {
     pub actor_id: ActorId,
     pub actee_id: ActorId,

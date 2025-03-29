@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-#[derive(Debug, Clone, Event, PartialEq)]
+#[derive(Event, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ChangeConflict {
     pub hash: u64,
 }

@@ -1,10 +1,10 @@
-use std::collections::HashMap;
+//use std::collections::HashMap;
 
 use qol::pout;
 
 use super::*;
 use crate::sandbox::ai::{
-    Blackboard, InpulseId, Instruction, Status, Thread, ThreadName, TreePool,
+    Blackboard, InpulseId, Instruction, Status, TreePool,
 };
 
 #[test]
@@ -243,7 +243,7 @@ fn step_test() {
 fn test() {
     let mut blackboard = Blackboard::new();
 
-    let mut task_db = HashMap::<ThreadName, Thread>::new();
+    let mut task_db = TreePool::new();
     let action1 = "a1".to_owned();
     task_db.insert(
         action1.clone(),

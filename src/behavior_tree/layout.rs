@@ -9,7 +9,7 @@ impl Layout {
         let init = if let Some(first) = iter.next() {
             first.size(spacing)
         } else {
-            vec2(0.0, 0.0)
+            vec2(Number::ZERO, Number::ZERO)
         };
 
         let x = iter.fold(init, |acc, item| {

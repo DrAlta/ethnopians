@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use crate::sandbox::ai::{
     parser::{
@@ -16,7 +16,7 @@ pub fn file_parser<'a>(
     input: &'a str,
     //    _prefix: &'b str
 ) -> IResult<&'a str, TreePool, (&'a str, ErrorKind)> {
-    //    let mut hash = HashMap::new();
+    //    let mut hash = BTreeMap::new();
     let (tail, (_, head, _)) = tuple((
         space_parser,
         separated_list1(
@@ -25,7 +25,7 @@ pub fn file_parser<'a>(
         ),
         space_parser,
     ))(input)?;
-    let mut hash = HashMap::new();
+    let mut hash = BTreeMap::new();
     for (_thread_name, body) in head {
         hash.extend(body.into_iter());
     }
@@ -36,7 +36,7 @@ pub fn named_tree_parser<'a>(
     input: &'a str,
     //    _prefix: &'b str
 ) -> IResult<&'a str, (ThreadName, TreePool), (&'a str, ErrorKind)> {
-    //    let mut hash = HashMap::new();
+    //    let mut hash = BTreeMap::new();
     let (tail, (thread_name, _, _, _, (mut i, db))) = tuple((
         ident_parser,
         space_parser,
@@ -52,7 +52,7 @@ pub fn named_tree_parser<'a>(
             Ok::<(Thread, TreesUsed), ()>((i, used))
         }),
     ))(input)?;
-    let mut hash = HashMap::new();
+    let mut hash = BTreeMap::new();
     for (k, mut v) in db.into_iter() {
         v.iter_mut().for_each(|x| x.correct(thread_name));
         assert_eq!(hash.insert(format!("{thread_name}{k}"), v), None,);
@@ -78,7 +78,7 @@ mod tests {
         use(axe, tree)
     }"#;
         let (tail, db) = file_parser(source).unwrap();
-        let standard = HashMap::from([
+        let standard = BTreeMap::from([
             (
                 "have_02_wood_02".to_owned(),
                 vec![Instruction::Selector(vec![

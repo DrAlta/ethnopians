@@ -1,15 +1,15 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::BTreeMap, sync::Arc};
 
 use qol::{logy, pout, Vecna};
 
 use crate::sandbox::{
-    ai::{Blackboard, BlackboardValue, InpulseId, StackItem, Status, CPU},
+    ai::{Blackboard, BlackboardValue, InpulseId, StackItem, Status, TreePool, CPU},
     EntityId, Item,
 };
 
 type Prayer = Status;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Eq, PartialOrd, Ord)]
 enum Info {
     Result,
     Standard,
@@ -22,7 +22,7 @@ impl std::cmp::PartialEq for Info {
 
 pub fn task_testing_harness(
     task: &str,
-    task_db: HashMap<String, Vec<super::Instruction>>,
+    task_db: TreePool,
     what_final_stack_should_be: crate::sandbox::ai::Stack,
     find_in_inventory: Vec<EntityId>,
     find_nearest: Vec<EntityId>,
@@ -33,7 +33,7 @@ pub fn task_testing_harness(
     get_is_inventory_ge: Vec<bool>,
     running: Vec<bool>,
     mut blackboard: Blackboard<String, BlackboardValue>,
-    item_types: HashMap<bevy::ecs::entity::Entity, Item>,
+    item_types: BTreeMap<bevy::ecs::entity::Entity, Item>,
 ) {
     let mut prayers = Vec::<(usize, Prayer)>::new();
 

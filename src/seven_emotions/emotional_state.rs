@@ -1,5 +1,5 @@
 // We’ll use a simple model where each emotional process is represented as a value between 0.0 and 1.0.
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct EmotionalState {
     // these are how 'active' the system is 0.0 if inactive. 1.0 is active at full strangth
     /// seeking is increased by novel stimuli, you're walking downa trai land hear one unsual noise you might walk on, but hear a buch and you're curiosity and peeked and to stop to investagate it.

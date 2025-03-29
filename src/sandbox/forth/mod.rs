@@ -26,7 +26,7 @@ use std::{
     sync::Arc,
 };
 
-#[derive(Debug, Eq)]
+#[derive(Debug, Clone, Eq,)]
 pub enum Value {
     Bool(bool),
     Int(i64),

@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::sandbox::ai::TreePool;
 
 pub trait Corrent {
@@ -7,7 +5,7 @@ pub trait Corrent {
 }
 impl Corrent for TreePool {
     fn correct(&mut self, prefix: &str) {
-        let original = std::mem::replace(self, HashMap::new());
+        let original = std::mem::replace(self, TreePool::new());
         for (k, mut v) in original.into_iter() {
             v.iter_mut().for_each(|x| x.correct(prefix));
             assert_eq!(self.insert(format!("{prefix}{k}"), v), None,);

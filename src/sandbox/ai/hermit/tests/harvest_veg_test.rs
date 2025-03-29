@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use crate::sandbox::{
     ai::{
@@ -17,7 +17,7 @@ fn harvest_veg_test() {
     let garden_2 = EntityId::from_raw(52);
     let garden_3 = EntityId::from_raw(52);
     let garden_4 = EntityId::from_raw(54);
-    let item_types: HashMap<bevy::ecs::entity::Entity, Item> = HashMap::from([
+    let item_types: BTreeMap<bevy::ecs::entity::Entity, Item> = BTreeMap::from([
         (my_self, Item::Agent),
         (house, Item::House),
         (garden_1, Item::Stone),

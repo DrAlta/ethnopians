@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use crate::sandbox::ai::{
     parser::{comment_parser, space_parser},
@@ -26,7 +26,7 @@ pub fn forth_parser<'a>(
         space_parser,
     ))(input)?;
     let mut thread = Vec::new();
-    let mut pool = HashMap::new();
+    let mut pool = BTreeMap::new();
     for (idx, (mut vec, mut hash_map)) in body.into_iter().enumerate() {
         let prefix = format!("@{idx}");
         hash_map.correct(&prefix);

@@ -2,7 +2,7 @@ use qol::{logy, pout};
 
 use super::{Item, NodeId, Treeturn};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Behavior {
     Sequence { behaviors: Vec<Behavior> },
     Fallback { behaviors: Vec<Behavior> },

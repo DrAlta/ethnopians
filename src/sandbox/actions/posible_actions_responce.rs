@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{sandbox::EntityId, types::ActionId};
 
-#[derive(Event, Debug, PartialEq, Eq)]
+#[derive(Event, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PosibleActionsResponce {
     pub agent_id: EntityId,
     pub target_id: EntityId,
