@@ -51,6 +51,8 @@ use sandbox::within_range;
 mod use_object;
 pub use use_object::UseObject;
 */
+mod posible_actions;
+pub use posible_actions::{PosibleActionsRequest, PosibleActionsResponce};
 pub mod world;
 
 pub type EntityId = bevy::prelude::Entity;

@@ -2,7 +2,8 @@ use bevy::prelude::*;
 
 use crate::{
     sandbox::{
-        actions::{use_object::UseRequest, PosibleActionsRequest, PosibleActionsResponce},
+        actions::use_object::UseRequest,
+        posible_actions::{PosibleActionsRequest, PosibleActionsResponce},
         world::Type,
         Item, Location,
     },

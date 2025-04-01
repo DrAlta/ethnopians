@@ -5,11 +5,9 @@ use qol::logy;
 
 use crate::{
     sandbox::{
-        actions::{
-            use_object::{use_object, UseRequest},
-            PosibleActionsRequest, PosibleActionsResponce,
-        },
+        actions::use_object::{use_object, UseRequest},
         change_request::ChangeRequest,
+        posible_actions::{PosibleActionsRequest, PosibleActionsResponce},
         world::{Energy, Size, Type},
         Location,
     },
