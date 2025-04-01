@@ -20,7 +20,7 @@ use crate::{
 /// I changed it to go thou the query and build a
 /// Hashmap<EntityId, Vec2> of the normalized direction of traval
 /// then just look inot that to see who collides with who
-/// 
+///
 
 pub fn process_movement(
     mut query: Query<(EntityId, Option<&Movement>, Option<&mut Location>, &Size)>,
@@ -47,21 +47,23 @@ pub fn process_movement(
         })
         .collect();
 
-    let number_of_substeps = query.iter().fold(Number::ONE, |x, (_, movement_maybe, _, _)| {
-        if let Some(Movement { target: _, speed }) = movement_maybe {
-            let step_dist = speed * time_step;
-            logy!(
-                "debug-process-movement",
-                "step_dist / max_step = {} / {} = {}",
-                step_dist,
-                max_step,
-                step_dist / max_step
-            );
-            Number::max(x, (step_dist / max_step).ceil())
-        } else {
-            x
-        }
-    });
+    let number_of_substeps = query
+        .iter()
+        .fold(Number::ONE, |x, (_, movement_maybe, _, _)| {
+            if let Some(Movement { target: _, speed }) = movement_maybe {
+                let step_dist = speed * time_step;
+                logy!(
+                    "debug-process-movement",
+                    "step_dist / max_step = {} / {} = {}",
+                    step_dist,
+                    max_step,
+                    step_dist / max_step
+                );
+                Number::max(x, (step_dist / max_step).ceil())
+            } else {
+                x
+            }
+        });
     let time_substep = time_step / number_of_substeps;
 
     let mut rearendings = HashMap::<EntityId, AARect>::new();
@@ -88,7 +90,8 @@ pub fn process_movement(
     //#[cfg(feature = "move_history")]
     //let mut history = Vec::new();
     let mut last_froms = HashMap::<EntityId, (Number, Number)>::new();
-    for step_number in 1..(Into::<f32>::into(number_of_substeps) as usize + 1) { // Todo: Make in Into usize for Number?
+    for step_number in 1..(Into::<f32>::into(number_of_substeps) as usize + 1) {
+        // Todo: Make in Into usize for Number?
         logy!("debug-process-movement", "processing step {step_number}");
         let desired = query.iter().filter_map(
             |
@@ -137,7 +140,10 @@ pub fn process_movement(
                 sizes: query
                     .iter()
                     .filter_map(|(id, _, _, Size { width, height })| {
-                        Some((id, (Into::<Number>::into(*width), Into::<Number>::into(*height))))
+                        Some((
+                            id,
+                            (Into::<Number>::into(*width), Into::<Number>::into(*height)),
+                        ))
                     })
                     .collect(),
                 locations: &last_froms,

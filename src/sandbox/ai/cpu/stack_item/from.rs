@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
-use crate::sandbox::{ai::{BlackboardValue, StackItem}, EntityId};
+use crate::sandbox::{
+    ai::{BlackboardValue, StackItem},
+    EntityId,
+};
 
 impl From<BlackboardValue> for StackItem {
     fn from(value: BlackboardValue) -> Self {
@@ -24,7 +27,6 @@ impl From<&BlackboardValue> for StackItem {
     }
 }
 
-
 impl From<EntityId> for StackItem {
     fn from(value: EntityId) -> Self {
         Self::EntityId(value)
@@ -36,13 +38,11 @@ impl From<&EntityId> for StackItem {
     }
 }
 
-
 impl From<i32> for StackItem {
     fn from(value: i32) -> Self {
         Self::Int(value)
     }
 }
-
 
 impl From<String> for StackItem {
     fn from(value: String) -> Self {
@@ -55,19 +55,18 @@ impl From<&str> for StackItem {
     }
 }
 
-
-impl<T:Into<StackItem>> From<Option<T>> for StackItem {
+impl<T: Into<StackItem>> From<Option<T>> for StackItem {
     fn from(value: Option<T>) -> Self {
         let Some(thing) = value else {
-            return StackItem::False
+            return StackItem::False;
         };
         StackItem::some(thing.into())
     }
 }
-impl<T:Into<StackItem> + Clone> From<&Option<T>> for StackItem {
+impl<T: Into<StackItem> + Clone> From<&Option<T>> for StackItem {
     fn from(value: &Option<T>) -> Self {
         let Some(thing) = value.clone() else {
-            return StackItem::False
+            return StackItem::False;
         };
         StackItem::some(thing.into())
     }

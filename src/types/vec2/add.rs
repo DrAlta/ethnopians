@@ -13,7 +13,6 @@ impl Add<Vec2> for Vec2 {
     }
 }
 
-
 impl<T: Into<Number> + Clone> Add<T> for Vec2 {
     type Output = Self;
     #[inline]

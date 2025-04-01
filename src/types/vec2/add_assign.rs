@@ -10,7 +10,6 @@ impl AddAssign<Vec2> for Vec2 {
     }
 }
 
-
 impl<T: Into<Number> + Clone> AddAssign<T> for Vec2 {
     #[inline]
     fn add_assign(&mut self, rhs: T) {

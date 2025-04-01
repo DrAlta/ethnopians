@@ -98,10 +98,10 @@ mod tests {
         assert_eq!(
             db,
             BTreeMap::new() /*from([
-                               ("@2".to_owned(), Instruction::Action(InpulseId::Act1)),
-                               ("@3".to_owned(), Instruction::Action(InpulseId::Act2)),
-                               ("@4".to_owned(), Instruction::Action(InpulseId::Act3)),
-                           ])*/
+                                ("@2".to_owned(), Instruction::Action(InpulseId::Act1)),
+                                ("@3".to_owned(), Instruction::Action(InpulseId::Act2)),
+                                ("@4".to_owned(), Instruction::Action(InpulseId::Act3)),
+                            ])*/
         );
     }
 }

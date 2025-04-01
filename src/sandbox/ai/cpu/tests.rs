@@ -3,9 +3,7 @@
 use qol::pout;
 
 use super::*;
-use crate::sandbox::ai::{
-    Blackboard, InpulseId, Instruction, Status, TreePool,
-};
+use crate::sandbox::ai::{Blackboard, InpulseId, Instruction, Status, TreePool};
 
 #[test]
 fn step_test() {

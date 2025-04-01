@@ -10,7 +10,6 @@ impl SubAssign<Vec2> for Vec2 {
     }
 }
 
-
 impl<T: Into<Number> + Clone> SubAssign<T> for Vec2 {
     #[inline]
     fn sub_assign(&mut self, rhs: T) {
@@ -18,4 +17,3 @@ impl<T: Into<Number> + Clone> SubAssign<T> for Vec2 {
         self.y.sub_assign(Into::<Number>::into(rhs));
     }
 }
-

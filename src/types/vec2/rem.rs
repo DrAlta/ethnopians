@@ -2,7 +2,6 @@ use std::ops::Rem;
 
 use crate::{Number, Vec2};
 
-
 impl Rem<Vec2> for Vec2 {
     type Output = Self;
     #[inline]
@@ -13,7 +12,7 @@ impl Rem<Vec2> for Vec2 {
         }
     }
 }
-impl<T:Into<Number> + Clone> Rem<T> for Vec2 {
+impl<T: Into<Number> + Clone> Rem<T> for Vec2 {
     type Output = Self;
     #[inline]
     fn rem(self, rhs: T) -> Self {

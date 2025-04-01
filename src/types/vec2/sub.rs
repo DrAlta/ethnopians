@@ -20,8 +20,7 @@ impl Sub for &Vec2 {
     }
 }
 
-
-impl<T:Into<Number> + Clone> Sub<T> for Vec2 {
+impl<T: Into<Number> + Clone> Sub<T> for Vec2 {
     type Output = Self;
     #[inline]
     fn sub(self, rhs: T) -> Self {
@@ -31,4 +30,3 @@ impl<T:Into<Number> + Clone> Sub<T> for Vec2 {
         }
     }
 }
-

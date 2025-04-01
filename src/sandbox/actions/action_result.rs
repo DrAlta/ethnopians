@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::sandbox::EntityId;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Result{
+pub enum Result {
     Success,
     Failure,
 }
@@ -12,5 +12,5 @@ pub enum Result{
 pub struct ActionResult {
     pub agent_id: EntityId,
     pub prayer_id: u64,
-    pub result: Result
+    pub result: Result,
 }

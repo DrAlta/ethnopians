@@ -91,7 +91,6 @@ pub fn use_on(
         }
     };
 
-
     let target_type = match query.get(target_id) {
         // the tool is in an inventory, so check if it's the agents' inventory
         Ok((_, Type(target_type), Location::Inventory(inventory), _)) => {
@@ -170,7 +169,7 @@ pub fn use_on(
                 return Err("Only a Stick can be used on a Knife!".to_owned());
             };
             make_axe(agent_id, target_id, tool_id)
-        },
+        }
         Item::Seed => todo!(),
         Item::Stone => {
             if tool_type != &Item::Stone {
@@ -191,7 +190,7 @@ pub fn use_on(
                 return Err("Only a Knife can be used on a Stick!".to_owned());
             };
             make_axe(agent_id, tool_id, target_id)
-        },
+        }
         Item::Wood => {
             if tool_type != &Item::Wood {
                 return Err("Only a wood can be used on wood!".to_owned());

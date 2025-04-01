@@ -9,7 +9,7 @@ impl MulAssign<Vec2> for Vec2 {
         self.y.mul_assign(rhs.y);
     }
 }
-impl<T:Into<Number> + Clone> MulAssign<T> for Vec2 {
+impl<T: Into<Number> + Clone> MulAssign<T> for Vec2 {
     #[inline]
     fn mul_assign(&mut self, rhs: T) {
         self.x.mul_assign(Into::<Number>::into(rhs.clone()));

@@ -146,11 +146,14 @@ impl RunningEnvelope {
         }
 
         // Compute the control point P₁ so that B(t_avg) = 0.
-        let p1 = (Number::ONE - Number::TWO * t_avg) / (Number::TWO * t_avg * (Number::ONE - t_avg));
+        let p1 =
+            (Number::ONE - Number::TWO * t_avg) / (Number::TWO * t_avg * (Number::ONE - t_avg));
 
         // Quadratic Bézier curve:
         // B(t) = (1-t)² * (-1) + 2*(1-t)*t * p1 + t² * (1)
-        let subjective = (Number::ONE - t).powi(2) * (Number::NEG_ONE) + Number::TWO * (Number::ONE - t) * t * p1 + t.powi(2) * Number::ONE;
+        let subjective = (Number::ONE - t).powi(2) * (Number::NEG_ONE)
+            + Number::TWO * (Number::ONE - t) * t * p1
+            + t.powi(2) * Number::ONE;
         subjective
     }
     /*

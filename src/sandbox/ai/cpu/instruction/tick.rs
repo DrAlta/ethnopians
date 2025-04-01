@@ -27,17 +27,17 @@ impl Instruction {
             }
             Instruction::Combine(a, b) => {
                 let Some(thing) = blackboard.get(a) else {
-                    return Err(format!("couldn't find {a} in blackboard"))
+                    return Err(format!("couldn't find {a} in blackboard"));
                 };
                 let Ok(aa) = thing.try_into() else {
-                    return Err(format!("{a} wasn't an EntityId"))
+                    return Err(format!("{a} wasn't an EntityId"));
                 };
 
                 let Some(thing) = blackboard.get(b) else {
-                    return Err(format!("couldn't find {b} in blackboard"))
+                    return Err(format!("couldn't find {b} in blackboard"));
                 };
                 let Ok(bb) = thing.try_into() else {
-                    return Err(format!("{b} wasn't an EntityId"))
+                    return Err(format!("{b} wasn't an EntityId"));
                 };
 
                 *pc = return_stack.pop();

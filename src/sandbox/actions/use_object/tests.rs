@@ -6,7 +6,8 @@ use crate::{
         world::Type,
         Item, Location,
     },
-    types::ActionId, Number,
+    types::ActionId,
+    Number,
 };
 
 use super::*;
@@ -90,7 +91,13 @@ pub fn agent_in_another_world_test() {
         .id();
     let target_id = app
         .world_mut()
-        .spawn((Type(Item::Veggie), Location::World { x: Number::ONE, y: Number::ONE }))
+        .spawn((
+            Type(Item::Veggie),
+            Location::World {
+                x: Number::ONE,
+                y: Number::ONE,
+            },
+        ))
         .id();
 
     app.world_mut().send_event(PosibleActionsRequest {
@@ -114,11 +121,23 @@ pub fn too_far_test() {
     app.add_systems(Update, use_object_system);
     let target_id = app
         .world_mut()
-        .spawn((Type(Item::Veggie), Location::World { x: Number::ZERO, y: Number::ZERO }))
+        .spawn((
+            Type(Item::Veggie),
+            Location::World {
+                x: Number::ZERO,
+                y: Number::ZERO,
+            },
+        ))
         .id();
     let agent_id = app
         .world_mut()
-        .spawn((Type(Item::Agent), Location::World { x: Number::ZERO, y: Into::<Number>::into(100.0) }))
+        .spawn((
+            Type(Item::Agent),
+            Location::World {
+                x: Number::ZERO,
+                y: Into::<Number>::into(100.0),
+            },
+        ))
         .id();
 
     app.world_mut().send_event(PosibleActionsRequest {
@@ -142,7 +161,13 @@ pub fn no_object_location_test() {
     let target_id = app.world_mut().spawn(Type(Item::Veggie)).id();
     let agent_id = app
         .world_mut()
-        .spawn((Type(Item::Agent), Location::World { x: Number::ZERO, y: Number::ZERO }))
+        .spawn((
+            Type(Item::Agent),
+            Location::World {
+                x: Number::ZERO,
+                y: Number::ZERO,
+            },
+        ))
         .id();
 
     app.world_mut().send_event(PosibleActionsRequest {
@@ -166,11 +191,20 @@ pub fn no_object_type_test() {
     app.add_systems(Update, use_object_system);
     let target_id = app
         .world_mut()
-        .spawn(Location::World { x: Number::ZERO, y: Number::ZERO })
+        .spawn(Location::World {
+            x: Number::ZERO,
+            y: Number::ZERO,
+        })
         .id();
     let agent_id = app
         .world_mut()
-        .spawn((Type(Item::Agent), Location::World { x: Number::ZERO, y: Number::ZERO }))
+        .spawn((
+            Type(Item::Agent),
+            Location::World {
+                x: Number::ZERO,
+                y: Number::ZERO,
+            },
+        ))
         .id();
 
     app.world_mut().send_event(PosibleActionsRequest {
@@ -195,7 +229,13 @@ pub fn use_test() {
 
     let agent_id = app
         .world_mut()
-        .spawn((Type(Item::Agent), Location::World { x: Number::ZERO, y: Number::ZERO }))
+        .spawn((
+            Type(Item::Agent),
+            Location::World {
+                x: Number::ZERO,
+                y: Number::ZERO,
+            },
+        ))
         .id();
     let target_id = app
         .world_mut()

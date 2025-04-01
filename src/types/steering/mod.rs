@@ -78,19 +78,31 @@ mod tests {
 
     #[test]
     pub fn over_test() {
-        let map = Steering::from(BTreeMap::from([(0, Number::TEN), (5, Number::FIVE), (9, Number::TEN)]));
+        let map = Steering::from(BTreeMap::from([
+            (0, Number::TEN),
+            (5, Number::FIVE),
+            (9, Number::TEN),
+        ]));
 
         assert_eq!(map.get(20).unwrap(), 10.0);
     }
     #[test]
     pub fn under_test() {
-        let map = Steering::from(BTreeMap::from([(3, Number::TEN), (5, Number::FIVE), (9, Number::TEN)]));
+        let map = Steering::from(BTreeMap::from([
+            (3, Number::TEN),
+            (5, Number::FIVE),
+            (9, Number::TEN),
+        ]));
 
         assert_eq!(map.get(1).unwrap(), 10.0);
     }
     #[test]
     pub fn mid_test() {
-        let map = Steering::from(BTreeMap::from([(3, Number::FIVE), (5, Number::TEN), (100, Number::TEN)]));
+        let map = Steering::from(BTreeMap::from([
+            (3, Number::FIVE),
+            (5, Number::TEN),
+            (100, Number::TEN),
+        ]));
 
         assert_eq!(map.get(50).unwrap(), 10.0);
     }

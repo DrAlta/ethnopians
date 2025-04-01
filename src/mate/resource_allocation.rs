@@ -35,9 +35,24 @@ mod tests {
 
     #[test]
     fn feedback() {
-        let values = HashMap::from([(0, Number::ONE), (1, Number::ONE), (2, Number::ONE), (3, Number::ONE)]);
-        let recieved = HashMap::from([(0, Number::ONE), (1, Number::THREE), (2, Number::ONE), (3, Number::ONE)]);
-        let given = HashMap::from([(0, Number::ONE), (1, Number::ONE), (2, Number::ONE), (3, Number::ONE)]);
+        let values = HashMap::from([
+            (0, Number::ONE),
+            (1, Number::ONE),
+            (2, Number::ONE),
+            (3, Number::ONE),
+        ]);
+        let recieved = HashMap::from([
+            (0, Number::ONE),
+            (1, Number::THREE),
+            (2, Number::ONE),
+            (3, Number::ONE),
+        ]);
+        let given = HashMap::from([
+            (0, Number::ONE),
+            (1, Number::ONE),
+            (2, Number::ONE),
+            (3, Number::ONE),
+        ]);
         let given2: HashMap<AgentId, Number> = compute_investment(&values, &recieved, &given)
             .into_iter()
             .map(|(id, value)| (id, value * 10.0))
@@ -54,7 +69,12 @@ mod tests {
         );
         assert_eq!(
             given2,
-            HashMap::from([(0, Number::TWO), (1, Number::FOUR), (2, Number::TWO), (3, Number::TWO),])
+            HashMap::from([
+                (0, Number::TWO),
+                (1, Number::FOUR),
+                (2, Number::TWO),
+                (3, Number::TWO),
+            ])
         );
     }
 }

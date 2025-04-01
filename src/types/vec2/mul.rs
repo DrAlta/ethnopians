@@ -12,7 +12,7 @@ impl Mul<Vec2> for Vec2 {
         }
     }
 }
-impl<T:Into<Number> + Clone> Mul<T> for Vec2 {
+impl<T: Into<Number> + Clone> Mul<T> for Vec2 {
     type Output = Self;
     #[inline]
     fn mul(self, rhs: T) -> Self {

@@ -13,10 +13,10 @@ mod div;
 mod div_assign;
 mod mul;
 mod mul_assign;
-mod sub;
-mod sub_assign;
 mod rem;
 mod rem_assign;
+mod sub;
+mod sub_assign;
 
 mod sum;
 

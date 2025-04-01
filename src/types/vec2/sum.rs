@@ -1,4 +1,3 @@
-
 use std::{iter::Sum, ops::Add};
 
 use crate::Vec2;

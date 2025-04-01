@@ -1,6 +1,4 @@
-use std::
-    ops::Mul
-;
+use std::ops::Mul;
 
 use crate::Number;
 
@@ -10,7 +8,10 @@ pub struct Vec2 {
     pub y: Number,
 }
 impl Vec2 {
-    pub const ZERO: Vec2 = Vec2 { x: Number::ZERO, y: Number::ZERO };
+    pub const ZERO: Vec2 = Vec2 {
+        x: Number::ZERO,
+        y: Number::ZERO,
+    };
     pub fn normalize(self) -> Self {
         self.mul(self.length().recip())
     }
@@ -32,9 +33,6 @@ pub fn vec2(x: Number, y: Number) -> Vec2 {
     Vec2 { x, y }
 }
 
-
-
-
 /*
 
 
@@ -46,4 +44,4 @@ pub fn vec2(x: Number, y: Number) -> Vec2 {
 
 
 
-    */
+*/

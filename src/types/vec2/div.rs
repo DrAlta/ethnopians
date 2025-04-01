@@ -2,7 +2,6 @@ use std::ops::Div;
 
 use crate::{Number, Vec2};
 
-
 impl Div<Vec2> for Vec2 {
     type Output = Self;
     #[inline]
@@ -14,8 +13,7 @@ impl Div<Vec2> for Vec2 {
     }
 }
 
-
-impl<T:Into<Number> + Clone> Div<T> for Vec2 {
+impl<T: Into<Number> + Clone> Div<T> for Vec2 {
     type Output = Self;
     #[inline]
     fn div(self, rhs: T) -> Self {
