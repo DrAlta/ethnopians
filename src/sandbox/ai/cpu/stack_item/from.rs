@@ -1,23 +1,16 @@
 use std::sync::Arc;
 
-use crate::sandbox::ai::{BlackboardValue, StackItem};
+use crate::sandbox::{ai::{BlackboardValue, StackItem}, EntityId};
 
-impl From<i32> for StackItem {
-    fn from(value: i32) -> Self {
-        Self::Int(value)
+impl From<BlackboardValue> for StackItem {
+    fn from(value: BlackboardValue) -> Self {
+        match value {
+            BlackboardValue::EntityId(entity) => Self::EntityId(entity),
+            BlackboardValue::String(x) => Self::String(x),
+            BlackboardValue::Coord { x, y } => Self::Coord { x, y: y },
+        }
     }
 }
-impl From<String> for StackItem {
-    fn from(value: String) -> Self {
-        Self::String(Arc::new(value))
-    }
-}
-impl From<&str> for StackItem {
-    fn from(value: &str) -> Self {
-        Self::String(Arc::new(value.to_owned()))
-    }
-}
-
 impl From<&BlackboardValue> for StackItem {
     fn from(value: &BlackboardValue) -> Self {
         match value {
@@ -30,12 +23,52 @@ impl From<&BlackboardValue> for StackItem {
         }
     }
 }
-impl From<BlackboardValue> for StackItem {
-    fn from(value: BlackboardValue) -> Self {
-        match value {
-            BlackboardValue::EntityId(entity) => Self::EntityId(entity),
-            BlackboardValue::String(x) => Self::String(x),
-            BlackboardValue::Coord { x, y } => Self::Coord { x, y: y },
-        }
+
+
+impl From<EntityId> for StackItem {
+    fn from(value: EntityId) -> Self {
+        Self::EntityId(value)
+    }
+}
+impl From<&EntityId> for StackItem {
+    fn from(value: &EntityId) -> Self {
+        Self::EntityId(*value)
+    }
+}
+
+
+impl From<i32> for StackItem {
+    fn from(value: i32) -> Self {
+        Self::Int(value)
+    }
+}
+
+
+impl From<String> for StackItem {
+    fn from(value: String) -> Self {
+        Self::String(Arc::new(value))
+    }
+}
+impl From<&str> for StackItem {
+    fn from(value: &str) -> Self {
+        Self::String(Arc::new(value.to_owned()))
+    }
+}
+
+
+impl<T:Into<StackItem>> From<Option<T>> for StackItem {
+    fn from(value: Option<T>) -> Self {
+        let Some(thing) = value else {
+            return StackItem::False
+        };
+        StackItem::some(thing.into())
+    }
+}
+impl<T:Into<StackItem> + Clone> From<&Option<T>> for StackItem {
+    fn from(value: &Option<T>) -> Self {
+        let Some(thing) = value.clone() else {
+            return StackItem::False
+        };
+        StackItem::some(thing.into())
     }
 }

@@ -37,3 +37,25 @@ impl From<StackItem> for BlackboardValue {
         }
     }
 }
+impl TryInto<EntityId> for BlackboardValue {
+    type Error = ();
+
+    fn try_into(self) -> Result<EntityId, Self::Error> {
+        match self{
+            BlackboardValue::EntityId(entity) => Ok(entity),
+            BlackboardValue::String(_) |
+            BlackboardValue::Coord { .. } => Err(()),
+        }
+    }
+}
+impl TryInto<EntityId> for &BlackboardValue {
+    type Error = ();
+
+    fn try_into(self) -> Result<EntityId, Self::Error> {
+        match self{
+            BlackboardValue::EntityId(entity) => Ok(*entity),
+            BlackboardValue::String(_) |
+            BlackboardValue::Coord { .. } => Err(()),
+        }
+    }
+}

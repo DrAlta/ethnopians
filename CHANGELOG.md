@@ -4,6 +4,19 @@ Notable changes to the "Ethnopians" crate will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.2.5] - 2025-03-31
+
+### Added
+
+- From<Option<T:Into(StackItem)>> for StackItem
+
+- From<*Option<T:Into(StackItem + Clone)>> for StackItem
+
+- From<Entity> for StackItem
+
+- From<&Entity> for StackItem
+
+
 ## [0.2.4] - 2025-03-28
 
 ### Changed

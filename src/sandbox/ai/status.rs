@@ -7,7 +7,8 @@ pub enum Status {
     FindInInventory {
         item_class: Item,
     },
-    UseOn(String, String), // this should be (EntityId, EntityId) but I'm lazy
+    // UseOn(ToolId, TargetId)
+    UseOn(EntityId, EntityId),
     // FindNearest means the process is praying for the answer to
     // "what is closest item of the specfified type to the location given"
     /// to be put on the stack

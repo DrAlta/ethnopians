@@ -26,9 +26,23 @@ impl Instruction {
                 return Self::next(Status::Running(action_id.clone()), pc);
             }
             Instruction::Combine(a, b) => {
+                let Some(thing) = blackboard.get(a) else {
+                    return Err(format!("couldn't find {a} in blackboard"))
+                };
+                let Ok(aa) = thing.try_into() else {
+                    return Err(format!("{a} wasn't an EntityId"))
+                };
+
+                let Some(thing) = blackboard.get(b) else {
+                    return Err(format!("couldn't find {b} in blackboard"))
+                };
+                let Ok(bb) = thing.try_into() else {
+                    return Err(format!("{b} wasn't an EntityId"))
+                };
+
                 *pc = return_stack.pop();
                 stack.pop();
-                Ok(Status::UseOn(a.clone(), b.clone()))
+                Ok(Status::UseOn(aa, bb))
             }
             Instruction::Debug(_x) => {
                 logy!("debug", "{_x}");
