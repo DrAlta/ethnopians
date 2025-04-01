@@ -8,7 +8,7 @@ use crate::sandbox::{
 
 #[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MovementRequest{
-    pub action_id: u64,
+    pub prayer_id: u64,
 }
 
 pub fn goto_system(
@@ -28,7 +28,7 @@ pub fn goto_system(
         let Ok(movement_request) = movement_request_query.get(*agent_id) else {
             continue;
         };
-        action_result.send(ActionResult { agent_id: *agent_id, action_id: movement_request.action_id, result: Result::Failure });
+        action_result.send(ActionResult { agent_id: *agent_id, prayer_id: movement_request.prayer_id, result: Result::Failure });
         commands.entity(*agent_id).remove::<MovementRequest>();
     }
 
@@ -36,22 +36,22 @@ pub fn goto_system(
         let Ok(movement_request) = movement_request_query.get(*agent_id) else {
             continue;
         };
-        action_result.send(ActionResult { agent_id: *agent_id, action_id: movement_request.action_id, result: Result::Success });
+        action_result.send(ActionResult { agent_id: *agent_id, prayer_id: movement_request.prayer_id, result: Result::Success });
         commands.entity(*agent_id).remove::<MovementRequest>();
     }
 
 
 
-    for GotoRequest { action_id, agent_id, movement } in goto_requests.read() {
+    for GotoRequest { prayer_id, agent_id, movement } in goto_requests.read() {
         let mut new = false;
         if let Ok(mut movement_request_component) = movement_request_query.get_mut(*agent_id) {
-            if &movement_request_component.action_id == action_id {
+            if &movement_request_component.prayer_id == prayer_id {
                 // we are ready doing this request
 
             } else {
                 new = true;
-                action_result.send(ActionResult { agent_id: *agent_id, action_id: *action_id, result: Result::Failure });
-                *movement_request_component = MovementRequest{ action_id: *action_id };
+                action_result.send(ActionResult { agent_id: *agent_id, prayer_id: *prayer_id, result: Result::Failure });
+                *movement_request_component = MovementRequest{ prayer_id: *prayer_id };
             }
         } else {
             commands.entity(*agent_id).insert(movement.clone());

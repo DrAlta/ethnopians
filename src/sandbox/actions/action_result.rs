@@ -11,6 +11,6 @@ pub enum Result{
 #[derive(Event, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ActionResult {
     pub agent_id: EntityId,
-    pub action_id: u64,
+    pub prayer_id: u64,
     pub result: Result
 }
