@@ -29,9 +29,7 @@ pub fn tree_parser<'a>(
 
 #[cfg(test)]
 mod tests {
-    use std::collections::BTreeMap;
-
-    use crate::sandbox::ai::Instruction;
+    use crate::sandbox::ai::{Instruction, TaskPool};
 
     use super::*;
     #[test]
@@ -74,7 +72,7 @@ mod tests {
         );
         assert_eq!(
             db,
-            BTreeMap::from([
+            TaskPool::from([
                 (
                     "@1".to_owned(),
                     vec![Instruction::Sequence(vec![

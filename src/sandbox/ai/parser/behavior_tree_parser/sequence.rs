@@ -1,5 +1,3 @@
-use std::collections::BTreeMap;
-
 use nom::{
     branch::alt, bytes::complete::tag, character::complete::char, error::ErrorKind,
     multi::separated_list1, sequence::tuple, IResult,
@@ -7,13 +5,13 @@ use nom::{
 
 use crate::sandbox::ai::{
     parser::{behavior_tree_parser::tree_parser, space_parser},
-    Instruction,
+    Instruction, TaskPool,
 };
 
 use super::Thingie;
 
 pub fn sequence_parser<'a, 'b>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
-    let mut hash = BTreeMap::new();
+    let mut hash = TaskPool::new();
     let (tail, (_, _, _, _, head, _, _)) = tuple((
         alt((tag("sequence"), tag("seq"))),
         space_parser,
@@ -64,7 +62,7 @@ mod tests {
         );
         assert_eq!(
             db,
-            BTreeMap::from([
+            TaskPool::from([
                 (
                     "@1".to_owned(),
                     vec![Instruction::Sequence(vec![
@@ -97,7 +95,7 @@ mod tests {
         );
         assert_eq!(
             db,
-            BTreeMap::new() /*from([
+            TaskPool::new() /*from([
                                 ("@2".to_owned(), Instruction::Action(InpulseId::Act1)),
                                 ("@3".to_owned(), Instruction::Action(InpulseId::Act2)),
                                 ("@4".to_owned(), Instruction::Action(InpulseId::Act3)),

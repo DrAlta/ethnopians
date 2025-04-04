@@ -15,4 +15,4 @@ pub use i32_parser::i32_parser;
 mod space_parser;
 pub use space_parser::space_parser;
 
-type TreesUsed = crate::sandbox::ai::TreePool;
+type TreesUsed = crate::sandbox::ai::TaskPool;

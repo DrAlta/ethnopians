@@ -3,7 +3,7 @@ use std::{collections::BTreeMap, sync::Arc};
 use qol::{logy, pout, Vecna};
 
 use crate::sandbox::{
-    ai::{Blackboard, BlackboardValue, InpulseId, StackItem, Status, TreePool, CPU},
+    ai::{Blackboard, BlackboardValue, InpulseId, StackItem, Status, TaskPool, CPU},
     EntityId, Item,
 };
 
@@ -22,7 +22,7 @@ impl std::cmp::PartialEq for Info {
 
 pub fn task_testing_harness(
     task: &str,
-    task_db: TreePool,
+    task_db: TaskPool,
     what_final_stack_should_be: crate::sandbox::ai::Stack,
     find_in_inventory: Vec<EntityId>,
     find_nearest: Vec<EntityId>,
@@ -308,7 +308,12 @@ pub fn task_testing_harness(
 
                         InpulseId::Use | InpulseId::Take | InpulseId::Plant | InpulseId::GoTo => {
                             cpu.stack.pop();
-                        } //_ => panic!("unhandled inpulse")
+                        },
+                        InpulseId::UseOn => {
+                            cpu.stack.pop();
+                            cpu.stack.pop();
+                        },
+                        //_ => panic!("unhandled inpulse")
                     }
                     prayers.push((running_idx, Prayer::Running(inpulse_id)));
 

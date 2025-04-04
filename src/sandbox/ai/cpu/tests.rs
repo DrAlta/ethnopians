@@ -3,13 +3,13 @@
 use qol::pout;
 
 use super::*;
-use crate::sandbox::ai::{Blackboard, InpulseId, Instruction, Status, TreePool};
+use crate::sandbox::ai::{Blackboard, InpulseId, Instruction, Status, TaskPool};
 
 #[test]
 fn step_test() {
     let mut blackboard = Blackboard::new();
 
-    let mut task_db = TreePool::new();
+    let mut task_db = TaskPool::new();
     let action1 = "act1".to_owned();
     task_db.insert(
         action1.clone(),
@@ -241,7 +241,7 @@ fn step_test() {
 fn test() {
     let mut blackboard = Blackboard::new();
 
-    let mut task_db = TreePool::new();
+    let mut task_db = TaskPool::new();
     let action1 = "a1".to_owned();
     task_db.insert(
         action1.clone(),

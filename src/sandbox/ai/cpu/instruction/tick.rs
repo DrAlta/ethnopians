@@ -27,22 +27,21 @@ impl Instruction {
             }
             Instruction::Combine(a, b) => {
                 let Some(thing) = blackboard.get(a) else {
-                    return Err(format!("couldn't find {a} in blackboard"));
+                    return Err(format!("couldn't find first object:{a} in blackboard"));
                 };
-                let Ok(aa) = thing.try_into() else {
-                    return Err(format!("{a} wasn't an EntityId"));
-                };
+                let aa = thing.into();
 
                 let Some(thing) = blackboard.get(b) else {
-                    return Err(format!("couldn't find {b} in blackboard"));
+                    return Err(format!("couldn't find second object:{b} in blackboard"));
                 };
-                let Ok(bb) = thing.try_into() else {
-                    return Err(format!("{b} wasn't an EntityId"));
-                };
+                let bb = thing.into();
 
-                *pc = return_stack.pop();
+                
                 stack.pop();
-                Ok(Status::UseOn(aa, bb))
+                stack.push(aa);
+                stack.push(bb);
+                *pc = Some(("combine@i".to_owned(), 0 ));
+                Ok(Status::None)
             }
             Instruction::Debug(_x) => {
                 logy!("debug", "{_x}");

@@ -6,11 +6,11 @@ use nom::{
     IResult,
 };
 
-use crate::sandbox::ai::{parser::space_parser, Instruction, Thread, TreePool};
+use crate::sandbox::ai::{parser::space_parser, Instruction, Thread, TaskPool};
 
 pub fn debug_statement_parser<'a>(
     input: &'a str,
-) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
+) -> IResult<&'a str, (Thread, TaskPool), (&'a str, ErrorKind)> {
     let (tail, (_, _, _, _, _, body, _, _, _)) = tuple((
         tag("debug"),
         space_parser,
@@ -24,7 +24,7 @@ pub fn debug_statement_parser<'a>(
     ))(input)?;
     Ok((
         tail,
-        (vec![Instruction::Debug(body.to_owned())], TreePool::new()),
+        (vec![Instruction::Debug(body.to_owned())], TaskPool::new()),
     ))
 }
 
@@ -42,7 +42,7 @@ mod tests {
             body,
             (
                 vec![Instruction::Debug(r#"This if some %$^#^ stuff"#.to_owned())],
-                TreePool::new()
+                TaskPool::new()
             )
         )
     }

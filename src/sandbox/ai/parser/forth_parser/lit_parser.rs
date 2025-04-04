@@ -11,12 +11,12 @@ use nom::{
 
 use crate::sandbox::ai::{
     parser::{ident_parser, space_parser},
-    Instruction, StackItem, Thread, TreePool,
+    Instruction, StackItem, Thread, TaskPool,
 };
 
 pub fn lit_parser<'a>(
     input: &'a str,
-) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
+) -> IResult<&'a str, (Thread, TaskPool), (&'a str, ErrorKind)> {
     let (tail, (_, _, _, _, body, _, _)) = tuple((
         tag("lit"),
         space_parser,
@@ -58,7 +58,7 @@ pub fn lit_parser<'a>(
         space_parser,
         char(')'),
     ))(input)?;
-    Ok((tail, (vec![body], TreePool::new())))
+    Ok((tail, (vec![body], TaskPool::new())))
 }
 
 pub fn coord_parser<'a>(input: &'a str) -> IResult<&'a str, Instruction, (&'a str, ErrorKind)> {
@@ -121,7 +121,7 @@ mod tests {
         let input = "lit(x:  -10, y: 5)";
         let (tail, (body, used)) = lit_parser(input).unwrap();
         assert_eq!(tail, "");
-        assert_eq!(used, TreePool::new());
+        assert_eq!(used, TaskPool::new());
         assert_eq!(
             body,
             vec![Instruction::ForthLit(StackItem::Coord { x: -10, y: 5 })]
@@ -132,7 +132,7 @@ mod tests {
         let input = "lit(Success)";
         let (tail, (body, used)) = lit_parser(input).unwrap();
         assert_eq!(tail, "");
-        assert_eq!(used, TreePool::new());
+        assert_eq!(used, TaskPool::new());
         assert_eq!(body, vec![Instruction::ForthLit(StackItem::success())])
     }
     #[test]
@@ -140,7 +140,7 @@ mod tests {
         let input = "lit(1)";
         let (tail, (body, used)) = lit_parser(input).unwrap();
         assert_eq!(tail, "");
-        assert_eq!(used, TreePool::new());
+        assert_eq!(used, TaskPool::new());
         assert_eq!(body, vec![Instruction::ForthLit(StackItem::Int(1))])
     }
     #[test]
@@ -148,7 +148,7 @@ mod tests {
         let input = "lit(\"one\")";
         let (tail, (body, used)) = lit_parser(input).unwrap();
         assert_eq!(tail, "");
-        assert_eq!(used, TreePool::new());
+        assert_eq!(used, TaskPool::new());
         assert_eq!(body, vec![Instruction::ForthLit("one".into())])
     }
 }

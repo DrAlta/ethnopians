@@ -1,16 +1,16 @@
 use nom::{bytes::complete::tag, error::ErrorKind, IResult};
 
-use crate::sandbox::ai::{Instruction, Thread, TreePool};
+use crate::sandbox::ai::{Instruction, Thread, TaskPool};
 
 pub fn retain_entities_of_type_parser<'a>(
     input: &'a str,
-) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
+) -> IResult<&'a str, (Thread, TaskPool), (&'a str, ErrorKind)> {
     let (tail, _body) = tag("retain_entities_of_type")(input)?;
     Ok((
         tail,
         (
             vec![Instruction::ForthRetainEntitiesOfType],
-            TreePool::new(),
+            TaskPool::new(),
         ),
     ))
 }

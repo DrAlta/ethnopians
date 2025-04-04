@@ -1,12 +1,10 @@
-use std::collections::BTreeMap;
-
 use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
 };
 
 use crate::sandbox::ai::{
     parser::{behavior_tree_parser::Thingie, forth_parser, space_parser},
-    Instruction,
+    Instruction, TaskPool,
 };
 
 pub fn forth_tree_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
@@ -22,7 +20,7 @@ pub fn forth_tree_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a s
     //    Ok((tail, Thingie::Tree(body, used)))
     //vvv new vvv
     let thread_name = "@0";
-    let mut hash = BTreeMap::new();
+    let mut hash = TaskPool::new();
     for (k, mut v) in db.into_iter() {
         v.iter_mut().for_each(|x| x.correct(thread_name));
         assert_eq!(hash.insert(format!("{k}"), v), None,);

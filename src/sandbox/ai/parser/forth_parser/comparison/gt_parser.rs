@@ -3,11 +3,11 @@ use nom::{
     error::ErrorKind, IResult,
 };
 
-use crate::sandbox::ai::{Instruction, Thread, TreePool};
+use crate::sandbox::ai::{Instruction, Thread, TaskPool};
 
-pub fn gt_parser<'a>(input: &'a str) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
+pub fn gt_parser<'a>(input: &'a str) -> IResult<&'a str, (Thread, TaskPool), (&'a str, ErrorKind)> {
     let (tail, _body) = alt((tag("gt"), recognize(char('>'))))(input)?;
-    Ok((tail, (vec![Instruction::ForthGT], TreePool::new())))
+    Ok((tail, (vec![Instruction::ForthGT], TaskPool::new())))
 }
 
 #[cfg(test)]
@@ -19,7 +19,7 @@ mod tests {
         let input = "gt";
         let (tail, (body, used)) = gt_parser(input).unwrap();
         assert_eq!(tail, "");
-        assert_eq!(used, TreePool::new());
+        assert_eq!(used, TaskPool::new());
         assert_eq!(body, vec![Instruction::ForthGT,])
     }
 }

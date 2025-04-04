@@ -9,16 +9,16 @@ use nom::{
 
 use crate::sandbox::ai::{
     parser::{balanced_parser, forth_parser::forth_threadette_parser, space_parser},
-    Thread, TreePool,
+    Thread, TaskPool,
 };
 
 mod r#if;
 use r#if::If;
 
-pub fn if_parser<'a>(input: &'a str) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
+pub fn if_parser<'a>(input: &'a str) -> IResult<&'a str, (Thread, TaskPool), (&'a str, ErrorKind)> {
     let (tail, body) = balanced_parser(
         map_res(tuple((space_parser, forth_threadette_parser)), |(_, x)| {
-            Result::<(Thread, TreePool), (&'a str, ErrorKind)>::Ok(x)
+            Result::<(Thread, TaskPool), (&'a str, ErrorKind)>::Ok(x)
         }),
         recognize(tuple((multispace0, tag("if")))),
         recognize(tuple((multispace0, tag("then")))),
@@ -42,7 +42,7 @@ mod tests {
         then";
         let (tail, (body, used)) = if_parser(input).unwrap();
         assert_eq!(tail, "");
-        assert_eq!(used, TreePool::new());
+        assert_eq!(used, TaskPool::new());
         assert_eq!(
             body,
             vec![
@@ -64,7 +64,7 @@ mod tests {
         then";
         let (tail, (body, used)) = if_parser(input).unwrap();
         assert_eq!(tail, "");
-        assert_eq!(used, TreePool::new());
+        assert_eq!(used, TaskPool::new());
         assert_eq!(
             body,
             vec![

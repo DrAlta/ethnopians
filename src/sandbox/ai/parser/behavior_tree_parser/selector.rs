@@ -1,5 +1,3 @@
-use std::collections::BTreeMap;
-
 use nom::{
     branch::alt, bytes::complete::tag, character::complete::char, error::ErrorKind,
     multi::separated_list1, sequence::tuple, IResult,
@@ -7,13 +5,13 @@ use nom::{
 
 use crate::sandbox::ai::{
     parser::{behavior_tree_parser::tree_parser, space_parser},
-    Instruction,
+    Instruction, TaskPool,
 };
 
 use super::Thingie;
 
 pub fn selector_parser<'a, 'b>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
-    let mut hash = BTreeMap::new();
+    let mut hash = TaskPool::new();
     let (tail, (_, _, _, _, head, _, _)) = //map_res(
         tuple((
             alt((
@@ -75,7 +73,7 @@ mod tests {
         );
         assert_eq!(
             db,
-            BTreeMap::from([
+            TaskPool::from([
                 (
                     "@1".to_owned(),
                     vec![Instruction::Selector(vec![
@@ -106,7 +104,7 @@ mod tests {
                 "act3".to_owned()
             ])],
         );
-        assert_eq!(db, BTreeMap::new());
+        assert_eq!(db, TaskPool::new());
     }
     #[test]
     fn selector_eats_test() {
@@ -125,7 +123,7 @@ mod tests {
         );
         assert_eq!(
             db,
-            BTreeMap::from([
+            TaskPool::from([
                 ("@1".to_owned(), vec![Instruction::Eat("pizza".to_owned())]),
                 ("@2".to_owned(), vec![Instruction::Eat("pizza".to_owned())]),
                 ("@3".to_owned(), vec![Instruction::Eat("pizza".to_owned())]),

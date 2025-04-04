@@ -4,8 +4,7 @@ use crate::sandbox::ai::{
     parser::{
         behavior_tree_parser::{tree_parser, Thingie},
         ident_parser, space_parser,
-    },
-    BlackboardKey, BlackboardValue, Instruction, Variable,
+    }, BlackboardKey, BlackboardValue, Instruction, TaskPool, Variable
 };
 
 use nom::{
@@ -20,7 +19,7 @@ use nom::{
 pub fn blackboard_parser<'a, 'b>(
     input: &'a str,
 ) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
-    let mut hash = BTreeMap::new();
+    let mut hash = TaskPool::new();
     //                1  2  3  4  5       6  7  8  9 10, 11,  12 13
     let (tail, (_, _, _, _, values, _, _, _, _, _, tree, _, _)) = //map_res(
         tuple((

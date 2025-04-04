@@ -3,9 +3,9 @@ use nom::{
     error::ErrorKind, IResult,
 };
 
-use crate::sandbox::ai::{Instruction, Thread, TreePool};
+use crate::sandbox::ai::{Instruction, Thread, TaskPool};
 
-pub fn lt_parser<'a>(input: &'a str) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
+pub fn lt_parser<'a>(input: &'a str) -> IResult<&'a str, (Thread, TaskPool), (&'a str, ErrorKind)> {
     let (tail, _body) = alt((tag("lt"), recognize(char('<'))))(input)?;
-    Ok((tail, (vec![Instruction::ForthLT], TreePool::new())))
+    Ok((tail, (vec![Instruction::ForthLT], TaskPool::new())))
 }

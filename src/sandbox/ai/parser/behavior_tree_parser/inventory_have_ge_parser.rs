@@ -1,12 +1,10 @@
-use std::collections::BTreeMap;
-
 use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
 };
 
 use crate::sandbox::ai::{
     parser::{behavior_tree_parser::Thingie, i32_parser, ident_parser, space_parser},
-    Instruction,
+    Instruction, TaskPool,
 };
 
 pub fn inventory_have_ge_parser<'a>(
@@ -27,7 +25,7 @@ pub fn inventory_have_ge_parser<'a>(
         tail,
         Thingie::Tree(
             vec![Instruction::InventoryGE(item.to_owned(), number)],
-            BTreeMap::new(),
+            TaskPool::new(),
         ),
     ))
 }

@@ -1,6 +1,6 @@
 use crate::sandbox::ai::{
     cpu::{ProgramCounter, ReturnStack, Stack, StackItem},
-    Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, Status, TreePool,
+    Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, Status, TaskPool,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -24,7 +24,7 @@ impl CPU {
     }
     pub fn step(
         &mut self,
-        bt: &TreePool,
+        bt: &TaskPool,
         blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
     ) -> Result<Status, String> {
         let Some((token, idx)) = &self.pc else {

@@ -43,7 +43,7 @@ fn have_knife_test() {
     );
 
     // set up  the dummy values
-    let find_in_inventory = vec![];
+    let find_in_inventory = vec![EntityId::from_raw(90), EntityId::from_raw(91)];
     let find_nearest = vec![house];
     let get_entities = vec![];
     let get_energy = vec![];
@@ -51,7 +51,7 @@ fn have_knife_test() {
     let get_location = vec![(6, 1), (6, 2)];
     let get_hp = vec![];
     let get_is_inventory_ge = vec![false, true, false];
-    let running = vec![true, true];
+    let running = vec![true, true, true];
     // end seting up dummy values
 
     let task_db = get_hermit_behavior_task();

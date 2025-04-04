@@ -2,9 +2,9 @@ use std::collections::BTreeSet;
 
 use qol::logy;
 
-use crate::sandbox::ai::{cpu::Instruction, ExecutionToken, TreePool};
+use crate::sandbox::ai::{cpu::Instruction, ExecutionToken, TaskPool};
 impl Instruction {
-    pub fn missing_threads_used(&self, bt: &TreePool) -> BTreeSet<ExecutionToken> {
+    pub fn missing_threads_used(&self, bt: &TaskPool) -> BTreeSet<ExecutionToken> {
         let mut missing = BTreeSet::new();
         match self {
             Instruction::Selector(vec) | Instruction::Sequence(vec) => {

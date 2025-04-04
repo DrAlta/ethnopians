@@ -5,7 +5,7 @@ use crate::sandbox::ai::{
         PLANT_ROW_DEFS, PLANT_VEGS_DEFS, SAT_HUNGER_DEFS,
     },
     parser::file_parser,
-    TreePool,
+    TaskPool,
 };
 macro_rules! foofoo {
     // `$x` followed by at least one `$y,`
@@ -17,7 +17,7 @@ macro_rules! foofoo {
     )
 }
 
-pub fn get_hermit_behavior_task() -> TreePool {
+pub fn get_hermit_behavior_task() -> TaskPool {
     let root = {
         r#"hermit = seq{
     sat_hunger,
@@ -87,6 +87,8 @@ take_all /* (table -- bool) */ = forth{
         assert_eq!((tail, idx), ("", idx));
         db.extend(new_db.into_iter());
     }
+    
+    db.extend(TaskPool::core());
 
     db
 }

@@ -1,8 +1,6 @@
-use std::collections::BTreeMap;
-
 use crate::sandbox::ai::{
     parser::{comment_parser, space_parser},
-    Corrent, Thread, TreePool,
+    Corrent, Thread, TaskPool,
 };
 use nom::{
     character::complete::{multispace0, multispace1},
@@ -17,7 +15,7 @@ use super::forth_threadette_parser;
 
 pub fn forth_parser<'a>(
     input: &'a str,
-) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
+) -> IResult<&'a str, (Thread, TaskPool), (&'a str, ErrorKind)> {
     let (tail, (body, _)) = tuple((
         separated_list1(
             tuple((multispace1, opt(tuple((comment_parser, multispace0))))),
@@ -26,7 +24,7 @@ pub fn forth_parser<'a>(
         space_parser,
     ))(input)?;
     let mut thread = Vec::new();
-    let mut pool = BTreeMap::new();
+    let mut pool = TaskPool::new();
     for (idx, (mut vec, mut hash_map)) in body.into_iter().enumerate() {
         let prefix = format!("@{idx}");
         hash_map.correct(&prefix);
@@ -59,7 +57,7 @@ mod tests {
     return";
         let (tail, (body, used)) = forth_parser(input).unwrap();
         assert_eq!(tail, "");
-        assert_eq!(used, TreePool::new());
+        assert_eq!(used, TaskPool::new());
         assert_eq!(
             body,
             vec![

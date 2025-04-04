@@ -1,11 +1,9 @@
-use std::collections::BTreeMap;
-
 use crate::sandbox::ai::{
     parser::{
         behavior_tree_parser::{tree_parser, Thingie, TreesUsed},
         ident_parser, space_parser,
     },
-    Instruction, Thread, ThreadName, TreePool,
+    Instruction, Thread, ThreadName, TaskPool,
 };
 use nom::{
     character::complete::char, combinator::map_res, error::ErrorKind, multi::separated_list1,
@@ -15,7 +13,7 @@ use nom::{
 pub fn file_parser<'a>(
     input: &'a str,
     //    _prefix: &'b str
-) -> IResult<&'a str, TreePool, (&'a str, ErrorKind)> {
+) -> IResult<&'a str, TaskPool, (&'a str, ErrorKind)> {
     //    let mut hash = BTreeMap::new();
     let (tail, (_, head, _)) = tuple((
         space_parser,
@@ -25,17 +23,17 @@ pub fn file_parser<'a>(
         ),
         space_parser,
     ))(input)?;
-    let mut hash = BTreeMap::new();
+    let mut hash = TaskPool::new();
     for (_thread_name, body) in head {
         hash.extend(body.into_iter());
     }
     Ok((tail, hash))
 }
-/// named_tree_parser() addes the tree to the TreePool
+/// named_tree_parser() addes the tree to the TaskPool
 pub fn named_tree_parser<'a>(
     input: &'a str,
     //    _prefix: &'b str
-) -> IResult<&'a str, (ThreadName, TreePool), (&'a str, ErrorKind)> {
+) -> IResult<&'a str, (ThreadName, TaskPool), (&'a str, ErrorKind)> {
     //    let mut hash = BTreeMap::new();
     let (tail, (thread_name, _, _, _, (mut i, db))) = tuple((
         ident_parser,
@@ -45,14 +43,14 @@ pub fn named_tree_parser<'a>(
         map_res(tree_parser, |x| {
             let (i, used) = match x {
                 Thingie::Token(token) => {
-                    (vec![Instruction::Selector(vec![token])], TreePool::new())
+                    (vec![Instruction::Selector(vec![token])], TaskPool::new())
                 }
                 Thingie::Tree(vec, hash_map) => (vec, hash_map),
             };
             Ok::<(Thread, TreesUsed), ()>((i, used))
         }),
     ))(input)?;
-    let mut hash = BTreeMap::new();
+    let mut hash = TaskPool::new();
     for (k, mut v) in db.into_iter() {
         v.iter_mut().for_each(|x| x.correct(thread_name));
         assert_eq!(hash.insert(format!("{thread_name}{k}"), v), None,);
@@ -78,7 +76,7 @@ mod tests {
         use(axe, tree)
     }"#;
         let (tail, db) = file_parser(source).unwrap();
-        let standard = BTreeMap::from([
+        let standard = TaskPool::from([
             (
                 "have_02_wood_02".to_owned(),
                 vec![Instruction::Selector(vec![
@@ -154,7 +152,7 @@ mod tests {
         assert_eq!(tail, "");
         assert_eq!(
             body,
-            TreePool::from([
+            TaskPool::from([
                 (
                     "footest".to_owned(),
                     vec![Instruction::ForthTree("footest@0".to_owned())]

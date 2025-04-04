@@ -1,13 +1,13 @@
 use crate::sandbox::ai::{
     parser::{balanced_parser::Tract, TreesUsed},
-    Instruction, Thread, TreePool,
+    Instruction, Thread, TaskPool,
 };
 
 pub(super) trait If {
-    fn flatten(self) -> (Thread, TreePool);
+    fn flatten(self) -> (Thread, TaskPool);
 }
-impl If for Vec<Tract<(Thread, TreePool)>> {
-    fn flatten(self) -> (Thread, TreePool) {
+impl If for Vec<Tract<(Thread, TaskPool)>> {
+    fn flatten(self) -> (Thread, TaskPool) {
         let mut thread = vec![Instruction::ForthIf(0)];
         let hash_map = TreesUsed::new();
         let mut used = hash_map;

@@ -10,5 +10,6 @@ pub enum InpulseId {
     Plant,
     Take,
     Use,
+    UseOn,
     EatClass(ItemClass),
 }

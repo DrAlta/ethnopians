@@ -22,14 +22,14 @@ use crate::sandbox::ai::{
         },
         ident_parser,
     },
-    Instruction, Thread, TreePool,
+    Instruction, Thread, TaskPool,
 };
 
 use super::debug_statement_parser;
 
 pub fn forth_threadette_parser_2<'a>(
     input: &'a str,
-) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
+) -> IResult<&'a str, (Thread, TaskPool), (&'a str, ErrorKind)> {
     alt((
         debug_statement_parser,
         //table
@@ -91,7 +91,7 @@ pub fn forth_threadette_parser_2<'a>(
 
 pub fn forth_threadette_parser<'a>(
     input: &'a str,
-) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
+) -> IResult<&'a str, (Thread, TaskPool), (&'a str, ErrorKind)> {
     alt((
         map_res(ident_parser, |x| {
             /*
@@ -109,12 +109,12 @@ pub fn forth_threadette_parser<'a>(
             };
             let a = tuple((forth_threadette_parser_2, eof))(x);
             if let Ok(("", (b, _))) = a {
-                return Ok::<(Thread, TreePool), ()>(b);
+                return Ok::<(Thread, TaskPool), ()>(b);
             } else {
                 logy!("trace-parser-threadette", "got was {a:?}");
                 Ok((
                     vec![Instruction::ForthCall(x.to_owned(), 0)],
-                    TreePool::new(),
+                    TaskPool::new(),
                 ))
             }
         }),
