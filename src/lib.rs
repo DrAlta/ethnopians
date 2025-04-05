@@ -3,6 +3,7 @@
 pub mod behavior_tree;
 mod brothel;
 mod bvh;
+pub use bvh::Node;
 pub mod combat;
 pub mod formation;
 pub mod kill_share;
