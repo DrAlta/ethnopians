@@ -1,3 +1,5 @@
+mod aa_rect;
+pub use aa_rect::AARect;
 mod action_id;
 pub use action_id::ActionId;
 //mod consts;
@@ -6,7 +8,5 @@ mod running_envelope;
 pub use running_envelope::RunningEnvelope;
 mod steering;
 pub use steering::{radians_to_u8, u8_to_radians, Steering};
-mod sweep_and_prune;
-pub use sweep_and_prune::{AARect, SpatialId, SweepAndPrune};
 mod vec2;
 pub use vec2::{vec2, Vec2};

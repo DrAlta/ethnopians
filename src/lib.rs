@@ -12,6 +12,7 @@ pub mod preferances;
 pub mod sandbox;
 pub mod seven_emotions;
 //pub mod social_sim;//! this is supersecced by the ensemblage crate
+pub mod sweep_and_prune;
 mod trauma;
 pub mod types;
 pub use types::{vec2, Vec2};

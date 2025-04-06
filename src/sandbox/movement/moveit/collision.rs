@@ -1,6 +1,6 @@
 use std::collections::{BTreeSet, HashMap};
 
-use crate::types::{AARect, SpatialId, SweepAndPrune};
+use crate::{sweep_and_prune::{SpatialId, SweepAndPrune}, types::AARect};
 
 use crate::sandbox::{EntityId, Prev};
 

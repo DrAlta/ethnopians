@@ -1,9 +1,6 @@
 use std::collections::{BTreeSet, HashMap};
 
-use crate::{
-    types::{AARect, SpatialId, SweepAndPrune},
-    Number,
-};
+use crate::{Number, sweep_and_prune::{SpatialId, SweepAndPrune}, types::AARect};
 use qol::logy;
 
 use crate::sandbox::EntityId;
