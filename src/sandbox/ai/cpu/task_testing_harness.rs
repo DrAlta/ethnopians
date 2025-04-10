@@ -33,7 +33,7 @@ pub fn task_testing_harness(
     get_is_inventory_ge: Vec<bool>,
     running: Vec<bool>,
     mut blackboard: Blackboard<String, BlackboardValue>,
-    item_types: BTreeMap<bevy::ecs::entity::Entity, Item>,
+    item_types: BTreeMap<EntityId, Item>,
 ) {
     let mut prayers = Vec::<(usize, Prayer)>::new();
 

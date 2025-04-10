@@ -11,13 +11,13 @@ use crate::sandbox::{
 #[test]
 fn hermit_test() {
     // Set up the world
-    let my_self = EntityId::from_raw(0);
-    let house = EntityId::from_raw(5);
-    let garden_1 = EntityId::from_raw(51);
-    let garden_2 = EntityId::from_raw(52);
-    let garden_3 = EntityId::from_raw(52);
-    let garden_4 = EntityId::from_raw(54);
-    let item_types: BTreeMap<bevy::ecs::entity::Entity, Item> = BTreeMap::from([
+    let my_self = EntityId::from(0_u64);
+    let house = EntityId::from(5_u64);
+    let garden_1 = EntityId::from(51_u64);
+    let garden_2 = EntityId::from(52_u64);
+    let garden_3 = EntityId::from(52_u64);
+    let garden_4 = EntityId::from(54_u64);
+    let item_types: BTreeMap<EntityId, Item> = BTreeMap::from([
         (my_self, Item::Agent),
         (house, Item::House),
         (garden_1, Item::Stone),
@@ -49,26 +49,26 @@ fn hermit_test() {
 
     // set up  the dummy values
     let find_in_inventory = vec![
-        EntityId::from_raw(70),
-        EntityId::from_raw(71),
-        EntityId::from_raw(72),
-        EntityId::from_raw(73),
-        EntityId::from_raw(74),
-        EntityId::from_raw(75),
-        EntityId::from_raw(76),
-        EntityId::from_raw(77),
-        EntityId::from_raw(78),
-        EntityId::from_raw(79),
-        EntityId::from_raw(80),
-        EntityId::from_raw(81),
-        EntityId::from_raw(82),
-        EntityId::from_raw(83),
-        EntityId::from_raw(84),
-        EntityId::from_raw(85),
-        EntityId::from_raw(86),
-        EntityId::from_raw(87),
-        EntityId::from_raw(88),
-        EntityId::from_raw(89),
+        EntityId::from(70_u64),
+        EntityId::from(71_u64),
+        EntityId::from(72_u64),
+        EntityId::from(73_u64),
+        EntityId::from(74_u64),
+        EntityId::from(75_u64),
+        EntityId::from(76_u64),
+        EntityId::from(77_u64),
+        EntityId::from(78_u64),
+        EntityId::from(79_u64),
+        EntityId::from(80_u64),
+        EntityId::from(81_u64),
+        EntityId::from(82_u64),
+        EntityId::from(83_u64),
+        EntityId::from(84_u64),
+        EntityId::from(85_u64),
+        EntityId::from(86_u64),
+        EntityId::from(87_u64),
+        EntityId::from(88_u64),
+        EntityId::from(89_u64),
     ];
     let find_nearest = vec![house, house, house];
     let get_entities = vec![

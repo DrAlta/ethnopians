@@ -5,7 +5,7 @@ use crate::{
     types::AARect,
 };
 
-use crate::sandbox::{EntityId, Prev};
+use crate::sandbox::{EntityId, movement::Prev};
 
 use super::Avalibility;
 

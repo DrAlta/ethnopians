@@ -37,9 +37,7 @@ mod item;
 pub use item::Item;
 mod location;
 pub use location::Location;
-pub mod inventory;
-mod movement;
-pub use movement::{process_movement, Collision, Prev, TravelCompleted};
+pub mod movement;
 mod r#return;
 pub use r#return::Return;
 
@@ -53,3 +51,14 @@ pub type EntityId = bevy::prelude::Entity;
 pub type EntityId = u64;
 
 pub type ItemClass = Arc<String>;
+
+
+#[cfg(feature = "bevy")]
+use bevy::prelude::Component;
+#[cfg(not(feature = "bevy"))]
+use macros::Component;
+
+#[cfg(feature = "bevy")]
+use bevy::prelude::Event;
+#[cfg(not(feature = "bevy"))]
+use macros::Event;

@@ -1,19 +1,23 @@
 use crate::{
-    sandbox::{
-        world::{Movement, Size},
-        EntityId, Location,
-    },
+    sandbox::EntityId,
     Number,
 };
-use bevy::prelude::*;
+
+#[cfg(feature = "bevy")]
+use crate::
+    sandbox::{
+        world::{Movement, Size},
+        Location,
+    };
 
 pub trait Prev {
     fn get_location(&self, id: EntityId) -> Option<(Number, Number)>;
     fn get_size(&self, id: EntityId) -> Option<(Number, Number)>;
 }
 
+#[cfg(feature = "bevy")]
 impl<'a, 'b, 'c, 'd, 'e> Prev
-    for Query<
+    for bevy::prelude::Query<
         'd,
         'e,
         (

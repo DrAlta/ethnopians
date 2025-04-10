@@ -1,6 +1,4 @@
-use bevy::prelude::*;
-
-use crate::sandbox::EntityId;
+use crate::sandbox::{EntityId, Event};
 
 #[derive(Event, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Collision {

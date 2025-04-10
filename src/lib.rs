@@ -19,4 +19,4 @@ pub use types::{vec2, Vec2};
 pub mod util;
 
 pub type Number = ordered_f32::OrderedF32;
-const IOTA: Number = ordered_f32::OrderedF32(0.0000001);
+pub const IOTA: Number = ordered_f32::OrderedF32(0.0000001);

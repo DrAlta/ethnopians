@@ -11,13 +11,13 @@ use crate::sandbox::{
 #[test]
 fn have_n_seed_test() {
     // Set up the world
-    let my_self = EntityId::from_raw(0);
-    let house = EntityId::from_raw(5);
-    let garden_1 = EntityId::from_raw(51);
-    let garden_2 = EntityId::from_raw(52);
-    let garden_3 = EntityId::from_raw(52);
-    let garden_4 = EntityId::from_raw(54);
-    let item_types: BTreeMap<bevy::ecs::entity::Entity, Item> = BTreeMap::from([
+    let my_self = EntityId::from(0_u64);
+    let house = EntityId::from(5_u64);
+    let garden_1 = EntityId::from(51_u64);
+    let garden_2 = EntityId::from(52_u64);
+    let garden_3 = EntityId::from(52_u64);
+    let garden_4 = EntityId::from(54_u64);
+    let item_types: BTreeMap<EntityId, Item> = BTreeMap::from([
         (my_self, Item::Agent),
         (house, Item::House),
         (garden_1, Item::Stone),
@@ -43,7 +43,7 @@ fn have_n_seed_test() {
     );
 
     // set up  the dummy values
-    let find_in_inventory = vec![EntityId::from_raw(70)];
+    let find_in_inventory = vec![EntityId::from(70_u64)];
     let find_nearest = vec![];
     let get_entities = vec![];
     let get_energy = vec![];

@@ -3,9 +3,7 @@
 //mod world;
 //pub use world::World;
 
-use bevy::prelude::Component;
-
-pub use crate::sandbox::Item;
+use crate::sandbox::{Component, Item};
 use crate::{Number, Vec2};
 
 #[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]

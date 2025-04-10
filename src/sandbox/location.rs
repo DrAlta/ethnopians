@@ -1,6 +1,4 @@
-use bevy::prelude::*;
-
-use crate::{sandbox::EntityId, Number};
+use crate::{sandbox::{Component, EntityId}, Number};
 
 #[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Location {
