@@ -27,12 +27,10 @@ pub const MAX_ENERGY: i32 = 100;
 pub mod ai;
 //pub mod interaction;
 
-pub mod actions;
 mod acts;
 use std::sync::Arc;
 
 pub use acts::Acts;
-pub mod change_request;
 //pub mod collision;
 pub mod forth;
 mod item;
@@ -46,14 +44,12 @@ mod r#return;
 pub use r#return::Return;
 
 mod sandbox;
-use sandbox::within_range;
-/*
-mod use_object;
-pub use use_object::UseObject;
-*/
-mod posible_actions;
-pub use posible_actions::{PosibleActionsRequest, PosibleActionsResponce};
+pub use sandbox::within_range;
 pub mod world;
 
+#[cfg(feature = "bevy")]
 pub type EntityId = bevy::prelude::Entity;
+#[cfg(not(feature = "bevy"))]
+pub type EntityId = u64;
+
 pub type ItemClass = Arc<String>;

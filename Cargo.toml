@@ -10,7 +10,6 @@ path = "src/lib.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-macros = {path = "./macros"}
 derive_more = { version = "1.0.0", features = ["add", "add_assign", "mul"] }
 fraction64 = { version = "0.1.15", git = "https://github.com/DrAlta/fraction64.git"}
 ordered-f32 = { version = "0.1.11", git = "https://github.com/DrAlta/rust-ordered-f32.git"}
@@ -48,13 +47,5 @@ trace-tick-sequence = []
 trace-moveit = []
 trace-parser = ["trace-parser-threadette"]
 trace-parser-threadette = []
-trace-req = ["trace-req-despawn", "trace-req-energy", "trace-req-hp", "trace-req-spawn-location-type"]
-trace-req-despawn = []
-trace-req-energy = []
-trace-req-hp = []
-trace-req-spawn-location-type = []
-trace-use-object = []
-trace-use-on = []
-trace-goto = []
 macroquad = ["dep:macroquad"]
 warn = []
