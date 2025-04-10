@@ -1,4 +1,7 @@
-use crate::{sandbox::{Component, EntityId}, Number};
+use crate::{
+    sandbox::{Component, EntityId},
+    Number,
+};
 
 #[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Location {

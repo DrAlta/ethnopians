@@ -52,7 +52,6 @@ pub type EntityId = u64;
 
 pub type ItemClass = Arc<String>;
 
-
 #[cfg(feature = "bevy")]
 use bevy::prelude::Component;
 #[cfg(not(feature = "bevy"))]

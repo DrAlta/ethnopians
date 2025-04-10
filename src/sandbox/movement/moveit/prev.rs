@@ -1,14 +1,10 @@
-use crate::{
-    sandbox::EntityId,
-    Number,
-};
+use crate::{sandbox::EntityId, Number};
 
 #[cfg(feature = "bevy")]
-use crate::
-    sandbox::{
-        world::{Movement, Size},
-        Location,
-    };
+use crate::sandbox::{
+    world::{Movement, Size},
+    Location,
+};
 
 pub trait Prev {
     fn get_location(&self, id: EntityId) -> Option<(Number, Number)>;

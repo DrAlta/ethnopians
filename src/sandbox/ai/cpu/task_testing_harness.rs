@@ -312,8 +312,7 @@ pub fn task_testing_harness(
                         InpulseId::UseOn => {
                             cpu.stack.pop();
                             cpu.stack.pop();
-                        }
-                        //_ => panic!("unhandled inpulse")
+                        } //_ => panic!("unhandled inpulse")
                     }
                     prayers.push((running_idx, Prayer::Running(inpulse_id)));
 
