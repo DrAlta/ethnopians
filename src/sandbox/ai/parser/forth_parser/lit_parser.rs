@@ -11,7 +11,7 @@ use nom::{
 
 use crate::sandbox::ai::{
     parser::{ident_parser, space_parser},
-    Instruction, StackItem, Thread, TaskPool,
+    Instruction, StackItem, TaskPool, Thread,
 };
 
 pub fn lit_parser<'a>(

@@ -1,14 +1,18 @@
 use std::collections::BTreeSet;
 
-use crate::{Number, {sweep_and_prune::{Entry, sortie, SpatialId}, types::AARect}};
-
+use crate::{
+    Number,
+    {
+        sweep_and_prune::{sortie, Entry, SpatialId},
+        types::AARect,
+    },
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SweepAndPrune {
     sorted: Vec<Entry>,
     dirty: bool,
 }
-
 
 impl SweepAndPrune {
     pub fn new(entities: Vec<AARect>) -> Self {

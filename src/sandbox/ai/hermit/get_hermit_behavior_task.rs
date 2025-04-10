@@ -87,7 +87,7 @@ take_all /* (table -- bool) */ = forth{
         assert_eq!((tail, idx), ("", idx));
         db.extend(new_db.into_iter());
     }
-    
+
     db.extend(TaskPool::core());
 
     db

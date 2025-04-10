@@ -1,6 +1,6 @@
 use crate::sandbox::ai::{
     parser::{comment_parser, space_parser},
-    Corrent, Thread, TaskPool,
+    Corrent, TaskPool, Thread,
 };
 use nom::{
     character::complete::{multispace0, multispace1},

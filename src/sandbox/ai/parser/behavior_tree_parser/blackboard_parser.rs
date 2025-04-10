@@ -4,7 +4,8 @@ use crate::sandbox::ai::{
     parser::{
         behavior_tree_parser::{tree_parser, Thingie},
         ident_parser, space_parser,
-    }, BlackboardKey, BlackboardValue, Instruction, TaskPool, Variable
+    },
+    BlackboardKey, BlackboardValue, Instruction, TaskPool, Variable,
 };
 
 use nom::{

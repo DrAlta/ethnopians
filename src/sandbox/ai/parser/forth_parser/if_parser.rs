@@ -9,7 +9,7 @@ use nom::{
 
 use crate::sandbox::ai::{
     parser::{balanced_parser, forth_parser::forth_threadette_parser, space_parser},
-    Thread, TaskPool,
+    TaskPool, Thread,
 };
 
 mod r#if;

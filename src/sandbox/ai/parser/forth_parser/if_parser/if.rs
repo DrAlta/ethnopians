@@ -1,6 +1,6 @@
 use crate::sandbox::ai::{
     parser::{balanced_parser::Tract, TreesUsed},
-    Instruction, Thread, TaskPool,
+    Instruction, TaskPool, Thread,
 };
 
 pub(super) trait If {

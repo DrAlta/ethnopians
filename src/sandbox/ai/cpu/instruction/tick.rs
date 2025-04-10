@@ -36,11 +36,10 @@ impl Instruction {
                 };
                 let bb = thing.into();
 
-                
                 stack.pop();
                 stack.push(aa);
                 stack.push(bb);
-                *pc = Some(("combine@i".to_owned(), 0 ));
+                *pc = Some(("combine@i".to_owned(), 0));
                 Ok(Status::None)
             }
             Instruction::Debug(_x) => {

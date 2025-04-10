@@ -29,4 +29,3 @@ impl AARect {
             && y <= self.min_y + self.height
     }
 }
-

@@ -2,7 +2,10 @@ use std::collections::HashMap;
 
 //use broad_phase::{Entity, EntityId as SpatialId, SpatialBloom};
 
-use crate::{sweep_and_prune::{SpatialId, SweepAndPrune}, types::AARect};
+use crate::{
+    sweep_and_prune::{SpatialId, SweepAndPrune},
+    types::AARect,
+};
 
 use crate::sandbox::EntityId;
 

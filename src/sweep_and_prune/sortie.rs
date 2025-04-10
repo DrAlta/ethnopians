@@ -12,4 +12,3 @@ pub fn sortie(
 ) -> std::cmp::Ordering {
     a.total_cmp(b)
 }
-

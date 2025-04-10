@@ -6,7 +6,7 @@ use nom::{
     IResult,
 };
 
-use crate::sandbox::ai::{parser::space_parser, Instruction, Thread, TaskPool};
+use crate::sandbox::ai::{parser::space_parser, Instruction, TaskPool, Thread};
 
 pub fn debug_statement_parser<'a>(
     input: &'a str,

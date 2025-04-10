@@ -22,7 +22,7 @@ use crate::sandbox::ai::{
         },
         ident_parser,
     },
-    Instruction, Thread, TaskPool,
+    Instruction, TaskPool, Thread,
 };
 
 use super::debug_statement_parser;

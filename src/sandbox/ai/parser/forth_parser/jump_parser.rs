@@ -4,7 +4,7 @@ use nom::{
 
 use crate::sandbox::ai::{
     parser::{ident_parser, space_parser},
-    Instruction, Thread, TaskPool,
+    Instruction, TaskPool, Thread,
 };
 
 pub fn jump_parser<'a>(

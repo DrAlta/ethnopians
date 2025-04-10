@@ -1,6 +1,6 @@
 use nom::{bytes::complete::tag, error::ErrorKind, IResult};
 
-use crate::sandbox::ai::{Instruction, Thread, TaskPool};
+use crate::sandbox::ai::{Instruction, TaskPool, Thread};
 
 pub fn return_parser<'a>(
     input: &'a str,

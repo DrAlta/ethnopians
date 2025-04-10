@@ -43,7 +43,11 @@ fn split_veg_to_seed_test() {
     );
 
     // set up  the dummy values
-    let find_in_inventory = vec![EntityId::from_raw(70), EntityId::from_raw(71), EntityId::from_raw(72)];
+    let find_in_inventory = vec![
+        EntityId::from_raw(70),
+        EntityId::from_raw(71),
+        EntityId::from_raw(72),
+    ];
     let find_nearest = vec![house];
     let get_entities = vec![];
     let get_energy = vec![];

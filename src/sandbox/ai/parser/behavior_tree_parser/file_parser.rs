@@ -3,7 +3,7 @@ use crate::sandbox::ai::{
         behavior_tree_parser::{tree_parser, Thingie, TreesUsed},
         ident_parser, space_parser,
     },
-    Instruction, Thread, ThreadName, TaskPool,
+    Instruction, TaskPool, Thread, ThreadName,
 };
 use nom::{
     character::complete::char, combinator::map_res, error::ErrorKind, multi::separated_list1,
