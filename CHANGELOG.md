@@ -4,6 +4,17 @@ Notable changes to the "Ethnopians" crate will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.3.0] - 2025-04-10
+
+### Changed
+
+- de Bevyfied it
+
+### Removed
+
+- I moved the Bevy system into the bevy front end create
+
+
 ## [0.2.5] - 2025-03-31
 
 ### Added
