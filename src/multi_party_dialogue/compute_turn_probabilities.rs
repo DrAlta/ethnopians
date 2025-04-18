@@ -29,12 +29,6 @@ pub fn compute_turn_probabilities<'a, 'b, 'c, 'd, 'e>(
     requests_made_by_char: &'d I,
     uncontested_followups_by_char: &'e I,
 ) -> HashMap<CharId, Probability> {
-    // Check if the cue_strengths map is empty
-    // If it is, return an empty HashMap because there are no characters to compute probabilities for
-    if cue_strengths.into_iter().next().is_none() {
-        return HashMap::new();
-    }
-
     // Compute the effective total number of requests
     // This is done by summing up the total number of requests made by all characters
     // and subtracting the total number of uncontested follow-ups
@@ -82,11 +76,13 @@ pub fn compute_turn_probabilities<'a, 'b, 'c, 'd, 'e>(
             / Into::<Number>::into(effective_total_requests);
 
         // Compute the weight for the current character
-        // The weight is computed as the weighted sum of the cue strength and attention
+        // The weight is computed as the sum of the cue strength and attention
         // minus a penalty term based on the hog factor
         // The penalty term is used to discourage characters from dominating the conversation
-        let weight = (cue_strength * status * 0.7 + attention * cue_strength * 0.3)
-            * (Number::ONE - hog_factor * 0.5);
+        // we keep the range of the penalty to 0.5 - 1.0 so that their probabilty doesn't 
+        // go to 0.0 when they are the only one talking
+        let weight = (cue_strength * status + attention * cue_strength)
+            * (Number::ONE - hog_factor * Number::HALF);
 
         // Add the weight to the total weight and insert it into the character weights map
         total_weight += weight;

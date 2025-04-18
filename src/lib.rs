@@ -8,7 +8,7 @@ pub mod combat;
 pub mod formation;
 pub mod kill_share;
 pub mod mate;
-pub mod multi_party_dialogues;
+pub mod multi_party_dialogue;
 pub mod preferances;
 mod ring;
 pub use ring::{ring, Box};
