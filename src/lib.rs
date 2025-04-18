@@ -8,7 +8,10 @@ pub mod combat;
 pub mod formation;
 pub mod kill_share;
 pub mod mate;
+pub mod multi_party_dialogues;
 pub mod preferances;
+mod ring;
+pub use ring::{ring, Box};
 pub mod sandbox;
 pub mod seven_emotions;
 //pub mod social_sim;//! this is supersecced by the ensemblage crate
