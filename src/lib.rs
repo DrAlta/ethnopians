@@ -10,6 +10,7 @@ pub mod kill_share;
 pub mod mate;
 pub mod multi_party_dialogue;
 pub mod preferances;
+pub mod probing;
 mod ring;
 pub use ring::{ring, Box};
 pub mod sandbox;
