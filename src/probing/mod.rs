@@ -10,3 +10,5 @@ mod massagee;
 pub use massagee::Massagee;
 mod masseuse;
 pub use masseuse::Masseuse;
+mod skillette;
+pub use skillette::Skillette;
