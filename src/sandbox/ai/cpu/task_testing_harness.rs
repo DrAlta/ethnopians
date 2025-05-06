@@ -9,7 +9,7 @@ use crate::sandbox::{
 
 type Prayer = Status;
 
-#[derive(Debug, Clone, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Eq, PartialOrd, Ord, Hash)]
 enum Info {
     Result,
     Standard,

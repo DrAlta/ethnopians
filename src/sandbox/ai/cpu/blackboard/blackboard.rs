@@ -2,12 +2,12 @@ use std::{borrow::Borrow, collections::BTreeMap, fmt::Debug, hash::Hash};
 
 use super::Variable;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Blackboard<K: Debug + std::cmp::Eq + std::hash::Hash, V: Debug> {
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Blackboard<K: Debug + std::cmp::Eq + std::hash::Hash, V: Debug + std::hash::Hash> {
     stack: Vec<BTreeMap<K, Variable<K, V>>>,
 }
 
-impl<K: Debug + std::cmp::Eq + std::hash::Hash + Ord, V: Debug> Blackboard<K, V> {
+impl<K: Debug + std::cmp::Eq + std::hash::Hash + Ord, V: Debug + std::hash::Hash> Blackboard<K, V> {
     pub fn insert(&mut self, k: K, v: Variable<K, V>) -> Option<Variable<K, V>> {
         if self.stack.is_empty() {
             self.stack.push(BTreeMap::new());
@@ -35,7 +35,7 @@ impl<K: Debug + std::cmp::Eq + std::hash::Hash + Ord, V: Debug> Blackboard<K, V>
         None
     }
 }
-impl<K: Debug + Eq + std::hash::Hash, V: Debug> Blackboard<K, V> {
+impl<K: Debug + Eq + std::hash::Hash, V: Debug + std::hash::Hash> Blackboard<K, V> {
     pub fn from(hash: BTreeMap<K, Variable<K, V>>) -> Self {
         Self { stack: vec![hash] }
     }

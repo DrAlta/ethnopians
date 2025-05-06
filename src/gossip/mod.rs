@@ -7,7 +7,7 @@ use crate::Number;
 type CharId = usize;
 /// Represents the personality traits of a character that influence their behavior and reactions
 /// in the gossip system.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct PersonalityTraits {
     /// How forgiving the character is when others share commonly held beliefs, even if untrue.
     /// Range: 0.0 (not forgiving) to 1.0 (very forgiving).
@@ -35,7 +35,7 @@ struct PersonalityTraits {
     opinion_weight_bias: Number,
 }
 /// Represents the direct relationship between this character and another character.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct Relationship {
     /// The affection level towards the other character.
     /// Range: -1.0 (strong dislike) to 1.0 (strong liking).
@@ -46,7 +46,7 @@ struct Relationship {
     trust: Number,
 }
 /// Represents this character's perception of how one character feels about another character.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct Opinion {
     /// The believed affection that the subject character has towards the target character.
     /// Range: -1.0 (believes the subject strongly dislikes the target) to 1.0 (believes the
@@ -54,7 +54,7 @@ struct Opinion {
     affection: Number,
 }
 /// Represents a character in the game, including their personality, relationships, and perceptions.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct Character {
     /// Unique identifier for the character.
     id: CharId,

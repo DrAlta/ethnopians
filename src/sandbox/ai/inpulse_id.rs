@@ -1,6 +1,6 @@
 use crate::sandbox::ItemClass;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum InpulseId {
     Act1,
     Act2,

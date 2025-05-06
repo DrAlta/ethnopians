@@ -4,7 +4,7 @@ use crate::Number;
 
 pub type SpatialId = usize;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct AARect {
     pub min_x: Number,
     pub min_y: Number,
@@ -34,13 +34,13 @@ impl AARect {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct Entry {
     aabb: AARect,
     entity_id: SpatialId,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SweepAndPrune {
     sorted: Vec<Entry>,
     dirty: bool,

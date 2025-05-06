@@ -6,8 +6,8 @@ use crate::{
     Number,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Node<Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord> {
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Node<Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::hash::Hash> {
     pub min_x: Number,
     pub min_y: Number,
     pub max_x: Number,
@@ -16,7 +16,7 @@ pub struct Node<Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord>
     pub node_type: NodeType<Id>,
 }
 
-impl<'a, Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord> Node<Id> {
+impl<'a, Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::hash::Hash> Node<Id> {
     pub fn create_tree<I, F>(list: I, get_aa_rect: &'a F) -> Result<Self, String>
     where
         I: IntoIterator<Item = Id> + Clone,

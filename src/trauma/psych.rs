@@ -6,7 +6,7 @@ use fraction64::Fraction;
 
 use super::{Event, TraumaExperience, TraumaExperienceType};
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Stage1EmotionalExperience {
     // Type of emotional experience
     experience_type: TraumaExperienceType,
@@ -14,7 +14,7 @@ pub struct Stage1EmotionalExperience {
     traumatic_stress: Fraction,
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Psych {
     // Mapping of experience types to the number of times experienced
     num_experiences: BTreeMap<TraumaExperienceType, u32>,

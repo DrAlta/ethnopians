@@ -3,7 +3,7 @@ use crate::{
     types::AARect,
 };
 
-pub fn create_subtree<'a, Id, F>(
+pub fn create_subtree<'a, Id: std::hash::Hash, F>(
     sorted_list: &Vec<(Id, MortenCode)>,
     begin: usize,
     end: usize,

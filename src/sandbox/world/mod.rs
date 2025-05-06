@@ -6,19 +6,19 @@
 use crate::sandbox::{Component, Item};
 use crate::{Number, Vec2};
 
-#[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Energy(pub i32);
 
-#[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Hp(pub i32);
 
-#[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Size {
     pub width: i32,
     pub height: i32,
 }
 
-#[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Type(pub Item);
 
 #[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]

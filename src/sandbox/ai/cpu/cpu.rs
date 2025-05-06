@@ -3,7 +3,7 @@ use crate::sandbox::ai::{
     Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, Status, TaskPool,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct CPU {
     pub pc: ProgramCounter,
     pub stack: Stack,

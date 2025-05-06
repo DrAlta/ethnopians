@@ -1,6 +1,6 @@
 use crate::Number;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Agent {
     pub value: Number,
     pub threshold: Number,

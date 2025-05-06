@@ -10,7 +10,7 @@ use crate::sandbox::ai::{
 /// should probably take their argumants off the stack
 ///
 /// should Combine, Use, Eat take a BlackboardKey that points to a ItemClass or the ItemClass directly? ether way InventoryGE should probably do the same
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Instruction {
     // takes two Blackboard keys that points to ItemClass
     Combine(BlackboardKey, BlackboardKey),

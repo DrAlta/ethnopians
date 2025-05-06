@@ -45,8 +45,8 @@ pub fn compute_turn_probabilities<'a, 'b, 'c, 'd, 'e>(
 
     // Initialize the total weight and character weights HashMap
     // The total weight will be used to normalize the character weights
-    let mut total_weight = Number::ZERO;
-    let mut character_weights = HashMap::new();
+    let mut total_tickets = Number::ZERO;
+    let mut character_tickets = HashMap::new();
 
     // Iterate over the cue strengths map
     // For each character, compute their weight based on their cue strength, social status, and attention
@@ -81,18 +81,18 @@ pub fn compute_turn_probabilities<'a, 'b, 'c, 'd, 'e>(
         // The penalty term is used to discourage characters from dominating the conversation
         // we keep the range of the penalty to 0.5 - 1.0 so that their probabilty doesn't 
         // go to 0.0 when they are the only one talking
-        let weight = (cue_strength * status + attention * cue_strength)
+        let tickets = (cue_strength * status + attention * cue_strength)
             * (Number::ONE - hog_factor * Number::HALF);
 
         // Add the weight to the total weight and insert it into the character weights map
-        total_weight += weight;
-        character_weights.insert(id, weight);
+        total_tickets += tickets;
+        character_tickets.insert(id, tickets);
     }
 
     // Normalize the character weights by dividing them by the total weight
     // This ensures that the weights sum up to 1
-    character_weights
+    character_tickets
         .into_iter()
-        .map(|(id, weight)| (*id, weight / total_weight))
+        .map(|(id, tickets)| (*id, tickets / total_tickets))
         .collect()
 }

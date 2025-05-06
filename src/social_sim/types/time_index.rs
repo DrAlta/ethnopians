@@ -1,6 +1,6 @@
 use derive_more::derive::{Add, AddAssign, Div, Mul, Rem, Sub};
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul, Div, Rem, AddAssign)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Add, Sub, Mul, Div, Rem, AddAssign)]
 pub struct TimeIndex(i64);
 
 impl std::fmt::Display for TimeIndex {

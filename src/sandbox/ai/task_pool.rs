@@ -2,7 +2,7 @@ use std::{borrow::Borrow, collections::BTreeMap};
 
 use crate::sandbox::ai::{Instruction, Thread, ThreadName};
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct TaskPool(BTreeMap<ThreadName, Thread>);
 impl TaskPool {
     pub fn new() -> Self {

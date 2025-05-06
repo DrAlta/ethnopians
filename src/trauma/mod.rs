@@ -71,7 +71,7 @@ impl Event {
 }
 
 // record on her experine of an event
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct TraumaExperience {
     // Type of emotional experience
     experience_type: TraumaExperienceType,
