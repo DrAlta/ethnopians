@@ -3,6 +3,11 @@
 Notable changes to the "Ethnopians" crate will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [0.3.1] - 2025-05-05
+
+### Added
+
+- Hash to all structs and enums
 
 ## [0.3.0] - 2025-04-10
 
