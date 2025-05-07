@@ -3,6 +3,12 @@
 Notable changes to the "Ethnopians" crate will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [0.3.2] - 2025-05-07
+
+### Added
+
+- From<bool> and From<&bool> for StackItem
+
 ## [0.3.1] - 2025-05-05
 
 ### Added

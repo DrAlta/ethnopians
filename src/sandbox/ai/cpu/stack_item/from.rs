@@ -27,6 +27,21 @@ impl From<&BlackboardValue> for StackItem {
     }
 }
 
+impl From<bool> for StackItem {
+    fn from(value: bool) -> Self {
+        if value {
+            Self::True
+        } else {
+            Self::False
+        }
+    }
+}
+impl From<&bool> for StackItem {
+    fn from(value: &bool) -> Self {
+        (*value).into()
+    }
+}
+
 impl From<EntityId> for StackItem {
     fn from(value: EntityId) -> Self {
         Self::EntityId(value)
