@@ -78,11 +78,11 @@ impl<T: Into<StackItem>> From<Option<T>> for StackItem {
         StackItem::some(thing.into())
     }
 }
-impl<T: Into<StackItem> + Clone> From<&Option<T>> for StackItem {
-    fn from(value: &Option<T>) -> Self {
-        let Some(thing) = value.clone() else {
-            return StackItem::False;
-        };
-        StackItem::some(thing.into())
+impl<'a, T> From<&'a Option<T>> for StackItem
+where
+    &'a T: Into<StackItem>,
+{
+    fn from(value: &'a Option<T>) -> Self {
+        value.as_ref().into()
     }
 }

@@ -3,6 +3,12 @@
 Notable changes to the "Ethnopians" crate will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [0.3.3] = 2025-05-07
+
+### Changed
+
+- From<&Option<T>> for StackItem now uses as.ref() instead of cloning the inner value of the Option.
+
 ## [0.3.2] - 2025-05-07
 
 ### Added
