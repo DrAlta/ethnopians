@@ -1,6 +1,5 @@
 use crate::Number;
 
-
 // We’ll use a simple model where each emotional process is represented as a value between 0.0 and 1.0.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct EmotionalState {

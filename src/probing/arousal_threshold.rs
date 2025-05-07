@@ -1,5 +1,7 @@
-use crate::{probing::{apprehension_delta, arousal_delta, MassageSkill, Massagee, Masseuse}, Number, IOTA};
-
+use crate::{
+    probing::{apprehension_delta, arousal_delta, MassageSkill, Massagee, Masseuse},
+    Number, IOTA,
+};
 
 /// Calculate the minimum threshold for the massagee's arousal level, based on their current state, the masseuse's skills, and the massage skills being used.
 /// This function is used to determine when the massagee's arousal level drops below the limit that she will allow the massage to continue.
@@ -32,10 +34,11 @@ pub fn arousal_threshold(
 
     // Calculate the factor that adjusts the arousal threshold based on the massagee's relationship with the masseuse.
     // This is based on the idea that the massagee's relationship with the masseuse affects their sensitivity to arousal drops.
-    let linear_factor = (&massagee.arousal_threshold_factor_slope * &massagee.relationship_with_masseuse) + &massagee.arousal_threshold_factor_base;
+    let linear_factor = (&massagee.arousal_threshold_factor_slope
+        * &massagee.relationship_with_masseuse)
+        + &massagee.arousal_threshold_factor_base;
 
     // Calculate the threshold for the massagee's arousal level, based on their peak arousal level and the arousal lost due to the tame massages.
     // The linear factor is used to adjust the threshold based on the massagee's relationship with the masseuse.
     peek_arousal - (arousal_lost * linear_factor)
-
 }

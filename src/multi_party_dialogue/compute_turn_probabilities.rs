@@ -79,7 +79,7 @@ pub fn compute_turn_probabilities<'a, 'b, 'c, 'd, 'e>(
         // The weight is computed as the sum of the cue strength and attention
         // minus a penalty term based on the hog factor
         // The penalty term is used to discourage characters from dominating the conversation
-        // we keep the range of the penalty to 0.5 - 1.0 so that their probabilty doesn't 
+        // we keep the range of the penalty to 0.5 - 1.0 so that their probabilty doesn't
         // go to 0.0 when they are the only one talking
         let tickets = (cue_strength * status + attention * cue_strength)
             * (Number::ONE - hog_factor * Number::HALF);

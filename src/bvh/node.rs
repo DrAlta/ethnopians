@@ -16,7 +16,9 @@ pub struct Node<Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord 
     pub node_type: NodeType<Id>,
 }
 
-impl<'a, Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::hash::Hash> Node<Id> {
+impl<'a, Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::hash::Hash>
+    Node<Id>
+{
     pub fn create_tree<I, F>(list: I, get_aa_rect: &'a F) -> Result<Self, String>
     where
         I: IntoIterator<Item = Id> + Clone,
