@@ -58,6 +58,11 @@ impl From<i32> for StackItem {
         Self::Int(value)
     }
 }
+impl From<&i32> for StackItem {
+    fn from(value: &i32) -> Self {
+        Self::Int(*value)
+    }
+}
 
 impl From<String> for StackItem {
     fn from(value: String) -> Self {

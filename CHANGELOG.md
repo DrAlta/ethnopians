@@ -3,6 +3,12 @@
 Notable changes to the "Ethnopians" crate will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [0.3.4] = 2025-05-08
+
+### Added
+
+- this might be fixinga regression bit added From<&i32> for StackItem
+
 ## [0.3.3] = 2025-05-07
 
 ### Changed
