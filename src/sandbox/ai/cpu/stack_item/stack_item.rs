@@ -84,19 +84,13 @@ impl StackItem {
 }
 
 impl StackItem {
-    pub fn from_iter<T: Into<StackItem>, I: Iterator<Item=T>>(value: I) -> Self {
+    pub fn from_iter<T: Into<StackItem>, I: Iterator<Item = T>>(value: I) -> Self {
         let mut inner = TableInterior::new();
-        value.enumerate().for_each(
-            |(idx, x)| 
-            {
-                inner.insert(
-                    idx.into(), 
-                    x.into()
-                );
-            }
-        );
+        value.enumerate().for_each(|(idx, x)| {
+            inner.insert(idx.into(), x.into());
+        });
         Self::Table(Arc::new(inner))
-    }    
+    }
 
     pub fn stuff(
         &mut self,
