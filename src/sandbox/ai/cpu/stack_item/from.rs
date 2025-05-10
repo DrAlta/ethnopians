@@ -64,6 +64,17 @@ impl From<&i32> for StackItem {
     }
 }
 
+impl From<usize> for StackItem {
+    fn from(value: usize) -> Self {
+        Self::Int(value as i32)
+    }
+}
+impl From<&usize> for StackItem {
+    fn from(value: &usize) -> Self {
+        Self::Int(*value as i32)
+    }
+}
+
 impl From<String> for StackItem {
     fn from(value: String) -> Self {
         Self::String(Arc::new(value))
@@ -91,3 +102,4 @@ where
         value.as_ref().into()
     }
 }
+
