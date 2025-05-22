@@ -19,7 +19,6 @@ impl From<EntityId> for BlackboardValue {
     }
 }
 
-
 impl From<StackItem> for BlackboardValue {
     fn from(value: StackItem) -> Self {
         match value {
