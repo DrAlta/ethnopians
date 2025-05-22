@@ -18,8 +18,13 @@ impl Instruction {
         pc: &mut ProgramCounter,
         blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
     ) -> Prayer {
-        logy!("debug", "ticking:{self:?}");
-        match self {
+        logy!("debug", "ticking:{pc:?}:{self:?}");
+        println!("Stack is:");
+        for c in &*stack {
+            println!("    {c:?}");
+        }
+
+        let ret = match self {
             Instruction::ForthAction(action_id) => {
                 //*pc = return_stack.pop();
 
@@ -720,6 +725,11 @@ impl Instruction {
                 *pc = Some((token.clone(), 0));
                 Ok(Status::None)
             }
+        };
+        println!("ending Stack is:");
+        for c in &*stack {
+            println!("    {c:?}");
         }
+        ret
     }
 }

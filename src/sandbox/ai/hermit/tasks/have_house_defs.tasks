@@ -23,6 +23,8 @@ is_house_in_range = forth{
                     then
                 then
             then
+            drop
+            drop
         then
     then
     lit(Failure)

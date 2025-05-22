@@ -11,8 +11,8 @@ pub fn tick_selector(
     return_stack: &mut ReturnStack,
     pc: &mut ProgramCounter,
 ) -> Result<Status, String> {
-    logy!("trace-tick-selector", "executing Selector:{stack:?}");
-    logy!("trace-tick-selector", "{return_stack:?}");
+    logy!("trace-tick-selector", "executing Selector, stack:{stack:?}");
+    logy!("trace-tick-selector", "return stack:{return_stack:?}");
 
     let Some(tos) = stack.pop() else {
         return Err("Nothing on stack when checking result of child".into());
@@ -42,30 +42,37 @@ pub fn tick_selector(
     logy!("trace-tick-selector", "Doing main body of Selector tick");
 
     let Some(StackItem::Table(x)) = stack.pop() else {
-        logy!("debug", "{stack:#?}");
+        logy!("debug", "stack:{stack:?}");
         return Err("Selector state not found on stack".into());
     };
     let TableInterior { map } = x.as_ref();
 
     let Some(StackItem::Int(idx)) = map.table_get("Selector") else {
-        logy!("debug", "{map:#?}");
+        logy!("debug", "map:{map:#?}");
         return Err("Selector state not found on stack".into());
     };
+    logy!("trace-tick-selector", "stack:{stack:?}");
 
     match (*idx as usize >= children.len(), tos) {
         // if we had a success then we succeed
         (_, StackItem::String(x)) if *x == "Success" => {
+            logy!("trace-tick-selector", "we got a Success");
             stack.push(StackItem::success());
             let status = if pc.is_none() {
-                Status::None
-            } else {
                 Status::Success
+            } else {
+                Status::None
             };
             Instruction::exit(status, return_stack, pc)
         }
         (true, StackItem::String(x)) if *x == "Failure" => {
+            logy!(
+                "trace-tick-selector",
+                "we reached the end without a Success then we fail"
+            );
             // if we reached the end without a Success then we fail
             stack.push(StackItem::failure());
+            println!("popy popy");
             if let Some(parent_token) = return_stack.pop() {
                 // return to calling fuction
                 *pc = Some(parent_token);
@@ -78,6 +85,10 @@ pub fn tick_selector(
         }
         // if we haven't reached the end and received a Failure then try the next child
         (false, StackItem::String(x)) if *x == "Failure" => {
+            logy!(
+                "trace-tick-selector",
+                "if we haven't reached the end and received a Failure then try the next child"
+            );
             let child_token: &ExecutionToken = children
                 .get(*idx as usize)
                 .expect("we already check they it was within range");

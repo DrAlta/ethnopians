@@ -1,6 +1,8 @@
 use std::collections::BTreeMap;
 use std::hash::Hash;
 
+use qol::logy;
+
 use crate::sandbox::ai::StackItem as Value;
 
 // TableInterior is the type that the Value::Table has in its Arc
@@ -32,9 +34,11 @@ impl TableGet<&Value> for BTreeMap<Value, Value> {
         self.get(k)
     }
 }
-impl<T: Into<Value>> TableGet<T> for BTreeMap<Value, Value> {
+impl<T: Into<Value> + std::fmt::Debug> TableGet<T> for BTreeMap<Value, Value> {
     fn table_get(&self, k: T) -> Option<&Value> {
+        logy!("debug", "{k:?}");
         let k2: Value = k.into();
+        logy!("debug", "{k2:?}");
         self.get(&k2)
     }
 }

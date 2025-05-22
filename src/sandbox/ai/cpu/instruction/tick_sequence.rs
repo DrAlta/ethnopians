@@ -11,7 +11,6 @@ pub fn tick_sequence(
     return_stack: &mut ReturnStack,
     pc: &mut ProgramCounter,
 ) -> Result<Status, String> {
-    println!("");
     let Some(tos) = stack.pop() else {
         return Err("Nothing on stack when checking result of child".into());
     };
