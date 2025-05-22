@@ -13,6 +13,12 @@ impl From<&str> for BlackboardValue {
         BlackboardValue::String(Arc::new(value.to_owned()))
     }
 }
+impl From<EntityId> for BlackboardValue {
+    fn from(value: EntityId) -> Self {
+        BlackboardValue::EntityId(value)
+    }
+}
+
 
 impl From<StackItem> for BlackboardValue {
     fn from(value: StackItem) -> Self {

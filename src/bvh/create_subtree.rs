@@ -34,7 +34,7 @@ where
     } else {
         let m = (begin + end) / 2;
         let left = Box::new(
-            create_subtree(sorted_list, begin, m - 1, get_aa_rect)
+            create_subtree(sorted_list, begin, m, get_aa_rect)
                 .map_err(|err| format!("Could biuld left side: {err}"))?,
         );
         let right = Box::new(
