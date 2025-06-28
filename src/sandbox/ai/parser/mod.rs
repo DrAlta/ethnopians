@@ -14,5 +14,6 @@ mod i32_parser;
 pub use i32_parser::i32_parser;
 mod space_parser;
 pub use space_parser::space_parser;
+mod types;
 
 type TreesUsed = crate::sandbox::ai::TaskPool;

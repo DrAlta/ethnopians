@@ -23,7 +23,9 @@ def main():
        min_c = (miny * (tpl[0] + (diff * tpl[1])))
        max_c = (maxy * (tpl[2] + (diff * tpl[3])))
        c = min_c + max_c
-       return (( q + miny + maxy) / 2.0 ) + c
+       danja1 = (( q + miny + maxy) * 0.5 ) + c
+       n = (x * x) + (y * y)
+       return 0.5 * (danja1 + (n / danja1))
    # ErrorFunc is the diference between the danja and the y "experimental" data
    ErrorFunc=lambda tpl,x,y,z: danja(tpl,x,y)-z
    #tplInitial contains the "first guess" of the parameters 
