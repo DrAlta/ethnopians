@@ -37,14 +37,26 @@
 //!
 //! let b =   effective_traumatic_stress / comfurt_zone
 //! final_x_intercept = ((intermediat_x-intecept - old_x_interceop) * b) + old_x_intercept
+//! 
+//! ---
+//! 
+//! Based on High-Threshold-Low-Tolerance_-_A Model for the Emotionality Paradox in PTSD
+//! we should a 'threhold level' of stress that it the level of stimuli needed to 
+//! be perceive as stressful
+//! and the 'tolerance level' beyond which they become unragulated
+//! 
+//! * we should take the ability to handle line and use a line from the origin to some point and use that line before that intersectin point
+//! ** @the intersection of the ability to handle line and  the threhold @
+//! ** @the intersection of the ability to handle line  and half the threhold @
+//! 
 mod event;
 pub use event::Event;
 mod psych;
 pub use psych::Psych;
 mod trauma_experience_type;
 pub use trauma_experience_type::TraumaExperienceType;
-mod experience;
-pub use experience::TraumaExperience;
+mod trauma_experience;
+pub use trauma_experience::TraumaExperience;
 
 
 pub type TraumaExperienceId = u64;
