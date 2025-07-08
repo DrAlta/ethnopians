@@ -17,13 +17,13 @@ pub fn danja_distance(mut x: Number, mut y: Number) -> Number {
         -5.07106089e-01,
         -1.20884737e-04,
         1.14701372e-02,
-        -1.15830904e-14
+        -1.15830904e-14,
     ];
 
     let min_correction = min * (min_diff_c + (diff * min_diff_m));
     let max_correction = max * (max_diff_c + (diff * max_diff_m));
     let correction = min_correction + max_correction;
-    
+
     // run it thru a step of Newton's Method
     let guess = ((under + max + min) * 0.5) + correction;
     let sqrd = (x * x) + (y * y);

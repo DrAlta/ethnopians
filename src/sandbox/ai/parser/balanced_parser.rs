@@ -1,10 +1,10 @@
-use std::{cell::RefCell, rc::Rc};
 use nom::{
     branch::alt,
     error::{ErrorKind, ParseError},
     multi::many_till,
     Err, IResult, InputLength, Parser,
 };
+use std::{cell::RefCell, rc::Rc};
 
 use crate::sandbox::ai::parser::types::{InnerTract, Tract};
 
