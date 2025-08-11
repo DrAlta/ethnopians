@@ -11,7 +11,7 @@ use crate::{
 pub struct Psych {
     // Mapping of experience types to the number of times experienced
     num_experiences: BTreeMap<TraumaExperienceType, u32>,
-    // Mapping of experience types to the number of good experiences
+    // Mapping of experience types to the  number of traumatic experince of that they where are to successfully manage
     num_good_experiences: BTreeMap<TraumaExperienceType, u32>,
     recent_experiences: BTreeMap<TraumaExperienceId, TraumaExperience>,
     /* this will just be the sum of the Exerinces of that type
@@ -21,6 +21,9 @@ pub struct Psych {
         ability_to_handle_emotional_experience_type:
             BTreeMap<TraumaExperienceType, (Number, Number)>,
     */
+
+    // dysregulated_gradient and dysregulated_y_intercept are just placehold. in production 
+    // dysregulation should be handlesby the emotional_dysregulation module
     dysregulated_gradient: Number,
     dysregulated_y_intercept: Number,
     // Location in the comfort zone (average of how well handled experiences)
@@ -113,8 +116,29 @@ impl Psych {
         match event {
             Event::Support {
                 stressfulness,
-                suppertiveness,
-            } => todo!(),
+                supportiveness,
+            } => {
+                let Some(experince) = self.get_trauma_experience(&trauma_experince_id) else {
+                    return;
+                };
+                let current_coping_support = experince.get_current_coping_support();
+
+                let (net_support, stressfulness2) =if supportiveness < current_coping_support {
+                    (
+                        Number::ZERO,
+                        supportiveness - stressfulness
+                    )
+                } else {
+                    (
+                        supportiveness - stressfulness,
+                        stressfulness
+                    )
+                };
+
+                self.get_trauma_experience_mut(&trauma_experince_id)
+                    .expect("we just got this experince so it shoulf still be there")
+                    .add_support_event(net_support, stressfulness2);
+            },
             Event::Trauma {
                 trauma_type,
                 base_traumatic_stressfulness,
@@ -187,7 +211,7 @@ impl Psych {
                 };
                 // add the event to the experince
                 match self.get_trauma_experience_mut(&trauma_experince_id) {
-                    Some(experience) => experience.add_event(
+                    Some(experience) => experience.add_trauma_event(
                         new_gradient_delta,
                         new_y_intercept_delta,
                         trauma,

@@ -10,13 +10,29 @@ pub struct TraumaExperience {
 
     pub ability_to_handle_gradient: Number,
     pub ability_to_handle_y_intercept: Number,
+    // should we make spressing inner_events for supportive and traumatice events?
+    // curectly we just consider any event with a negatice trauma asa supportive event.
     pub inner_events: Vec<InnerEvent>,
+
+    pub coping_threshold: Number,
 }
 impl TraumaExperience {
-    pub fn get_current_coping_support(&self) -> Number {
-        todo!()
+    pub fn add_support_event(&mut self, net_support: Number, stress: Number) {
+        if net_support < Number::ZERO {
+            return
+        };
+        self.coping_threshold = Number::ZERO.max(net_support + self.coping_threshold);
+        self.inner_events.push(InnerEvent {
+            trauma:  - net_support,
+            base_traumatic_stressfulness: stress,
+        });
     }
-    pub fn add_event(
+    pub fn get_current_coping_support(&self) -> Number {
+        let support_count = self.inner_events.iter().filter_map(
+            |&InnerEvent { trauma, base_traumatic_stressfulness: _ }| if trauma < Number::ZERO{ Some(())} else {None}).count();
+        self.coping_threshold * Into::<Number>::into(support_count)
+    }
+    pub fn add_trauma_event(
         &mut self,
         new_gradient_delta: Number,
         new_y_intercept_delta: Number,
@@ -47,6 +63,7 @@ impl TraumaExperience {
                 trauma,
                 base_traumatic_stressfulness,
             }],
+            coping_threshold: Number::ZERO
         }
     }
 }

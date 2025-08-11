@@ -4,7 +4,7 @@ use crate::{trauma::TraumaExperienceType, Number};
 pub enum Event {
     Support {
         stressfulness: Number,
-        suppertiveness: Number,
+        supportiveness: Number,
     },
     Trauma {
         // Type of trauma experience
@@ -27,7 +27,7 @@ impl Event {
         match self {
             Event::Support {
                 stressfulness: _,
-                suppertiveness: _,
+                supportiveness: _,
             } => None,
             Event::Trauma {
                 trauma_type,
@@ -39,7 +39,7 @@ impl Event {
         match self {
             Event::Support {
                 stressfulness,
-                suppertiveness: _,
+                supportiveness: _,
             } => stressfulness.clone(),
             Event::Trauma {
                 trauma_type: _,
