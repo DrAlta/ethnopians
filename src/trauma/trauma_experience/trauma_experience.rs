@@ -19,17 +19,31 @@ pub struct TraumaExperience {
 impl TraumaExperience {
     pub fn add_support_event(&mut self, net_support: Number, stress: Number) {
         if net_support < Number::ZERO {
-            return
+            return;
         };
         self.coping_threshold = Number::ZERO.max(net_support + self.coping_threshold);
         self.inner_events.push(InnerEvent {
-            trauma:  - net_support,
+            trauma: -net_support,
             base_traumatic_stressfulness: stress,
         });
     }
     pub fn get_current_coping_support(&self) -> Number {
-        let support_count = self.inner_events.iter().filter_map(
-            |&InnerEvent { trauma, base_traumatic_stressfulness: _ }| if trauma < Number::ZERO{ Some(())} else {None}).count();
+        let support_count = self
+            .inner_events
+            .iter()
+            .filter_map(
+                |&InnerEvent {
+                     trauma,
+                     base_traumatic_stressfulness: _,
+                 }| {
+                    if trauma < Number::ZERO {
+                        Some(())
+                    } else {
+                        None
+                    }
+                },
+            )
+            .count();
         self.coping_threshold * Into::<Number>::into(support_count)
     }
     pub fn add_trauma_event(
@@ -63,7 +77,7 @@ impl TraumaExperience {
                 trauma,
                 base_traumatic_stressfulness,
             }],
-            coping_threshold: Number::ZERO
+            coping_threshold: Number::ZERO,
         }
     }
 }

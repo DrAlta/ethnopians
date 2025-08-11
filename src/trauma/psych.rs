@@ -21,8 +21,7 @@ pub struct Psych {
         ability_to_handle_emotional_experience_type:
             BTreeMap<TraumaExperienceType, (Number, Number)>,
     */
-
-    // dysregulated_gradient and dysregulated_y_intercept are just placehold. in production 
+    // dysregulated_gradient and dysregulated_y_intercept are just placehold. in production
     // dysregulation should be handlesby the emotional_dysregulation module
     dysregulated_gradient: Number,
     dysregulated_y_intercept: Number,
@@ -123,22 +122,16 @@ impl Psych {
                 };
                 let current_coping_support = experince.get_current_coping_support();
 
-                let (net_support, stressfulness2) =if supportiveness < current_coping_support {
-                    (
-                        Number::ZERO,
-                        supportiveness - stressfulness
-                    )
+                let (net_support, stressfulness2) = if supportiveness < current_coping_support {
+                    (Number::ZERO, supportiveness - stressfulness)
                 } else {
-                    (
-                        supportiveness - stressfulness,
-                        stressfulness
-                    )
+                    (supportiveness - stressfulness, stressfulness)
                 };
 
                 self.get_trauma_experience_mut(&trauma_experince_id)
                     .expect("we just got this experince so it shoulf still be there")
                     .add_support_event(net_support, stressfulness2);
-            },
+            }
             Event::Trauma {
                 trauma_type,
                 base_traumatic_stressfulness,

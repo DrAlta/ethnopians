@@ -15,7 +15,7 @@ pub struct SweepAndPrune {
 }
 
 impl SweepAndPrune {
-    pub fn new<I:Iterator<Item = AARect>>(entities: I) -> Self {
+    pub fn new<I: Iterator<Item = AARect>>(entities: I) -> Self {
         let sorted: Vec<Entry> = entities
             .enumerate()
             .map(|(idx, aabb)| Entry {
