@@ -11,6 +11,7 @@ pub mod mate;
 pub mod multi_party_dialogue;
 pub mod preferances;
 pub mod probing;
+pub mod pubsub;
 mod ring;
 pub use ring::{ring, Box};
 pub mod sandbox;

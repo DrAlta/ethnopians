@@ -10,14 +10,13 @@ use crate::{
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SweepAndPrune {
-    sorted: Vec<Entry>,
-    dirty: bool,
+    pub sorted: Vec<Entry>,
+    pub dirty: bool,
 }
 
 impl SweepAndPrune {
-    pub fn new(entities: Vec<AARect>) -> Self {
+    pub fn new<I:Iterator<Item = AARect>>(entities: I) -> Self {
         let sorted: Vec<Entry> = entities
-            .into_iter()
             .enumerate()
             .map(|(idx, aabb)| Entry {
                 aabb,

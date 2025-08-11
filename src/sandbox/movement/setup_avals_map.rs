@@ -16,7 +16,7 @@ pub fn setup_avals_map(
     rearendings: HashMap<EntityId, AARect>,
 ) -> (HashMap<SpatialId, Avalibility>, SweepAndPrune) {
     let mut avals = HashMap::<SpatialId, Avalibility>::new();
-    let mut map = SweepAndPrune::new(Vec::new());
+    let mut map = SweepAndPrune::new(Vec::new().into_iter());
     for (unit_id, entity) in collisions {
         let entity_id = map.insert(entity);
         avals.insert(entity_id, Avalibility::Collision(unit_id));
