@@ -10,7 +10,10 @@ pub use foo::Foo;
 
 type Sting = String;
 
-pub fn join_i8<const AI: usize, Id: Eq + std::hash::Hash, A: Foo<AI>>(working: &mut HashMap<Id, i8>, a: &A) {
-    let temp: Vec<i8> = a.get_i8_iter().map(|x|*x).collect();
-    working.retain(|_,v| temp.contains(&*v));
+pub fn join_i8<const AI: usize, Id: Eq + std::hash::Hash, A: Foo<AI>>(
+    working: &mut HashMap<Id, i8>,
+    a: &A,
+) {
+    let temp: Vec<i8> = a.get_i8_iter().map(|x| *x).collect();
+    working.retain(|_, v| temp.contains(&*v));
 }
