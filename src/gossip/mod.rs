@@ -1,5 +1,5 @@
 //! this was coded by Chad.  I''m reveiw it when I migrate it bevy
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 use crate::Number;
 
@@ -67,11 +67,11 @@ struct Character {
 
     /// Direct relationships with other characters.
     /// Key: Other character's ID, Value: Relationship instance.
-    relationships: HashMap<CharId, Relationship>,
+    relationships: BTreeMap<CharId, Relationship>,
 
     /// Perceptions about how other characters feel about one another.
     /// Key: Subject character's ID, Value: Map of target character IDs to Opinions.
-    perceptions: HashMap<CharId, HashMap<CharId, Opinion>>,
+    perceptions: BTreeMap<CharId, BTreeMap<CharId, Opinion>>,
 }
 impl Character {
     /// Normalizes a value from the range -1.0 to 1.0 to the range 0.0 to 1.0.
@@ -83,8 +83,8 @@ impl Character {
     /// # Returns
     ///
     /// A normalized value in the range 0.0 to 1.0.
-    fn normalize(value: f32) -> f32 {
-        (value + 1.0) / 2.0
+    fn normalize(value: Number) -> Number {
+        (value + Number::ONE) / Number::TWO
     }
 
     /// Calculates the weight assigned to another character's opinion based on this character's
@@ -97,28 +97,28 @@ impl Character {
     /// # Returns
     ///
     /// A weight value between 0.0 and 1.0.
-    fn calculate_weight(&self, other: &Character) -> f32 {
+    fn calculate_weight(&self, other: &Character) -> Number {
         // Normalize affection towards the other character to 0.0 - 1.0.
-        let affection_weight = Self::normalize(
+        let affection_weight: Number = Self::normalize(
             self.relationships
                 .get(&other.id)
-                .map_or(0.0, |rel| rel.affection),
+                .map_or(Number::ZERO, |rel| rel.affection),
         );
 
         // Trust weight is taken directly as it's already in the range 0.0 - 1.0.
         let trust_weight = self
             .relationships
             .get(&other.id)
-            .map_or(0.0, |rel| rel.trust);
+            .map_or(Number::ZERO, |rel| rel.trust);
 
         // Convert opinion_weight_bias from -1.0 - 1.0 to bias factor between 0.0 and 1.0.
         // A value of -1.0 (fully trust-focused) becomes 0.0.
         // A value of 1.0 (fully affection-focused) becomes 1.0.
-        let bias = (self.personality.opinion_weight_bias + 1.0) / 2.0;
+        let bias = (self.personality.opinion_weight_bias + Number::ONE) / Number::TWO;
 
         // Calculate the final weight by interpolating between affection_weight and trust_weight
         // based on the bias factor.
-        bias * affection_weight + (1.0 - bias) * trust_weight
+        bias * affection_weight + (Number::ONE - bias) * trust_weight
     }
 }
 impl Character {
@@ -141,9 +141,9 @@ impl Character {
         victim_id: CharId,
         exclude_id: Option<CharId>,
         all_characters: &HashMap<CharId, Character>,
-    ) -> f32 {
-        let mut sum_weighted_opinions = 0.0; // Accumulates the weighted opinions.
-        let mut sum_weights = 0.0;           // Accumulates the weights.
+    ) -> Number {
+        let mut sum_weighted_opinions = Number::ZERO; // Accumulates the weighted opinions.
+        let mut sum_weights = Number::ZERO;           // Accumulates the weights.
 
         // Iterate over each acquaintance (characters with whom this character has a relationship).
         for (&other_id, relationship) in &self.relationships {
@@ -162,7 +162,7 @@ impl Character {
                     other
                         .relationships
                         .get(&victim_id)
-                        .map_or(0.0, |rel| rel.affection),
+                        .map_or(Number::ZERO, |rel| rel.affection),
                 );
 
                 // Accumulate the weighted opinion and weight.
@@ -172,10 +172,10 @@ impl Character {
         }
 
         // Calculate and return the consensus opinion.
-        if sum_weights > 0.0 {
+        if sum_weights > Number::ZERO {
             sum_weighted_opinions / sum_weights
         } else {
-            0.5 // Neutral consensus if no acquaintances are considered.
+            Number::HALF // Neutral consensus if no acquaintances are considered.
         }
     }
 }
@@ -199,9 +199,9 @@ impl Character {
         victim_id: CharId,
         exclude_id: Option<CharId>,
         all_characters: &HashMap<CharId, Character>,
-    ) -> f32 {
-        let mut sum_weighted_opinions = 0.0; // Accumulates the weighted opinions.
-        let mut sum_weights = 0.0;           // Accumulates the weights.
+    ) -> Number {
+        let mut sum_weighted_opinions = Number::ZERO; // Accumulates the weighted opinions.
+        let mut sum_weights = Number::ZERO;           // Accumulates the weights.
 
         // Iterate over each acquaintance.
         for (&other_id, _) in &self.relationships {
@@ -220,7 +220,7 @@ impl Character {
                     .perceptions
                     .get(&subject_id)
                     .and_then(|opinions| opinions.get(&victim_id))
-                    .map_or(0.0, |op| Self::normalize(op.affection));
+                    .map_or(Number::ZERO, |op| Self::normalize(op.affection));
 
                 // Accumulate the weighted opinion and weight.
                 sum_weighted_opinions += weight * opinion;
@@ -229,20 +229,20 @@ impl Character {
         }
 
         // Calculate and return the consensus opinion.
-        if sum_weights > 0.0 {
+        if sum_weights > Number::ZERO {
             sum_weighted_opinions / sum_weights
         } else {
-            0.5 // Neutral consensus if no acquaintances are considered.
+            Number::HALF // Neutral consensus if no acquaintances are considered.
         }
     }
 }
 /// Represents the potential changes to a character's beliefs resulting from hearing gossip.
 struct GossipImpact {
     /// Change in trust towards the gossiper.
-    trust_change: f32,
+    trust_change: Number,
 
     /// Change in affection towards the victim of the gossip.
-    affection_change_towards_victim: f32,
+    affection_change_towards_victim: Number,
 
     /// Changes in perceptions about how the subject feels about the victim (for third-party gossip).
     perceptions_update: Option<OpinionChange>,
@@ -252,7 +252,7 @@ struct GossipImpact {
 struct OpinionChange {
     subject_id: CharId,
     victim_id: CharId,
-    affection_change: f32,
+    affection_change: Number,
 }
 impl Character {
     /// Calculates the changes to this character's beliefs upon hearing gossip from another character.
@@ -273,8 +273,8 @@ impl Character {
         all_characters: &HashMap<CharId, Character>,
     ) -> GossipImpact {
         // Initialize changes
-        let mut trust_change = 0.0;
-        let mut affection_change_towards_victim = 0.0;
+        let mut trust_change = Number::ZERO;
+        let mut affection_change_towards_victim = Number::ZERO;
         let mut perceptions_update = None;
 
         // Determine if the gossip is direct or third-party
@@ -335,18 +335,18 @@ impl Character {
         let victim_id = gossip_content.victim_id;
 
         // 1. Assess alignment between the gossip and this character's existing beliefs about the victim.
-        let existing_opinion = self.relationships.get(&victim_id).map_or(0.0, |rel| rel.affection);
-        let alignment = 1.0 - (existing_opinion - gossip_content.affection).abs() / 2.0; // Normalize to 0.0 - 1.0
+        let existing_opinion = self.relationships.get(&victim_id).map_or(Number::ZERO, |rel| rel.affection);
+        let alignment = Number::ONE - (existing_opinion - gossip_content.affection).abs() / Number::TWO; // Normalize to 0.0 - 1.0
 
         // 2. Calculate trust change towards the gossiper.
         // Increase trust if gossip aligns with beliefs, decrease if not.
         let gullibility = self.personality.gullibility_for_confirmation;
-        let trust_change = if alignment >= 0.5 {
+        let trust_change = if alignment >= Number::HALF {
             // Gossip aligns with beliefs
-            gullibility * (alignment - 0.5) * 2.0
+            gullibility * (alignment - Number::HALF) * Number::TWO
         } else {
             // Gossip contradicts beliefs
-            -self.personality.skepticism * (0.5 - alignment) * 2.0
+            -self.personality.skepticism * (Number::HALF - alignment) * Number::TWO
         };
 
         // 3. Calculate change in affection towards the victim.
@@ -373,16 +373,16 @@ impl Character {
         let victim_id = gossip_content.victim_id;
 
         // 1. Assess credibility of the gossiper.
-        let gossiper_trust = self.relationships.get(&gossiper.id).map_or(0.0, |rel| rel.trust);
+        let gossiper_trust = self.relationships.get(&gossiper.id).map_or(Number::ZERO, |rel| rel.trust);
         let skepticism = self.personality.skepticism;
-        let credibility = gossiper_trust * (1.0 - skepticism);
+        let credibility = gossiper_trust * (Number::ONE - skepticism);
 
         // 2. Calculate change in perception about how the subject feels about the victim.
         let existing_opinion = self
             .perceptions
             .get(&subject_id)
             .and_then(|opinions| opinions.get(&victim_id))
-            .map_or(0.0, |op| op.affection);
+            .map_or(Number::ZERO, |op| op.affection);
 
         let opinion_change = credibility * (gossip_content.affection - existing_opinion);
 
@@ -391,8 +391,8 @@ impl Character {
 
         // Return the impact with perception updates
         GossipImpact {
-            trust_change: 0.0,
-            affection_change_towards_victim: 0.0, // No direct affection change towards the victim
+            trust_change: Number::ZERO,
+            affection_change_towards_victim: Number::ZERO, // No direct affection change towards the victim
             perceptions_update: Some(OpinionChange {
                 subject_id,
                 victim_id,
@@ -412,7 +412,7 @@ struct GossipContent {
 
     /// The affection value expressed in the gossip.
     /// Range: -1.0 (strong negative sentiment) to 1.0 (strong positive sentiment).
-    affection: f32,
+    affection: Number,
 }
 impl Character {
     /// Processes gossip received from another character by calculating the impact and updating this
@@ -436,11 +436,11 @@ impl Character {
         self.relationships
             .entry(gossiper.id)
             .and_modify(|rel| {
-                rel.trust = (rel.trust + impact.trust_change).clamp(0.0, 1.0);
+                rel.trust = (rel.trust + impact.trust_change).clamp(Number::ZERO, Number::ONE);
             })
             .or_insert_with(|| Relationship {
-                affection: 0.0,
-                trust: impact.trust_change.clamp(0.0, 1.0),
+                affection: Number::ZERO,
+                trust: impact.trust_change.clamp(Number::ZERO, Number::ONE),
             });
 
         // Step 3: Update affection towards the victim for direct gossip.
@@ -449,13 +449,13 @@ impl Character {
                 .entry(gossip_content.victim_id)
                 .and_modify(|rel| {
                     rel.affection = (rel.affection + impact.affection_change_towards_victim)
-                        .clamp(-1.0, 1.0);
+                        .clamp(Number::NEG_ONE, Number::ONE);
                 })
                 .or_insert_with(|| Relationship {
                     affection: impact
                         .affection_change_towards_victim
-                        .clamp(-1.0, 1.0),
-                    trust: 0.5, // Default trust value for new acquaintances
+                        .clamp(Number::NEG_ONE, Number::ONE),
+                    trust: Number::HALF, // Default trust value for new acquaintances
                 });
         }
 
@@ -463,14 +463,14 @@ impl Character {
         if let Some(opinion_change) = impact.perceptions_update {
             self.perceptions
                 .entry(opinion_change.subject_id)
-                .or_insert_with(HashMap::new)
+                .or_insert_with(BTreeMap::new)
                 .entry(opinion_change.victim_id)
                 .and_modify(|op| {
                     op.affection = (op.affection + opinion_change.affection_change)
-                        .clamp(-1.0, 1.0);
+                        .clamp(Number::NEG_ONE, Number::ONE);
                 })
                 .or_insert(Opinion {
-                    affection: opinion_change.affection_change.clamp(-1.0, 1.0),
+                    affection: opinion_change.affection_change.clamp(Number::NEG_ONE, Number::ONE),
                 });
         }
     }
