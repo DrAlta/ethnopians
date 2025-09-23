@@ -1,7 +1,10 @@
-use super::EntityId;
+use crate::{
+    sandbox::{Component, EntityId},
+    Number,
+};
 
-#[derive(Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Component, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Location {
     Inventory(EntityId),
-    World { x: f32, y: f32 },
+    World { x: Number, y: Number },
 }

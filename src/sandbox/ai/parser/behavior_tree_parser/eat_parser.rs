@@ -1,12 +1,10 @@
-use std::collections::HashMap;
-
 use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
 };
 
 use crate::sandbox::ai::{
     parser::{behavior_tree_parser::Thingie, ident_parser, space_parser},
-    Instruction,
+    Instruction, TaskPool,
 };
 
 pub fn eat_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
@@ -21,7 +19,7 @@ pub fn eat_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, Err
     ))(input)?;
     Ok((
         tail,
-        Thingie::Tree(vec![Instruction::Eat(item_a.to_owned())], HashMap::new()),
+        Thingie::Tree(vec![Instruction::Eat(item_a.to_owned())], TaskPool::new()),
     ))
 }
 #[cfg(test)]

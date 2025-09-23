@@ -1,17 +1,22 @@
 use std::collections::HashMap;
 
-use broad_phase::{Entity, EntityId as SpatialId, SpatialBloom};
+//use broad_phase::{Entity, EntityId as SpatialId, SpatialBloom};
+
+use crate::{
+    sweep_and_prune::{SpatialId, SweepAndPrune},
+    types::AARect,
+};
 
 use crate::sandbox::EntityId;
 
 use super::moveit::Avalibility;
 
 pub fn setup_avals_map(
-    collisions: HashMap<EntityId, Entity>,
-    rearendings: HashMap<EntityId, Entity>,
-) -> (HashMap<SpatialId, Avalibility>, SpatialBloom) {
+    collisions: HashMap<EntityId, AARect>,
+    rearendings: HashMap<EntityId, AARect>,
+) -> (HashMap<SpatialId, Avalibility>, SweepAndPrune) {
     let mut avals = HashMap::<SpatialId, Avalibility>::new();
-    let mut map = SpatialBloom::new(10.0, 10.0, Vec::new()).unwrap();
+    let mut map = SweepAndPrune::new(Vec::new().into_iter());
     for (unit_id, entity) in collisions {
         let entity_id = map.insert(entity);
         avals.insert(entity_id, Avalibility::Collision(unit_id));
@@ -21,6 +26,6 @@ pub fn setup_avals_map(
         let entity_id = map.insert(entity);
         avals.insert(entity_id, Avalibility::RearEnded(unit_id));
     }
-
+    map.ready();
     (avals, map)
 }

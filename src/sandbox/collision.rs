@@ -84,11 +84,11 @@ mod tests {
     #[test]
     pub fn one_d_collid_left_test() {
         let x = one_d_collide(5.0, 10.0, 10.0, 1.0);
-        assert_eq!(Some(-5.0), x);
+        assert_eq!(x, Some(-5.0));
     }
     #[test]
     pub fn one_d_collid_pen_test() {
         let x = one_d_collide(11.0, 10.0, 10.0, 20.0);
-        assert_eq!(Some(0.0), x);
+        assert_eq!(x, Some(0.0));
     }
 }

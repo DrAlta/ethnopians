@@ -1,4 +1,6 @@
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+use std::sync::Arc;
+
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Hash)]
 pub enum Item {
     Agent,
 
@@ -9,6 +11,8 @@ pub enum Item {
     Wood,
 
     House,
+    Knife,
+    Seed,
     Tree,
     Veggie,
 }
@@ -22,6 +26,8 @@ impl std::fmt::Display for Item {
                 Item::Agent => "Agent",
                 Item::Axe => "Axe",
                 Item::Food => "Food",
+                Item::Knife => "Knife",
+                Item::Seed => "Seed",
                 Item::Stone => "Stone",
                 Item::Stick => "Stick",
                 Item::Wood => "Wood",
@@ -32,11 +38,25 @@ impl std::fmt::Display for Item {
         )
     }
 }
-
-impl TryFrom<&str> for Item {
-    
+impl TryFrom<String> for Item {
     type Error = ();
-    
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        let str: &str = &value;
+        str.try_into()
+    }
+}
+impl TryFrom<Arc<String>> for Item {
+    type Error = ();
+
+    fn try_from(value: Arc<String>) -> Result<Self, Self::Error> {
+        let str: &str = &*value;
+        str.try_into()
+    }
+}
+impl TryFrom<&str> for Item {
+    type Error = ();
+
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         Ok(if value.eq_ignore_ascii_case("Agent") {
             Item::Agent
@@ -44,6 +64,8 @@ impl TryFrom<&str> for Item {
             Item::Axe
         } else if value.eq_ignore_ascii_case("Food") {
             Item::Food
+        } else if value.eq_ignore_ascii_case("Knife") {
+            Item::Knife
         } else if value.eq_ignore_ascii_case("Stone") {
             Item::Stone
         } else if value.eq_ignore_ascii_case("Stick") {
@@ -52,12 +74,14 @@ impl TryFrom<&str> for Item {
             Item::Wood
         } else if value.eq_ignore_ascii_case("House") {
             Item::House
+        } else if value.eq_ignore_ascii_case("Seed") {
+            Item::Seed
         } else if value.eq_ignore_ascii_case("Tree") {
             Item::Tree
         } else if value.eq_ignore_ascii_case("Veggie") {
             Item::Veggie
         } else {
-            return Err(())
+            return Err(());
         })
     }
 }

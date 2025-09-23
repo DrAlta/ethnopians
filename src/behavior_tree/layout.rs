@@ -1,15 +1,15 @@
-use crate::{vec2, Vec2};
+use crate::{vec2, Number, Vec2};
 pub struct Layout {
     child: Vec<Layout>,
 }
 
 impl Layout {
-    pub fn size(&self, spacing: f32) -> Vec2 {
+    pub fn size(&self, spacing: Number) -> Vec2 {
         let mut iter = self.child.iter();
         let init = if let Some(first) = iter.next() {
             first.size(spacing)
         } else {
-            vec2(0.0, 0.0)
+            vec2(Number::ZERO, Number::ZERO)
         };
 
         let x = iter.fold(init, |acc, item| {

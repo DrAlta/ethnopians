@@ -1,25 +1,32 @@
 #![feature(box_into_inner)]
 #![feature(btree_cursors)]
-mod types;
-pub use types::{radians_to_u8, u8_to_radians, ActionId, ActorId, Desire, Steering, TimeIndex};
-
-#[cfg(not(feature = "macroquad"))]
-pub use types::{vec2, Vec2};
-
-#[cfg(feature = "macroquad")]
-pub use macroquad::math::{vec2, Vec2};
-
+pub mod anger;
 pub mod behavior_tree;
 mod brothel;
+mod bvh;
+pub use bvh::Node;
 pub mod combat;
+pub mod emotional_dysregulation;
 pub mod formation;
+pub mod general_specific_affinity;
+#[cfg(feature = "gossip")]
+pub mod gossip;
 pub mod kill_share;
 pub mod mate;
+pub mod multi_party_dialogue;
 pub mod preferances;
+pub mod probing;
+pub mod pubsub;
+mod ring;
+pub use ring::{ring, Box};
 pub mod sandbox;
-pub mod social_sim;
-mod trauma;
+pub mod seven_emotions;
+//pub mod social_sim;//! this is supersecced by the ensemblage crate
+pub mod sweep_and_prune;
+pub mod trauma;
+pub mod types;
+pub use types::{vec2, Vec2};
+pub mod util;
 
-pub mod sqrt;
-
-pub type Number = f64;
+pub type Number = ordered_f32::OrderedF32;
+pub const IOTA: Number = ordered_f32::OrderedF32(0.0000001);

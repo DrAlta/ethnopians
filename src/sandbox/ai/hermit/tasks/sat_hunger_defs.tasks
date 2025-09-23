@@ -1,0 +1,48 @@
+dont_need_to_eat = forth {
+    lit("self")
+    get_blackboard
+    some_entity_id
+    if
+        get_energy
+        some_int
+        if
+            lit(5)
+            gt
+            if
+                lit(Success)
+                return
+            then
+            lit(Failure)
+            return
+        then
+    then
+    drop
+    lit(Failure)
+    return
+};
+get_veg = selector {
+    blackboard(food => Veggie) {
+        inventory_have_ge(food, 1),
+        forth {
+            lit("self")
+            get_blackboard
+            some_entity_id
+            if
+                get_location
+                some_coord
+                if
+                    lit("Veggie") /* this should really by the food in the blackboard*/
+                    find_nearest
+                    some_entity_id
+                    if
+                        take_entity
+                        return
+                    then
+                then
+            then
+            drop
+            lit(Failure)
+            return
+        }
+    }
+}

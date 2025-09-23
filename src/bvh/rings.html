@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="myCanvas" width="400" height="400" style="border:1px solid #000000;">
+Your browser does not support the HTML canvas tag.
+</canvas>
+
+<script>
+// Get the canvas element and its context
+var canvas = document.getElementById('myCanvas');
+var ctx = canvas.getContext('2d');
+
+function drawRing(x, y, size, side, color) {
+   let half_size = size / 2;
+   let long_side = side + size;
+
+    ctx.fillStyle = color[0];
+    ctx.fillRect(
+        x + half_size, 
+        y - half_size, 
+        side, 
+        long_side);
+
+    ctx.fillStyle = color[1];
+    ctx.fillRect(
+        (x + half_size) - long_side, 
+        y + half_size, 
+        long_side,
+        side);
+
+    ctx.fillStyle = color[2];
+    ctx.fillRect(
+        (x - half_size) - side, 
+        (y - half_size) - side, 
+        side, 
+        long_side);
+
+    ctx.fillStyle = color[3];
+    ctx.fillRect(
+        (x - half_size), 
+        (y - half_size) - side, 
+        long_side, 
+        side);
+}
+// Function to draw a red square and additional rectangles
+function drawShapes(x, y, size) {
+    // Draw the red square
+    ctx.fillStyle = 'red';
+    ctx.fillRect(x - (size / 2), y - (size / 2), size, size);
+
+	drawRing(x, y, size, size, ['blue', 'green', 'yellow', 'orange'])
+	drawRing(x, y, size * 3, size, ['yellow','orange', 'blue','green' ])
+	drawRing(x, y, size * 5, size, ['blue', 'green', 'yellow', 'orange'])
+}
+
+// Calculate the position of the square to center it
+var canvasWidth = canvas.width;
+var canvasHeight = canvas.height;
+var squareSize = 50; // Size of the square
+var centerX = canvasWidth / 2 ; // X position for centering
+var centerY = canvasHeight / 2; // Y position for centering
+
+// Call the function to draw the shapes
+drawShapes(centerX, centerY, squareSize);
+</script>
+
+</body>
+</html>

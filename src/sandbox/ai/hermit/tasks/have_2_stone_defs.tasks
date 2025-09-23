@@ -1,0 +1,34 @@
+have_2_stone_02 /* ( -- Success/Failure) */= sel{
+    inventory_have_ge(stone, 2),
+    forth {
+        lit("self")
+        get_blackboard
+        some_entity_id
+        if
+            get_location
+            some_coord
+            if
+                lit("Stone")
+                find_nearest
+                some_entity_id
+                if
+                    dup
+                    get_location
+                    some_coord
+                    if
+                        go_to
+                        lit(Success)
+                        eq
+                        if
+                            take
+                            return
+                        then
+                    then
+                then
+            then
+        then
+        drop
+        lit(Failure)
+        return
+    }
+}

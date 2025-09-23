@@ -1,0 +1,18 @@
+plant_seed /* (coord -- Success/Failure ) plants a seed at coord*/= forth{
+    lit("Seed")
+    find_in_inventory
+    some_entity_id
+    if
+        swap
+        go_to
+        lit(Success)
+        eq
+        if
+            plant
+            return
+        then
+    then
+    drop
+    lit(Failure)
+    return
+}

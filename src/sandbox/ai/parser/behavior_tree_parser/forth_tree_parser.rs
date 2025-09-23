@@ -2,10 +2,13 @@ use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
 };
 
-use crate::sandbox::ai::parser::{behavior_tree_parser::Thingie, forth_parser, space_parser};
+use crate::sandbox::ai::{
+    parser::{behavior_tree_parser::Thingie, forth_parser, space_parser},
+    Instruction, TaskPool,
+};
 
 pub fn forth_tree_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
-    let (tail, (_, _, _, _, (body, used), _, _)) = tuple((
+    let (tail, (_, _, _, _, (mut i, db), _, _)) = tuple((
         tag("forth"),
         space_parser,
         char('{'),
@@ -14,11 +17,24 @@ pub fn forth_tree_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a s
         space_parser,
         char('}'),
     ))(input)?;
-    Ok((tail, Thingie::Tree(body, used)))
+    //    Ok((tail, Thingie::Tree(body, used)))
+    //vvv new vvv
+    let thread_name = "@0";
+    let mut hash = TaskPool::new();
+    for (k, mut v) in db.into_iter() {
+        v.iter_mut().for_each(|x| x.correct(thread_name));
+        assert_eq!(hash.insert(format!("{k}"), v), None,);
+    }
+    i.iter_mut().for_each(|x| x.correct(thread_name));
+    hash.insert(thread_name.to_owned(), i);
+    Ok((
+        tail,
+        Thingie::Tree(vec![Instruction::ForthTree(thread_name.to_owned())], hash),
+    ))
 }
 #[cfg(test)]
 mod tests {
-    use crate::sandbox::ai::{Instruction, StackItem, TreePool};
+    use crate::sandbox::ai::{Instruction, StackItem};
 
     use super::*;
 
@@ -47,20 +63,20 @@ mod tests {
             panic!("parser didn't return a THingie::Tree")
         };
         assert_eq!(tail, "");
-        assert_eq!(used, TreePool::new());
+        assert_eq!(body, vec![Instruction::ForthTree("@0".to_owned())]);
         assert_eq!(
-            body,
-            vec![
-                Instruction::ForthLit(StackItem::String("self".to_owned())),
+            used.get("@0").unwrap(),
+            &vec![
+                Instruction::ForthLit("self".into()),
                 Instruction::ForthGetEnergy,
                 Instruction::ForthIsInt,
                 Instruction::ForthIf(5),
                 Instruction::ForthLit(StackItem::Int(5)),
                 Instruction::ForthGT,
                 Instruction::ForthIf(2),
-                Instruction::ForthLit(StackItem::Success),
+                Instruction::ForthLit(StackItem::success()),
                 Instruction::ForthReturn,
-                Instruction::ForthLit(StackItem::Failure),
+                Instruction::ForthLit(StackItem::failure()),
                 Instruction::ForthReturn,
             ]
         )

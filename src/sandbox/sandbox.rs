@@ -19,7 +19,9 @@ Spear: used long range(father than reach of axe) deals damage; use close range p
 
 */
 
-pub fn within_range(x1: f32, y1: f32, x2: f32, y2: f32, dist: f32) -> bool {
+use crate::Number;
+
+pub fn within_range(x1: Number, y1: Number, x2: Number, y2: Number, dist: Number) -> bool {
     let x_off = x1 - x2;
     let y_off = y1 - y2;
     ((x_off * x_off) + (y_off * y_off)) > (dist * dist)

@@ -1,6 +1,6 @@
 use crate::Number;
 
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Agent {
     pub value: Number,
     pub threshold: Number,
@@ -15,7 +15,7 @@ impl Agent {
                 println!("threshold:{threshold} date:{}, delta:{delta}", date.value);
                 delta / threshold
             }
-            std::cmp::Ordering::Equal => 0.0,
+            std::cmp::Ordering::Equal => Number::ZERO,
             std::cmp::Ordering::Greater => {
                 let delta = date.value - threshold;
                 println!("delta:{delta}");
@@ -45,14 +45,14 @@ mod tests {
     fn agents() -> (Agent, Agent) {
         (
             Agent {
-                value: 10.0,
-                threshold: 5.0,
-                current_choices_value: 10.0,
+                value: Number::TEN,
+                threshold: Number::FIVE,
+                current_choices_value: Number::TEN,
             },
             Agent {
-                value: 10.0,
-                threshold: 5.0,
-                current_choices_value: 10.0,
+                value: Number::TEN,
+                threshold: Number::FIVE,
+                current_choices_value: Number::TEN,
             },
         )
     }
@@ -64,9 +64,9 @@ mod tests {
         assert_eq!(
             a,
             Agent {
-                value: 10.0,
-                threshold: 4.75,
-                current_choices_value: 10.0,
+                value: Number::TEN,
+                threshold: Into::<Number>::into(4.75_f32),
+                current_choices_value: Number::TEN,
             }
         );
     }
@@ -79,9 +79,9 @@ mod tests {
     fn at_threshold_desirability_test() {
         let (mut a, _) = agents();
         let date = Agent {
-            value: 10.0,
-            threshold: 5.0,
-            current_choices_value: 10.0,
+            value: Number::TEN,
+            threshold: Number::FIVE,
+            current_choices_value: Number::TEN,
         };
         assert_eq!(a.date_desirability_of_switching(&date), 0.0)
     }
@@ -89,9 +89,9 @@ mod tests {
     fn half_threshold_desirability_test() {
         let (mut a, _) = agents();
         let date = Agent {
-            value: 5.0,
-            threshold: 5.0,
-            current_choices_value: 10.0,
+            value: Number::FIVE,
+            threshold: Number::FIVE,
+            current_choices_value: Number::TEN,
         };
         assert_eq!(a.date_desirability_of_switching(&date), -0.5)
     }
@@ -99,9 +99,9 @@ mod tests {
     fn zero_value_desirability_test() {
         let (mut a, _) = agents();
         let date = Agent {
-            value: 0.0,
-            threshold: 5.0,
-            current_choices_value: 10.0,
+            value: Number::ZERO,
+            threshold: Number::FIVE,
+            current_choices_value: Number::TEN,
         };
         assert_eq!(a.date_desirability_of_switching(&date), -1.0)
     }

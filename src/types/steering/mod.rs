@@ -1,17 +1,21 @@
 use std::{collections::BTreeMap, ops::Add};
 
+use crate::{util::lerp, Number};
+
 mod degrees;
 use degrees::Degrees;
 
 mod util;
-pub use util::{lerp, radians_to_u8, u8_to_radians};
+pub use util::{radians_to_u8, u8_to_radians};
 
-pub struct Steering(BTreeMap<u8, f32>);
+/// Steering stores an intensity around a circle.
+/// It does this by storing the intensity at points around the circle and linier interprating between to closest two to the point being sampled
+pub struct Steering(BTreeMap<u8, Number>);
 impl Steering {
     pub fn new() -> Self {
         Self(BTreeMap::new())
     }
-    pub fn get<T: Degrees>(&self, direction: T) -> Option<f32> {
+    pub fn get<T: Degrees>(&self, direction: T) -> Option<Number> {
         let direction = direction.degrees();
         let x = self
             .0
@@ -37,13 +41,13 @@ impl Steering {
         let t = a / b;
 
         // Interpolate between the two closest values
-        Some(lerp(*prev, *next, t))
+        Some(lerp(*prev, *next, Into::<Number>::into(t)))
     }
-    pub fn max<T: Degrees>(&self) -> Option<f32> {
+    pub fn max<T: Degrees>(&self) -> Option<Number> {
         Some(*(&self.0).values().max_by(|a, b| a.total_cmp(b))?)
     }
 }
-impl<T: Into<BTreeMap<u8, f32>>> From<T> for Steering {
+impl<T: Into<BTreeMap<u8, Number>>> From<T> for Steering {
     fn from(value: T) -> Self {
         Self(value.into())
     }
@@ -74,20 +78,32 @@ mod tests {
 
     #[test]
     pub fn over_test() {
-        let map = Steering::from(BTreeMap::from([(0, 10.0), (5, 5.0), (9, 10.0)]));
+        let map = Steering::from(BTreeMap::from([
+            (0, Number::TEN),
+            (5, Number::FIVE),
+            (9, Number::TEN),
+        ]));
 
-        assert_eq!(10.0, map.get(20).unwrap());
+        assert_eq!(map.get(20).unwrap(), 10.0);
     }
     #[test]
     pub fn under_test() {
-        let map = Steering::from(BTreeMap::from([(3, 10.0), (5, 5.0), (9, 10.0)]));
+        let map = Steering::from(BTreeMap::from([
+            (3, Number::TEN),
+            (5, Number::FIVE),
+            (9, Number::TEN),
+        ]));
 
-        assert_eq!(10.0, map.get(1).unwrap());
+        assert_eq!(map.get(1).unwrap(), 10.0);
     }
     #[test]
     pub fn mid_test() {
-        let map = Steering::from(BTreeMap::from([(3, 5.0), (5, 10.0), (100, 10.0)]));
+        let map = Steering::from(BTreeMap::from([
+            (3, Number::FIVE),
+            (5, Number::TEN),
+            (100, Number::TEN),
+        ]));
 
-        assert_eq!(10.0, map.get(50).unwrap());
+        assert_eq!(map.get(50).unwrap(), 10.0);
     }
 }

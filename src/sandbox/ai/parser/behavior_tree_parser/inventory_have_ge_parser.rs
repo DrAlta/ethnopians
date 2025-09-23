@@ -1,12 +1,10 @@
-use std::collections::HashMap;
-
 use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
 };
 
 use crate::sandbox::ai::{
-    parser::{behavior_tree_parser::Thingie, ident_parser, space_parser, u8_parser},
-    Instruction,
+    parser::{behavior_tree_parser::Thingie, i32_parser, ident_parser, space_parser},
+    Instruction, TaskPool,
 };
 
 pub fn inventory_have_ge_parser<'a>(
@@ -19,7 +17,7 @@ pub fn inventory_have_ge_parser<'a>(
         space_parser,
         ident_parser,
         tuple((space_parser, char(','), space_parser)),
-        u8_parser,
+        i32_parser,
         space_parser,
         char(')'),
     ))(input)?;
@@ -27,7 +25,7 @@ pub fn inventory_have_ge_parser<'a>(
         tail,
         Thingie::Tree(
             vec![Instruction::InventoryGE(item.to_owned(), number)],
-            HashMap::new(),
+            TaskPool::new(),
         ),
     ))
 }

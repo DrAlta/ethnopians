@@ -1,0 +1,36 @@
+is_house_in_range = forth{
+    lit("self")
+    get_blackboard
+    some_entity_id
+    if
+        get_location
+        some_coord
+        if
+            dup
+            lit("House")
+            find_nearest
+            some_entity_id
+            if
+                get_location
+                some_coord
+                if
+                    distance
+                    lit(1000)
+                    le
+                    if
+                        lit(Success)
+                        return
+                    then
+                then
+            then
+            drop
+            drop
+        then
+    then
+    lit(Failure)
+    return
+};
+have_2_wood =seq{
+    have_2_wood_02,
+    have_2_wood_02
+}

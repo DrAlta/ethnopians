@@ -1,13 +1,16 @@
 use nom::{bytes::complete::tag, error::ErrorKind, IResult};
 
-use crate::sandbox::ai::{InpulseId, Instruction, Thread, TreePool};
+use crate::sandbox::ai::{InpulseId, Instruction, TaskPool, Thread};
 
 pub fn go_to_parser<'a>(
     input: &'a str,
-) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
+) -> IResult<&'a str, (Thread, TaskPool), (&'a str, ErrorKind)> {
     let (tail, _body) = tag("go_to")(input)?;
     Ok((
         tail,
-        (vec![Instruction::Action(InpulseId::GoTo)], TreePool::new()),
+        (
+            vec![Instruction::ForthAction(InpulseId::GoTo)],
+            TaskPool::new(),
+        ),
     ))
 }

@@ -11,7 +11,7 @@ pub fn tree_parser<'a>(
     input: &'a str,
     //    _prefix: &'b str
 ) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
-    //    let mut hash = HashMap::new();
+    //    let mut hash = BTreeMap::new();
     //let x =
     alt((
         blackboard_parser,
@@ -29,9 +29,7 @@ pub fn tree_parser<'a>(
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-
-    use crate::sandbox::ai::Instruction;
+    use crate::sandbox::ai::{Instruction, TaskPool};
 
     use super::*;
     #[test]
@@ -67,23 +65,23 @@ mod tests {
         assert_eq!(
             i,
             vec![Instruction::Selector(vec![
-                "_1".to_owned(),
-                "_2".to_owned(),
+                "@1".to_owned(),
+                "@2".to_owned(),
                 "act3".to_owned()
             ])],
         );
         assert_eq!(
             db,
-            HashMap::from([
+            TaskPool::from([
                 (
-                    "_1".to_owned(),
+                    "@1".to_owned(),
                     vec![Instruction::Sequence(vec![
                         "act1".to_owned(),
                         "act1".to_owned()
                     ])]
                 ),
                 (
-                    "_2".to_owned(),
+                    "@2".to_owned(),
                     vec![Instruction::Sequence(vec![
                         "act2".to_owned(),
                         "act2".to_owned()

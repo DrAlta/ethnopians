@@ -1,0 +1,4 @@
+have_2_stone = seq{
+    have_2_stone_02,
+    have_2_stone_02
+}

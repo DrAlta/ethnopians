@@ -1,4 +1,4 @@
-use crate::sandbox::{ai::{Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, Instruction, StackItem, Status, TreePool}, World};
+use crate::sandbox::{ai::{Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, Instruction, StackItem, Status, TaskPool}, World};
 
 use super::{ProgramCounter, ReturnStack, Stack, CPU};
 
@@ -14,7 +14,7 @@ pub fn tick_active_selector(
     stack: &mut Stack,
     return_stack: &mut ReturnStack,
     pc: &mut ProgramCounter,
-    bt: &TreePool,
+    bt: &TaskPool,
     blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
     world: &World,
 ) -> Result<Status, String>

@@ -1,11 +1,7 @@
 [package]
 name = "ethnopians"
-version = "0.1.0"
+version = "0.3.4"
 edition = "2021"
-
-[[bin]]
-name = "ethnopia"
-path = "src/bin.rs"
 
 [lib]
 name = "ethnolib"
@@ -14,28 +10,46 @@ path = "src/lib.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+macros = {path = "./macros"}
 derive_more = { version = "1.0.0", features = ["add", "add_assign", "mul"] }
 fraction64 = { version = "0.1.15", git = "https://github.com/DrAlta/fraction64.git"}
-thats_so_random = {version = "0.2.3", git = "https://github.com/DrAlta/thats_so_random.rs.git"}
-qol = { version = "0.1.17", git = "https://github.com/DrAlta/rust_quality_of_life.git"}
+ordered-f32 = { version = "0.1.11", git = "https://github.com/DrAlta/rust-ordered-f32.git"}
+thats_so_random = {version = "0.2.4", git = "https://github.com/DrAlta/thats_so_random.rs.git"}
+qol = { version = "0.1.19", git = "https://github.com/DrAlta/rust_quality_of_life.git"}
 macroquad = { version = "0.4.13", optional = true }
 base64 = "0.22.1"
-tales-of-tails = { version = "0.1.4", git = "ssh://hsingai@altaserver.local:/media/hsingai/bigdrive/smb/Gits/rust-tales-of-tail.git"}
 nom = "7.1.3"
+bevy = {version = "0.15.1", features = ["dynamic_linking"], optional = true }
 
+# Enable a small amount of optimization in the dev profile.
+[profile.dev]
+opt-level = 1
+
+# Enable a large amount of optimization in the dev profile for dependencies.
+[profile.dev.package."*"]
+opt-level = 3
 
 [features]
-default = ["move_history", "debug", "error", "todo", "trace"]
+default = ["defaults", "sandbox"]
+defaults = ["log", "debug", "error", "todo", "trace", "trace-tests"]
+# systems
+sandbox = []
+gossip = []
+# externals
+bevy = ["dep:bevy"]
+macroquad = ["dep:macroquad"]
+# logging
 debug = []
-debug-process-movement = []
 error = []
+log = []
 todo = []
 trace = ["trace-behavior-tree", "trace-tick"]
 trace-behavior-tree = []
+trace-tests = []
 trace-tick= ["trace-tick-selector", "trace-tick-sequence"]
 trace-tick-selector = []
 trace-tick-sequence = []
 trace-moveit = []
-macroquad = ["dep:macroquad"]
-move_history = []
+trace-parser = ["trace-parser-threadette"]
+trace-parser-threadette = []
 warn = []

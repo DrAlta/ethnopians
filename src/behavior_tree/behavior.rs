@@ -1,8 +1,8 @@
-use qol::logy;
+use qol::{logy, pout};
 
 use super::{Item, NodeId, Treeturn};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Behavior {
     Sequence { behaviors: Vec<Behavior> },
     Fallback { behaviors: Vec<Behavior> },
@@ -109,7 +109,7 @@ impl Behavior {
         let Some(a) = stack.pop() else {
             return Err("Nothing on stack to print!".into());
         };
-        println!("{:?}", a);
+        pout!("{:?}", a);
         return Ok(Treeturn::Success);
     }
 }

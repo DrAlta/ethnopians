@@ -8,17 +8,17 @@ use nom::{
 };
 
 use crate::sandbox::ai::{
-    parser::{balanced_parser, forth_parser::forth_threadette_parser},
-    Thread, TreePool,
+    parser::{balanced_parser, forth_parser::forth_threadette_parser, space_parser},
+    TaskPool, Thread,
 };
 
 mod r#if;
 use r#if::If;
 
-pub fn if_parser<'a>(input: &'a str) -> IResult<&'a str, (Thread, TreePool), (&'a str, ErrorKind)> {
+pub fn if_parser<'a>(input: &'a str) -> IResult<&'a str, (Thread, TaskPool), (&'a str, ErrorKind)> {
     let (tail, body) = balanced_parser(
-        map_res(tuple((multispace0, forth_threadette_parser)), |(_, x)| {
-            Result::<(Thread, TreePool), (&'a str, ErrorKind)>::Ok(x)
+        map_res(tuple((space_parser, forth_threadette_parser)), |(_, x)| {
+            Result::<(Thread, TaskPool), (&'a str, ErrorKind)>::Ok(x)
         }),
         recognize(tuple((multispace0, tag("if")))),
         recognize(tuple((multispace0, tag("then")))),
@@ -42,12 +42,12 @@ mod tests {
         then";
         let (tail, (body, used)) = if_parser(input).unwrap();
         assert_eq!(tail, "");
-        assert_eq!(used, TreePool::new());
+        assert_eq!(used, TaskPool::new());
         assert_eq!(
             body,
             vec![
                 Instruction::ForthIf(2),
-                Instruction::ForthLit(StackItem::Success),
+                Instruction::ForthLit(StackItem::success()),
                 Instruction::ForthReturn,
             ]
         )
@@ -55,23 +55,25 @@ mod tests {
     #[test]
     fn nested_if_parser_test() {
         let input = "if
-            lit(1)
+            lit(1) /*comment1*/
+            lit(2) /*comment2*/
             if
                 return
-            then
-            lit(2)
+            then /*comment3*/
+            lit(3)
         then";
         let (tail, (body, used)) = if_parser(input).unwrap();
         assert_eq!(tail, "");
-        assert_eq!(used, TreePool::new());
+        assert_eq!(used, TaskPool::new());
         assert_eq!(
             body,
             vec![
-                Instruction::ForthIf(4),
+                Instruction::ForthIf(5),
                 Instruction::ForthLit(StackItem::Int(1)),
+                Instruction::ForthLit(StackItem::Int(2)),
                 Instruction::ForthIf(1),
                 Instruction::ForthReturn,
-                Instruction::ForthLit(StackItem::Int(2)),
+                Instruction::ForthLit(StackItem::Int(3)),
             ]
         )
     }

@@ -1,0 +1,26 @@
+plant_row_02 /*(Coord Int -- True/False) plants seed  at Int multiples of  [x:5,Y:0] from coord  */= forth{
+    dup
+    lit(4)
+    lt
+    if
+        swap
+        lit(x: 5, y: 0)
+        add
+        dup
+        plant_seed
+        lit(Success)
+        eq
+        if
+            swap
+            lit(1)
+            add
+            jump(plant_row_02)
+        then
+        lit(False)
+        return
+    then
+    drop
+    drop
+    lit(True)
+    return
+}

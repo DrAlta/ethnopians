@@ -1,13 +1,9 @@
-use std::collections::HashMap;
-
-use crate::sandbox::{
-    ai::{
-        cpu::{ProgramCounter, ReturnStack, Stack, StackItem},
-        Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, Status, Thread,
-    },
-    World,
+use crate::sandbox::ai::{
+    cpu::{ProgramCounter, ReturnStack, Stack, StackItem},
+    Blackboard, BlackboardKey, BlackboardValue, ExecutionToken, Status, TaskPool,
 };
 
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct CPU {
     pub pc: ProgramCounter,
     pub stack: Stack,
@@ -17,7 +13,7 @@ pub struct CPU {
 impl CPU {
     pub fn load(token: ExecutionToken) -> Self {
         let pc = Some((token.clone(), 0));
-        let stack = vec![StackItem::Init];
+        let stack = vec![StackItem::init()];
         let return_stack = Vec::new();
 
         Self {
@@ -28,9 +24,8 @@ impl CPU {
     }
     pub fn step(
         &mut self,
-        bt: &HashMap<ExecutionToken, Thread>,
+        bt: &TaskPool,
         blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
-        world: &World,
     ) -> Result<Status, String> {
         let Some((token, idx)) = &self.pc else {
             return Err("program halted".into());
@@ -40,14 +35,15 @@ impl CPU {
             return Err("failed to get thread {token}".into());
         };
         let Some(i) = thread.get(*idx) else {
-            return Err("failed to get instruction{idx} from thread {token}".into());
+            return Err(format!(
+                "failed to get instruction{idx} from thread {token}"
+            ));
         };
         i.tick(
             &mut self.stack,
             &mut self.return_stack,
             &mut self.pc,
             blackboard,
-            world,
         )
     }
 }

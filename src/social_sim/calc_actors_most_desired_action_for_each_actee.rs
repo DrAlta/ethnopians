@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use qol::BiHashMap;
 
-use crate::{ActionId, ActorId, Desire};
+use crate::social_sim::{ActionId, ActorId, Desire};
 
 use super::{get_most_desired_action, ActionDesire};
 

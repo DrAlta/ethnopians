@@ -23,30 +23,41 @@
 //!
 //!
 
-pub const MAX_ENERGY: i16 = 100;
+pub const MAX_ENERGY: i32 = 100;
 pub mod ai;
-pub mod interaction;
+//pub mod interaction;
 
 mod acts;
+use std::sync::Arc;
+
 pub use acts::Acts;
-pub mod collision;
-mod command;
-pub use command::Command;
+//pub mod collision;
 pub mod forth;
 mod item;
 pub use item::Item;
 mod location;
 pub use location::Location;
-mod movement;
-pub use movement::{process_movement, Prev};
+pub mod movement;
 mod r#return;
 pub use r#return::Return;
-mod sandbox;
-use sandbox::within_range;
-mod use_object;
-pub use use_object::UseObject;
-mod world;
-pub use world::World;
 
-pub type EntityId = usize;
-pub type ItemClass = String;
+mod sandbox;
+pub use sandbox::within_range;
+pub mod world;
+
+#[cfg(feature = "bevy")]
+pub type EntityId = bevy::prelude::Entity;
+#[cfg(not(feature = "bevy"))]
+pub type EntityId = u64;
+
+pub type ItemClass = Arc<String>;
+
+#[cfg(feature = "bevy")]
+use bevy::prelude::Component;
+#[cfg(not(feature = "bevy"))]
+use macros::Component;
+
+#[cfg(feature = "bevy")]
+use bevy::prelude::Event;
+#[cfg(not(feature = "bevy"))]
+use macros::Event;

@@ -1,0 +1,6 @@
+have_2_wood_02 = sel{
+    inventory_have_ge(wood, 2),
+    have_axe,
+    go_to_tree,
+    use(axe, tree)
+}

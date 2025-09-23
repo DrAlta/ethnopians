@@ -1,12 +1,10 @@
-use std::collections::HashMap;
-
 use nom::{
     bytes::complete::tag, character::complete::char, error::ErrorKind, sequence::tuple, IResult,
 };
 
 use crate::sandbox::ai::{
     parser::{behavior_tree_parser::Thingie, ident_parser, space_parser},
-    Instruction,
+    Instruction, TaskPool,
 };
 
 pub fn use_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
@@ -25,7 +23,7 @@ pub fn use_parser<'a>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, Err
         tail,
         Thingie::Tree(
             vec![Instruction::Use(item_a.to_owned(), item_b.to_owned())],
-            HashMap::new(),
+            TaskPool::new(),
         ),
     ))
 }

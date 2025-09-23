@@ -1,11 +1,9 @@
-use std::collections::HashMap;
-
 use crate::sandbox::ai::{
     parser::{
         behavior_tree_parser::{tree_parser, Thingie, TreesUsed},
         ident_parser, space_parser,
     },
-    Instruction, Thread, ThreadName, TreePool,
+    Instruction, TaskPool, Thread, ThreadName,
 };
 use nom::{
     character::complete::char, combinator::map_res, error::ErrorKind, multi::separated_list1,
@@ -15,8 +13,8 @@ use nom::{
 pub fn file_parser<'a>(
     input: &'a str,
     //    _prefix: &'b str
-) -> IResult<&'a str, TreePool, (&'a str, ErrorKind)> {
-    //    let mut hash = HashMap::new();
+) -> IResult<&'a str, TaskPool, (&'a str, ErrorKind)> {
+    //    let mut hash = BTreeMap::new();
     let (tail, (_, head, _)) = tuple((
         space_parser,
         separated_list1(
@@ -25,18 +23,18 @@ pub fn file_parser<'a>(
         ),
         space_parser,
     ))(input)?;
-    let mut hash = HashMap::new();
+    let mut hash = TaskPool::new();
     for (_thread_name, body) in head {
         hash.extend(body.into_iter());
     }
     Ok((tail, hash))
 }
-/// named_tree_parser() addes the tree to the TreePool
+/// named_tree_parser() addes the tree to the TaskPool
 pub fn named_tree_parser<'a>(
     input: &'a str,
     //    _prefix: &'b str
-) -> IResult<&'a str, (ThreadName, TreePool), (&'a str, ErrorKind)> {
-    //    let mut hash = HashMap::new();
+) -> IResult<&'a str, (ThreadName, TaskPool), (&'a str, ErrorKind)> {
+    //    let mut hash = BTreeMap::new();
     let (tail, (thread_name, _, _, _, (mut i, db))) = tuple((
         ident_parser,
         space_parser,
@@ -45,14 +43,14 @@ pub fn named_tree_parser<'a>(
         map_res(tree_parser, |x| {
             let (i, used) = match x {
                 Thingie::Token(token) => {
-                    (vec![Instruction::Selector(vec![token])], TreePool::new())
+                    (vec![Instruction::Selector(vec![token])], TaskPool::new())
                 }
                 Thingie::Tree(vec, hash_map) => (vec, hash_map),
             };
             Ok::<(Thread, TreesUsed), ()>((i, used))
         }),
     ))(input)?;
-    let mut hash = HashMap::new();
+    let mut hash = TaskPool::new();
     for (k, mut v) in db.into_iter() {
         v.iter_mut().for_each(|x| x.correct(thread_name));
         assert_eq!(hash.insert(format!("{thread_name}{k}"), v), None,);
@@ -64,36 +62,36 @@ pub fn named_tree_parser<'a>(
 
 #[cfg(test)]
 mod tests {
-    use crate::sandbox::ai::Instruction;
+    use crate::sandbox::ai::{Instruction, StackItem};
     use std::collections::BTreeMap;
 
     use super::*;
 
     #[test]
     fn named_tree_parser_test() {
-        let source = r#"have_2_wood_2 = sel{
+        let source = r#"have_02_wood_02 /* this is a test task */ = sel{
         inventory_have_ge(wood, 2),
         have_axe,
         go_to_tree,
         use(axe, tree)
     }"#;
         let (tail, db) = file_parser(source).unwrap();
-        let standard = HashMap::from([
+        let standard = TaskPool::from([
             (
-                "have_2_wood_2".to_owned(),
+                "have_02_wood_02".to_owned(),
                 vec![Instruction::Selector(vec![
-                    "have_2_wood_2_1".to_owned(),
+                    "have_02_wood_02@1".to_owned(),
                     "have_axe".to_owned(),
                     "go_to_tree".to_owned(),
-                    "have_2_wood_2_4".to_owned(),
+                    "have_02_wood_02@4".to_owned(),
                 ])],
             ),
             (
-                "have_2_wood_2_1".to_owned(),
+                "have_02_wood_02@1".to_owned(),
                 vec![Instruction::InventoryGE("wood".to_owned(), 2)],
             ),
             (
-                "have_2_wood_2_4".to_owned(),
+                "have_02_wood_02@4".to_owned(),
                 vec![Instruction::Use("axe".to_owned(), "tree".to_owned())],
             ),
         ]);
@@ -105,7 +103,7 @@ mod tests {
         let source = r#"sat_hunger = selector{
         sel{
             selector{
-                inventory_have_ge(veg, 1)
+                inventory_have_ge(veggie, 1)
             }
         }
     }"#;
@@ -113,70 +111,69 @@ mod tests {
         let standard = BTreeMap::from([
             (
                 "sat_hunger".to_owned(),
-                vec![Instruction::Selector(vec!["sat_hunger_1".to_owned()])],
+                vec![Instruction::Selector(vec!["sat_hunger@1".to_owned()])],
             ),
             (
-                "sat_hunger_1".to_owned(),
-                vec![Instruction::Selector(vec!["sat_hunger_1_1".to_owned()])],
+                "sat_hunger@1".to_owned(),
+                vec![Instruction::Selector(vec!["sat_hunger@1@1".to_owned()])],
             ),
             (
-                "sat_hunger_1_1".to_owned(),
-                vec![Instruction::Selector(vec!["sat_hunger_1_1_1".to_owned()])],
+                "sat_hunger@1@1".to_owned(),
+                vec![Instruction::Selector(vec!["sat_hunger@1@1@1".to_owned()])],
             ),
             (
-                "sat_hunger_1_1_1".to_owned(),
-                vec![Instruction::InventoryGE("veg".to_owned(), 1)],
+                "sat_hunger@1@1@1".to_owned(),
+                vec![Instruction::InventoryGE("veggie".to_owned(), 1)],
             ),
         ]);
         assert_eq!(standard, db.into_iter().collect(),);
         assert_eq!(tail, "");
     }
-    /*
+
     #[test]
-    fn named_tree_parser_test2() {
-        let source = r#"sat_hunger = selector{
-        dont_need_to_eat,
-        seq{
-            selector{
-                inventory_have_ge(veg, 1),
-                get_veg
-            },
-            eat(veg)
-        }
-    }"#;
-        let (tail, db) = file_parser(source).unwrap();
-        let standard = BTreeMap::from([
-            (
-                "sat_hunger".to_owned(),
-                Instruction::Selector(vec![
-                    "dont_need_to_eat".to_owned(),
-                    "sat_hunger_2".to_owned(),
-                ]),
-            ),
-            (
-                "sat_hunger_2".to_owned(),
-                Instruction::Sequence(vec![
-                    "sat_hunger_2_1".to_owned(),
-                    "sat_hunger_2_2".to_owned(),
-                ])
-            ),
-            (
-                "sat_hunger_2_1".to_owned(),
-                Instruction::Selector(vec![
-                    "sat_hunger_2_1_1".to_owned(),
-                    "get_veg".to_owned(),
-                ])
-            ),
-            (
-                "sat_hunger_2_2".to_owned(),
-                Instruction::Eat("veg".to_owned())
-            )
-        ]);
-        assert_eq!(
-            standard,
-            db.into_iter().collect(),
-        );
+    fn footest_test() {
+        let input = "footest = forth {
+        lit(\"self\")
+        get_energy
+        some_int
+        if
+            lit(5)
+            gt
+            if
+                lit(Success)
+                return
+            then
+        then
+        lit(Failure)
+        return
+        
+    }";
+        let (tail, (_name, body)) = named_tree_parser(input).unwrap();
         assert_eq!(tail, "");
+        assert_eq!(
+            body,
+            TaskPool::from([
+                (
+                    "footest".to_owned(),
+                    vec![Instruction::ForthTree("footest@0".to_owned())]
+                ),
+                (
+                    "footest@0".to_owned(),
+                    vec![
+                        Instruction::ForthLit("self".into()),
+                        Instruction::ForthGetEnergy,
+                        Instruction::ForthSomeInt,
+                        Instruction::ForthIf(5),
+                        Instruction::ForthLit(StackItem::Int(5)),
+                        Instruction::ForthGT,
+                        Instruction::ForthIf(2),
+                        Instruction::ForthLit(StackItem::success()),
+                        Instruction::ForthReturn,
+                        Instruction::ForthLit(StackItem::failure()),
+                        Instruction::ForthReturn,
+                    ]
+                )
+            ])
+        );
     }
-    */
 }

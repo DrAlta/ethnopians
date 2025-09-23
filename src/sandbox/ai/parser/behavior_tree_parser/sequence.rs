@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use nom::{
     branch::alt, bytes::complete::tag, character::complete::char, error::ErrorKind,
     multi::separated_list1, sequence::tuple, IResult,
@@ -7,13 +5,13 @@ use nom::{
 
 use crate::sandbox::ai::{
     parser::{behavior_tree_parser::tree_parser, space_parser},
-    Instruction,
+    Instruction, TaskPool,
 };
 
 use super::Thingie;
 
 pub fn sequence_parser<'a, 'b>(input: &'a str) -> IResult<&'a str, Thingie, (&'a str, ErrorKind)> {
-    let mut hash = HashMap::new();
+    let mut hash = TaskPool::new();
     let (tail, (_, _, _, _, head, _, _)) = tuple((
         alt((tag("sequence"), tag("seq"))),
         space_parser,
@@ -29,7 +27,7 @@ pub fn sequence_parser<'a, 'b>(input: &'a str) -> IResult<&'a str, Thingie, (&'a
         match thingie {
             Thingie::Token(token) => vec.push(token),
             Thingie::Tree(mut this_i, db) => {
-                let thread_name = format!("_{}", idx + 1);
+                let thread_name = format!("@{}", idx + 1);
                 for (k, mut v) in db.into_iter() {
                     v.iter_mut().for_each(|x| x.correct(&thread_name));
                     assert_eq!(hash.insert(format!("{thread_name}{k}"), v), None,);
@@ -57,23 +55,23 @@ mod tests {
         assert_eq!(
             i,
             vec![Instruction::Sequence(vec![
-                "_1".to_owned(),
-                "_2".to_owned(),
+                "@1".to_owned(),
+                "@2".to_owned(),
                 "act3".to_owned()
             ])],
         );
         assert_eq!(
             db,
-            HashMap::from([
+            TaskPool::from([
                 (
-                    "_1".to_owned(),
+                    "@1".to_owned(),
                     vec![Instruction::Sequence(vec![
                         "act1".to_owned(),
                         "act1".to_owned()
                     ])]
                 ),
                 (
-                    "_2".to_owned(),
+                    "@2".to_owned(),
                     vec![Instruction::Sequence(vec![
                         "act2".to_owned(),
                         "act2".to_owned()
@@ -97,11 +95,11 @@ mod tests {
         );
         assert_eq!(
             db,
-            HashMap::new() /*from([
-                               ("_2".to_owned(), Instruction::Action(InpulseId::Act1)),
-                               ("_3".to_owned(), Instruction::Action(InpulseId::Act2)),
-                               ("_4".to_owned(), Instruction::Action(InpulseId::Act3)),
-                           ])*/
+            TaskPool::new() /*from([
+                                ("@2".to_owned(), Instruction::Action(InpulseId::Act1)),
+                                ("@3".to_owned(), Instruction::Action(InpulseId::Act2)),
+                                ("@4".to_owned(), Instruction::Action(InpulseId::Act3)),
+                            ])*/
         );
     }
 }
