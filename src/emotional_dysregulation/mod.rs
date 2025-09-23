@@ -23,6 +23,8 @@
 //! * Conflict in interpersonal relationships
 //! * Eating disorder
 //! * Suicidal thoughts or attempts
+
+use crate::Number;
 pub struct RegulationState {
     buffer: Number,             // accumulated regulatory “currency”
     gradient: Number,           // sensitivity scaling
@@ -41,14 +43,11 @@ impl RegulationState {
         }
     }
 
-    pub fn get_threshold(&self) {
+    pub fn get_threshold(&self) -> Number {
          - ( self.intercept / self.gradient)
     }
     
-    pub fn get_location(&self, regulation_effort: Number) {
-        // Add or subtract regulation “currency”
-        self.buffer += regulation_effort;
-        // Recompute position
+    pub fn get_location(&self) -> Number {
         self.gradient * self.buffer + self.intercept
     }
 
@@ -58,6 +57,6 @@ impl RegulationState {
         // Recompute position
         let location = self.get_location();
         // Simple flip
-        self.is_dysregulated = raw < Number::ZERO;
+        self.is_dysregulated = location < Number::ZERO;
     }
 }

@@ -1,11 +1,16 @@
 #![feature(box_into_inner)]
 #![feature(btree_cursors)]
+pub mod anger;
 pub mod behavior_tree;
 mod brothel;
 mod bvh;
 pub use bvh::Node;
 pub mod combat;
+pub mod emotional_dysregulation;
 pub mod formation;
+pub mod general_specific_affinity;
+#[cfg(feature = "gossip")]
+pub mod gossip;
 pub mod kill_share;
 pub mod mate;
 pub mod multi_party_dialogue;

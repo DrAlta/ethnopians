@@ -7,7 +7,7 @@
 /// ToDO:
 /// seperate number of levels and number of stages
 
-fn main(){
+pub fn main(){
     let mut a = Anger::new();
     println!("starting:{:?}", a.get());
     for _ in 0..10 {

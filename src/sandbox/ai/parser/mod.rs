@@ -6,6 +6,7 @@ pub use behavior_tree_parser::{file_parser, named_tree_parser};
 mod comment_parser;
 pub use comment_parser::comment_parser;
 
+pub mod new_forth_parser;
 mod forth_parser;
 pub use forth_parser::forth_parser;
 mod ident_parser;

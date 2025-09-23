@@ -1,5 +1,5 @@
 //! this was coded by Chad.  I''m reveiw it when I migrate it bevy
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap};
 
 use crate::Number;
 

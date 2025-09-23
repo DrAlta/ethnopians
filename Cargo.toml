@@ -34,6 +34,7 @@ default = ["defaults", "sandbox"]
 defaults = ["log", "debug", "error", "todo", "trace", "trace-tests"]
 # systems
 sandbox = []
+gossip = []
 # externals
 bevy = ["dep:bevy"]
 macroquad = ["dep:macroquad"]
