@@ -9,6 +9,8 @@
 //! useinga knife on stick or visvera produces a axe and consumes the knife and stick
 //!
 //! knife has higher DPS than axe but shorter range
+//! 
+pub mod new_behavior_tree;
 mod cpu;
 pub use cpu::{
     task_testing_harness, Blackboard, BlackboardValue, Instruction, Stack, StackItem, TableGet,
