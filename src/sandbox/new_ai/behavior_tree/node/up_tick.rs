@@ -1,6 +1,6 @@
 use qol::logy;
 
-use crate::sandbox::ai::new_behavior_tree::{Node, Prayer, State, Status};
+use crate::sandbox::new_ai::behavior_tree::{Node, Prayer, State, Status};
 
 impl Node {
     pub fn up_tick(&self, state: State, childs_returned_status: Status) -> Prayer {

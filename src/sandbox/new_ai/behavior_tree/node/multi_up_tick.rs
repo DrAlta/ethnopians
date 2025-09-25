@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::sandbox::ai::new_behavior_tree::{Node, Prayer, State, Status};
+use crate::sandbox::new_ai::behavior_tree::{Node, Prayer, State, Status};
 
 impl Node {
     pub fn multi_up_tick(&self, state: State, childerns_returned_statuses: BTreeMap<usize, Status>) -> Prayer {

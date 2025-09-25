@@ -1,6 +1,7 @@
 use std::collections::BTreeSet;
 
-use crate::sandbox::ai::{new_behavior_tree::{Node, Prayer, State, Status}, Blackboard, BlackboardKey, BlackboardValue};
+use crate::sandbox::ai::{Blackboard, BlackboardKey, BlackboardValue};
+use crate::sandbox::new_ai::behavior_tree::{Node, Prayer, State, Status};
 
 impl Node {
     pub fn down_tick(
