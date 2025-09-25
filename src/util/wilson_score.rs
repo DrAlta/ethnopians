@@ -19,6 +19,8 @@ use crate::Number;
 /// # Examples
 ///
 /// ```
+/// use ethnolib::util::calculate_wilson_score;
+/// 
 /// let upvotes = 100;
 /// let downvotes = 40;
 /// let score = calculate_wilson_score(upvotes, downvotes);

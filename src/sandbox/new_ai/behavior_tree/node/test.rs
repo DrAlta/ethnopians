@@ -2,11 +2,15 @@ use std::sync::Arc;
 
 use qol::assert_specimen;
 
-use crate::sandbox::{ai::{new_behavior_tree::*, Blackboard, BlackboardValue, Variable}, Item};
+use crate::sandbox::{new_ai::{behavior_tree::*, Blackboard, BlackboardValue, Variable}, Item};
 
 #[test]
 fn test(){
     let mut blackboard = Blackboard::new();
+    blackboard.insert(
+        "self".to_owned(), 
+        Variable::Chit(BlackboardValue::EntityId(42_u64.into())),
+    );
     blackboard.insert(
         "A".to_owned(), 
         Variable::Chit(BlackboardValue::String(Arc::new("Veggie".to_owned()))),
@@ -32,17 +36,26 @@ fn test(){
             child_state_maybe: None
         }
     );
+    let Node::Sequence { children } = &tree else {panic!()};
+
     let Prayer::TickChild { child_index, my_state, child_state_maybe } = x1 else {panic!()};
     let x2;
-    {
-    let Node::Sequence { children } = &tree else {panic!()};
-    x2 = children[child_index].down_tick(child_state_maybe, &mut blackboard)
-    }
+    x2 = children[child_index].down_tick(child_state_maybe, &mut blackboard);
     assert_specimen!(
         x2,
         Prayer::Combine { direct_item_class: Item::Veggie, indirect_item_class: Item::Axe }
     );
     // I'm leaning for when a condition prayer is made the sky daddy up ticks the parent with the answer
     let x3 = tree.up_tick(my_state, Status::Success);
-    panic!("{x3:?}")
+    let Prayer::TickChild { child_index, my_state, child_state_maybe } = x3 else {panic!()};
+    let x4 = children[child_index].down_tick(child_state_maybe, &mut blackboard);
+    assert_specimen!(
+        x4,
+        Prayer::GetIsInventoryGE { agent: 42_u64.into(), item_class: Item::Axe, amount: 1 }
+    );
+    let x5 = tree.up_tick(my_state, Status::Success);
+    assert_specimen!(
+        x5,
+        Prayer::Status { status: Status::Success }
+    );
 }

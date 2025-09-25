@@ -1,7 +1,6 @@
 use std::collections::BTreeSet;
 
-use crate::sandbox::ai::{Blackboard, BlackboardKey, BlackboardValue};
-use crate::sandbox::new_ai::behavior_tree::{Node, Prayer, State, Status};
+use crate::sandbox::new_ai::{behavior_tree::{Node, Prayer, State, Status}, Blackboard, BlackboardKey, BlackboardValue};
 
 impl Node {
     pub fn down_tick(
@@ -153,20 +152,35 @@ impl Node {
                 return Prayer::Combine { direct_item_class, indirect_item_class }
             },
             Node::InventoryGE { key_to_item_class, amount } => {
-                let Some(&BlackboardValue::EntityId(agent)) = blackboard.get("self") else {
+                let Some(self_value) = blackboard.get("self") else {
                     return Prayer::Status { 
                         status: Status::Failure {
                             reason: format!("self not found in blackboard")
                         }
                     };
                 };
-                let Some(BlackboardValue::String(item_class_string)) = blackboard.get(key_to_item_class) else {
+                let &BlackboardValue::EntityId(agent) = self_value else {
+                    return Prayer::Status { 
+                        status: Status::Failure {
+                            reason: format!("self not an EntityId")
+                        }
+                    };
+                };
+                let Some(item_class_value) = blackboard.get(key_to_item_class) else {
                     return Prayer::Status { 
                         status: Status::Failure {
                             reason: format!("{key_to_item_class} not found in blackboard")
                         }
                     };
                 };
+                let BlackboardValue::String(item_class_string) = item_class_value else {
+                    return Prayer::Status { 
+                        status: Status::Failure {
+                            reason: format!("{key_to_item_class} not a string")
+                        }
+                    };
+                };
+
 
                 let item_class_str: &str = &item_class_string;
                 let Ok(item_class) = item_class_str.try_into() else {

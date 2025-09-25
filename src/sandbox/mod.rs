@@ -28,7 +28,7 @@ pub const MAX_ENERGY: i32 = 100;
 mod new_ai;
 
 
-pub mod ai;
+//pub mod ai;
 //pub mod interaction;
 
 mod acts;
