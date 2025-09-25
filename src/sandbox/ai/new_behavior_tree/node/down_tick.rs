@@ -1,7 +1,5 @@
 use std::collections::BTreeSet;
 
-use qol::logy;
-
 use crate::sandbox::ai::{new_behavior_tree::{Node, Prayer, State, Status}, Blackboard, BlackboardKey, BlackboardValue};
 
 impl Node {
@@ -12,32 +10,33 @@ impl Node {
     ) -> Prayer {
         match self {
             Node::Selector { children: _ } => {
-                let (child_index, child_state_maybe) = if let Some(state) = state_maybe {
-                    if let State::Selector { child_index, child_state_maybe } = state {
+                let (child_index, child_state_maybe, reason_for_failure) = if let Some(state) = state_maybe {
+                    if let State::Selector { child_index, child_state_maybe, reason_for_failure } = state {
                         (
                             child_index, 
                             if let Some(child_state)= child_state_maybe {
                                 Some(*child_state)
                             } else {
                                 None
-                            } )
+                            },
+                            reason_for_failure 
+                        )
                     } else {
-                        logy!("error", "Excepted a Selector state, got {state:?}");
-                        return Prayer::Status { status: Status::Failure }
+                        return Prayer::Status { status: Status::Failure{reason: format!("Excepted a Selector state, got {state:?}")} }
                     }
                 } else{
-                    (0, None)
+                    (0, None, "".to_owned())
                 };
 
                 return Prayer::TickChild { 
                     child_index, 
-                    my_state: State::Selector { child_index, child_state_maybe: None }, 
+                    my_state: State::Selector { child_index, child_state_maybe: None, reason_for_failure }, 
                     child_state_maybe
                 }
             },
             Node::Sequence { children: _ } => {
                 let (child_index, child_state_maybe) = if let Some(state) = state_maybe {
-                    if let State::Selector { child_index, child_state_maybe } = state {
+                    if let State::Sequence { child_index, child_state_maybe } = state {
                         (
                             child_index, 
                             if let Some(child_state)= child_state_maybe {
@@ -47,8 +46,7 @@ impl Node {
                             }
                         )
                     } else {
-                        logy!("error", "Excepted a Sequence state, got {state:?}");
-                        return Prayer::Status { status: Status::Failure }
+                        return Prayer::Status { status: Status::Failure{reason: format!("Excepted a Sequence state, got {state:?}")} }
                     }
                 } else{
                     (0, None)
@@ -64,8 +62,7 @@ impl Node {
                 if let Some(state) = &state_maybe {
                     if let State::Parallel { .. } = state {
                     } else {
-                        logy!("error", "Excepted a Parallel state, got {state:?}");
-                        return Prayer::Status { status: Status::Failure }
+                        return Prayer::Status { status: Status::Failure {reason: format!("Excepted a Parallel state, got {state:?}") } }
                     }
                 }
                 let (succeeded_children, failed_children, children_states_maybe) = if let Some(State::Parallel { succeeded_children, failed_children, children_states_maybe  }) = state_maybe {
@@ -78,7 +75,7 @@ impl Node {
                     return Prayer::Status { status: Status::Success }
                 };
                 if &failed_children.len() >= failure_abort_limit {
-                    return Prayer::Status { status: Status::Failure }
+                    return Prayer::Status { status: Status::Failure {reason: format!("Too many children failed")} }
                 };
 
                 let children_states = if let Some(children_states) = children_states_maybe{
@@ -100,57 +97,83 @@ impl Node {
                 return Prayer::TickChildren { children_states }
             },
             Node::Inverter { child: _ } => {
-                // Inverter: invert child's terminal results, propagate child ticking/waiting and preserve child state
-                if let Some(state) = &state_maybe {
-                    logy!("error", "Excepted an Inverter state, got {state:?}");
-                    return Prayer::Status{status: Status::Failure}
-                };
-
-                let child_state_maybe = if let Some(State::Inverter { child_state_maybe }) = state_maybe {
-                    if let Some(x) =child_state_maybe {
-                        Some(*x)
+                let child_state_maybe = if let Some(state) = state_maybe {
+                    if let State::Inverter { child_state_maybe } = state {
+                        if let Some(x) =child_state_maybe {
+                            Some(*x)
+                        } else {
+                            None
+                        }
                     } else {
-                        None
+                        return Prayer::Status { status: Status::Failure {reason: format!("Excepted an Inverter state, got {state:?}")} }
                     }
-                }else {
-                    return Prayer::Status { status: Status::Failure }
+                } else {
+                    None
                 };
                 
                 return Prayer::TickChild { child_index: 0, my_state: State::Inverter { child_state_maybe: None }, child_state_maybe }
             },
             Node::Combine { key_to_direct_item_class, key_to_indirect_item_class } => {
                 let Some(BlackboardValue::String(direct_item_class_string)) = blackboard.get(key_to_direct_item_class) else {
-                    return Prayer::Status { status: Status::Failure } //Err(format!("{key} not found in blackboard"));
+                    return Prayer::Status { 
+                        status: Status::Failure{ 
+                            reason: format!("{key_to_direct_item_class} not found in blackboard")
+                        }
+                    };
                 };
 
                 let direct_item_class_str: &str = &direct_item_class_string;
                 let Ok(direct_item_class) = direct_item_class_str.try_into() else {
-                    return Prayer::Status { status: Status::Failure } //Err(format!("{item_class_string} is not a valid item class"));
+                    return Prayer::Status { 
+                        status: Status::Failure{ 
+                            reason: format!("{direct_item_class_str} is not a valid item class")
+                        }
+                    };
                 };
 
 
                 let Some(BlackboardValue::String(indirect_item_class_string)) = blackboard.get(key_to_indirect_item_class) else {
-                    return Prayer::Status { status: Status::Failure } //Err(format!("{key} not found in blackboard"));
+                    return Prayer::Status { 
+                        status: Status::Failure { 
+                            reason:format!("{key_to_indirect_item_class} not found in blackboard")
+                        }
+                    };
                 };
 
                 let indirect_item_class_str: &str = &indirect_item_class_string;
                 let Ok(indirect_item_class) = indirect_item_class_str.try_into() else {
-                    return Prayer::Status { status: Status::Failure } //Err(format!("{item_class_string} is not a valid item class"));
+                    return Prayer::Status { 
+                        status: Status::Failure {
+                            reason: format!("{indirect_item_class_str} is not a valid item class")
+                        }
+                    };
                 };
 
                 return Prayer::Combine { direct_item_class, indirect_item_class }
             },
             Node::InventoryGE { key_to_item_class, amount } => {
                 let Some(&BlackboardValue::EntityId(agent)) = blackboard.get("self") else {
-                    return Prayer::Status { status: Status::Failure } // Err(format!("self not found in blackboard"));
+                    return Prayer::Status { 
+                        status: Status::Failure {
+                            reason: format!("self not found in blackboard")
+                        }
+                    };
                 };
                 let Some(BlackboardValue::String(item_class_string)) = blackboard.get(key_to_item_class) else {
-                    return Prayer::Status { status: Status::Failure } //Err(format!("{key} not found in blackboard"));
+                    return Prayer::Status { 
+                        status: Status::Failure {
+                            reason: format!("{key_to_item_class} not found in blackboard")
+                        }
+                    };
                 };
 
                 let item_class_str: &str = &item_class_string;
                 let Ok(item_class) = item_class_str.try_into() else {
-                    return Prayer::Status { status: Status::Failure } //Err(format!("{item_class_string} is not a valid item class"));
+                    return Prayer::Status { 
+                        status: Status::Failure {
+                            reason: format!("{item_class_str} is not a valid item class")
+                        }
+                    };
                 };
 
                 return Prayer::GetIsInventoryGE {

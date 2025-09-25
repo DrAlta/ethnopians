@@ -27,3 +27,15 @@ pub enum Node {
     // takes a Blackboard key that points to an ItemClass and u8 of the number to compare to
     InventoryGE{key_to_item_class: BlackboardKey, amount: i32},
 }
+impl Node {
+    pub fn name(&self) -> &'static str {
+        match self {
+            Node::Selector { .. } => "Selector",
+            Node::Sequence { .. } => "Sequence",
+            Node::Parallel { .. } => "Parallel",
+            Node::Inverter { .. } => "Inverter",
+            Node::Combine { .. } => "Combine",
+            Node::InventoryGE { .. } => "InventoryGE",
+        }
+    }
+}

@@ -28,7 +28,7 @@ mod tests {
                 Behavior::Print,
             ],
         };
-        let mut running = vec!["".to_owned()];
+        let mut running = vec![String::new()];
         let mut stack = vec![Item::Int(9), Item::Int(3), Item::Int(2), Item::Int(1)];
         let mut c = 0;
         //while !bt.running.is_empty() {

@@ -10,7 +10,7 @@ use super::State;
 #[derive(Debug, Clone, PartialEq)]
 pub enum Status {
     Success,
-    Failure,
+    Failure{reason: String},
 //    Ticking{child: usize, my_state: State, child_state_maybe: Option<State>},
     // Tradition BT Running is Waiting{state: State}
     Waiting{state: State},

@@ -35,7 +35,7 @@ pub fn word_parser<'a>(
 pub fn forth_parser<'a>(
     input: &'a str,
 ) -> IResult<&'a str, (Thread, TaskPool), (&'a str, ErrorKind)> {
-    let mut stack = vec![Parser{ this: "".to_owned(), number_of_ifs: 0 }];
+    let mut stack = vec![Parser{ this: String::new(), number_of_ifs: 0 }];
     let mut thread = Vec::new();
     let mut pool = TaskPool::new();
     loop {

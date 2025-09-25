@@ -15,7 +15,7 @@ derive_more = { version = "1.0.0", features = ["add", "add_assign", "mul"] }
 fraction64 = { version = "0.1.15", git = "https://github.com/DrAlta/fraction64.git"}
 ordered-f32 = { version = "0.1.11", git = "https://github.com/DrAlta/rust-ordered-f32.git"}
 thats_so_random = {version = "0.2.4", git = "https://github.com/DrAlta/thats_so_random.rs.git"}
-qol = { version = "0.1.19", git = "https://github.com/DrAlta/rust_quality_of_life.git"}
+qol = { version = "0.1.21", git = "https://github.com/DrAlta/rust_quality_of_life.git"}
 macroquad = { version = "0.4.13", optional = true }
 base64 = "0.22.1"
 nom = "7.1.3"

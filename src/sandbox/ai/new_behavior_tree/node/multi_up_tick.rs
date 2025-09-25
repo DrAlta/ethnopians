@@ -1,7 +1,5 @@
 use std::collections::BTreeMap;
 
-use qol::logy;
-
 use crate::sandbox::ai::new_behavior_tree::{Node, Prayer, State, Status};
 
 impl Node {
@@ -9,12 +7,10 @@ impl Node {
         match self {
             Node::Parallel { children: _, needed_successed, failure_abort_limit } => {
                 let State::Parallel { mut succeeded_children, mut failed_children, children_states_maybe } = state else {
-                    logy!("error", "Excepted a Parallel state, got {state:?}");
-                    return Prayer::Status { status: Status::Failure }
+                    return Prayer::Status { status: Status::Failure {reason: format!("Excepted a Parallel state, got {state:?}")} }
                 };
                 if children_states_maybe.is_some() {
-                    logy!("error", "Excepted a Parallel state, to not have any states for children");
-                    return Prayer::Status { status: Status::Failure }
+                    return Prayer::Status { status: Status::Failure {reason: format!("Excepted a Parallel state, to not have any states for children")} }
                 }
 
                 let children_states = childerns_returned_statuses.into_iter().filter_map(
@@ -25,7 +21,7 @@ impl Node {
                                 succeeded_children.insert(idx);
                                 None
                             },
-                            Status::Failure => {
+                            Status::Failure{ .. } => {
                                 failed_children.insert(idx);
                                 None
                             },
@@ -38,7 +34,7 @@ impl Node {
                     return Prayer::Status { status: Status::Success }
                 };
                 if &failed_children.len() >= failure_abort_limit {
-                    return Prayer::Status { status: Status::Failure }
+                    return Prayer::Status { status: Status::Failure{reason: format!("Too many child tasks failed")} }
                 };
 
                 return Prayer::Status { status: Status::Waiting { state: State::Parallel { 
@@ -48,11 +44,11 @@ impl Node {
                  } } }
 
             },
-            Node::Selector { .. } |
-            Node::Sequence { .. } |
-            Node::Inverter { .. } |
-            Node::Combine { .. } |
-            Node::InventoryGE { .. } => return Prayer::Status { status: Status::Failure },
+            x @ Node::Selector { .. } |
+            x @ Node::Sequence { .. } |
+            x @ Node::Inverter { .. } |
+            x @ Node::Combine { .. } |
+            x @ Node::InventoryGE { .. } => return Prayer::Status { status: Status::Failure{reason: format!("{} nodes are invalidfor multi_up_tick", x.name())} },
         }
     }
 
