@@ -23,11 +23,6 @@
 //!
 //!
 
-pub const MAX_ENERGY: i32 = 100;
-
-mod new_ai;
-
-
 //pub mod ai;
 //pub mod interaction;
 
@@ -42,6 +37,7 @@ pub use item::Item;
 mod location;
 pub use location::Location;
 pub mod movement;
+pub mod new_ai;
 mod r#return;
 pub use r#return::Return;
 
@@ -65,3 +61,6 @@ use macros::Component;
 use bevy::prelude::Event;
 #[cfg(not(feature = "bevy"))]
 use macros::Event;
+
+
+pub const MAX_ENERGY: i32 = 100;

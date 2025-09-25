@@ -1,6 +1,6 @@
 use qol::{assert_specimen, pout};
 
-use crate::sandbox::new_ai::{forth::{cpu::CPU, Instruction, StackItem, Status, ThreadPool}, Blackboard, InpulseId};
+use crate::sandbox::new_ai::{forth::{cpu::CPU, Instruction, Status, ThreadPool}, Blackboard};
 
 #[test]
 fn step_test() {
