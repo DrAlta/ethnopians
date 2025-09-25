@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use qol::assert_specimen;
 
-use crate::sandbox::ai::{new_behavior_tree::*, Blackboard, BlackboardValue, Variable};
+use crate::sandbox::{ai::{new_behavior_tree::*, Blackboard, BlackboardValue, Variable}, Item};
 
 #[test]
 fn test(){
@@ -38,5 +38,11 @@ fn test(){
     let Node::Sequence { children } = &tree else {panic!()};
     x2 = children[child_index].down_tick(child_state_maybe, &mut blackboard)
     }
-    panic!("{x2:?}")
+    assert_specimen!(
+        x2,
+        Prayer::Combine { direct_item_class: Item::Veggie, indirect_item_class: Item::Axe }
+    );
+    // I'm leaning for when a condition prayer is made the sky daddy up ticks the parent with the answer
+    let x3 = tree.up_tick(my_state, Status::Success);
+    panic!("{x3:?}")
 }

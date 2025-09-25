@@ -58,12 +58,15 @@ pub fn tick_selector(
         (_, StackItem::String(x)) if *x == "Success" => {
             logy!("trace-tick-selector", "we got a Success");
             stack.push(StackItem::success());
-            let status = if pc.is_none() {
-                Status::Success
+            if let Some(parent_token) = return_stack.pop() {
+                // return to calling fuction
+                *pc = Some(parent_token);
+                return Ok(Status::None);
             } else {
-                Status::None
+                // the program finished
+                *pc = None;
+                return Ok(Status::Success);
             };
-            Instruction::exit(status, return_stack, pc)
         }
         (true, StackItem::String(x)) if *x == "Failure" => {
             logy!(
