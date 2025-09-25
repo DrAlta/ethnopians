@@ -7,6 +7,8 @@ mod datum;
 pub use datum::Datum;
 mod get_datum_type;
 pub use get_datum_type::{DatumType, GetDatumType};
+mod join;
+pub use join::join;
 mod relation;
 pub use relation::Relation;
 

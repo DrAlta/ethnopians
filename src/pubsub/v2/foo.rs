@@ -3,6 +3,7 @@ pub trait Foo<const INDEX: usize> {
     fn get_column<'a>(&'a self) -> Vec<Datum>;
     fn get_i8_iter<'a>(&'a self) -> impl Iterator<Item = &'a i8>;
     fn get_string_iter<'a>(&'a self) -> impl Iterator<Item = &'a Sting>;
+
 }
 impl Foo<0> for Vec<(i8, i8)> {
     fn get_column<'a>(&'a self) -> Vec<Datum> {

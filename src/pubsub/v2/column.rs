@@ -1,4 +1,6 @@
 use std::sync::LazyLock;
+use crate::pubsub::v2::DatumType;
+
 use super::Sting;
 #[derive(Debug)]
 pub enum Column {
@@ -12,6 +14,12 @@ impl Column {
     }
     pub fn empty_string() -> &'static Self {
         &EMPTY_STRING_COLUMN
+    }
+    pub fn get_data_type(&self) -> Option<super::DatumType> {
+        match self {
+            Column::I8(_) => Some(DatumType::I8),
+            Column::String(_) => Some(DatumType::String),
+        }
     }
 }
 

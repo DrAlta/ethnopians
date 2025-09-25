@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use crate::pubsub::v2::{empty_i8, empty_string, Column, Datum, Foo, Sting};
+use crate::pubsub::v2::{empty_i8, empty_string, Column, Datum, DatumType, Foo, Sting};
 
 #[derive(Debug)]
 pub struct Relation<const SIZE: usize> {
@@ -60,5 +60,56 @@ impl<const INDEX: usize, const SIZE: usize> Foo<INDEX> for Relation<SIZE> {
             }
         };
         iter.map(|a| a)
+    }
+
+
+}
+
+impl<const SIZE: usize> Relation<SIZE> {
+    pub fn new(
+    field_names: [Sting; SIZE],
+    fields: [Column; SIZE],
+    ) -> Self{
+        Self{ field_names, fields }
+    }
+    pub fn lookup_feilds_type(
+        &self,
+        field_id: &str,
+    ) -> Option<DatumType> {
+        for (idx, this_field_id) in self.field_names.iter().enumerate() {
+            if field_id == &**this_field_id {
+                return self.fields[idx].get_data_type()
+            }
+        }
+        None
+    }
+    pub fn get_i8_iter(&self, field_id: &str,) -> Option<impl Iterator<Item = &i8>> {
+        for (idx, this_field_id) in self.field_names.iter().enumerate() {
+            if field_id == &**this_field_id {
+                let column = &self.fields[idx];
+                match column {
+                    Column::I8(items) => {
+                        return Some(items.into_iter().map(|a| a)) 
+
+                    },
+                    Column::String(_items) => ()
+                };
+            }
+        }
+        None
+    }
+    pub fn get_string_iter<'a>(&'a self, field_id: &str,) -> Option<impl Iterator<Item = &'a str>>{
+        for (idx, this_field_id) in self.field_names.iter().enumerate() {
+            if field_id == &**this_field_id {
+                let column = &self.fields[idx];
+                match column {
+                    Column::I8(_items) => (),
+                    Column::String(items) => {
+                        return Some(items.into_iter().map(|a| &**a)) 
+                    },
+                };
+            }
+        }
+        None
     }
 }
