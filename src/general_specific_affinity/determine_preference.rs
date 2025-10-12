@@ -22,9 +22,10 @@ pub fn sum_preferences(
         let mut to_remove = Vec::new();
         for this_candidate_idx in 0..rule_candidates.len() {
             let this_candidate = &rule_candidates[this_candidate_idx].event_tags;
-            for other_candidate_idx in this_candidate_idx + 1 .. rule_candidates.len() {
+            for other_candidate_idx in this_candidate_idx + 1..rule_candidates.len() {
                 let other_candidate = &rule_candidates[other_candidate_idx].event_tags;
-                if is_more_specific(other_candidate, this_candidate) { //other_candidate.is_superset(this_candidate) {
+                if is_more_specific(other_candidate, this_candidate) {
+                    //other_candidate.is_superset(this_candidate) {
                     to_remove.push(this_candidate_idx);
                 }
             }
@@ -33,7 +34,6 @@ pub fn sum_preferences(
             rule_candidates.remove(idx);
         }
     }
-
 
     // step 3 gather the response test
     let mut response_candidates = Vec::new();
@@ -44,13 +44,14 @@ pub fn sum_preferences(
     }
 
     // Step 4: find the subset with the highest specificity
-        {
+    {
         let mut to_remove = Vec::new();
         for this_candidate_idx in 0..response_candidates.len() {
             let this_candidate = &response_candidates[this_candidate_idx].response_tags;
-            for other_candidate_idx in this_candidate_idx + 1 .. response_candidates.len() {
+            for other_candidate_idx in this_candidate_idx + 1..response_candidates.len() {
                 let other_candidate = &response_candidates[other_candidate_idx].response_tags;
-                if is_more_specific(other_candidate, this_candidate) {//other_candidate.is_superset(this_candidate) {
+                if is_more_specific(other_candidate, this_candidate) {
+                    //other_candidate.is_superset(this_candidate) {
                     to_remove.push(this_candidate_idx);
                 }
             }
@@ -64,8 +65,8 @@ pub fn sum_preferences(
     let mut disapprovals = 0;
     for rule in response_candidates {
         match &rule.preference {
-            Preference::Approve => {approvals += 1},
-            Preference::Disapprove => {disapprovals += 1},
+            Preference::Approve => approvals += 1,
+            Preference::Disapprove => disapprovals += 1,
         }
     }
     (approvals, disapprovals)
@@ -76,7 +77,7 @@ pub fn determine_preference(
     response: &Response,
 ) -> Option<Preference> {
     let (approvals, disapprovals) = sum_preferences(character, event, response);
-    
+
     match approvals.cmp(&disapprovals) {
         std::cmp::Ordering::Less => Some(Preference::Disapprove),
         std::cmp::Ordering::Equal => None,

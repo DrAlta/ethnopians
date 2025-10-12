@@ -1,17 +1,18 @@
+use std::collections::HashMap;
+
 use crate::{
-    bvh::{MortenCode, Node, NodeType},
+    broadphase::bvh::{MortenCode, Node, NodeType},
     types::AARect,
 };
 
-pub fn create_subtree<'a, Id: std::hash::Hash, F>(
+pub fn create_subtree<Id: std::hash::Hash>(
     sorted_list: &Vec<(Id, MortenCode)>,
     begin: usize,
     end: usize,
-    get_aa_rect: &'a F,
+    entities: &HashMap<Id, AARect>,
 ) -> Result<Node<Id>, String>
 where
     Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord,
-    F: Fn(&Id) -> Option<AARect>,
 {
     if begin == end {
         let id = sorted_list[begin].0.clone();
@@ -20,7 +21,7 @@ where
             min_y,
             width,
             height,
-        }) = get_aa_rect(&id)
+        }) = entities.get(&id).cloned()
         else {
             return Err(format!("faild fo find AArect for {id:?}"));
         };
@@ -34,11 +35,11 @@ where
     } else {
         let m = (begin + end) / 2;
         let left = Box::new(
-            create_subtree(sorted_list, begin, m, get_aa_rect)
+            create_subtree(sorted_list, begin, m, entities)
                 .map_err(|err| format!("Could biuld left side: {err}"))?,
         );
         let right = Box::new(
-            create_subtree(sorted_list, m + 1, end, get_aa_rect)
+            create_subtree(sorted_list, m + 1, end, entities)
                 .map_err(|err| format!("Could biuld right side: {err}"))?,
         );
 

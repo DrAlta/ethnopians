@@ -18,18 +18,23 @@ pub fn join<const SIZE: usize, const N: usize>(
             return false;
         };
         let Some(datum_type) = db.lookup_relations_fields_type(table_id_a, field_id_a) else {
-            logy!("error", "failed to look uptables typetable_id:{table_id_a:?}, field_id:{field_id_a:?}");
+            logy!(
+                "error",
+                "failed to look uptables typetable_id:{table_id_a:?}, field_id:{field_id_a:?}"
+            );
             return false;
         };
         x.all(|((table_id_a, field_id_a), (table_id_b, field_id_b))| {
-            let Some(this_datum_type_a) = db.lookup_relations_fields_type(table_id_a, field_id_a) else {
+            let Some(this_datum_type_a) = db.lookup_relations_fields_type(table_id_a, field_id_a)
+            else {
                 return false;
             };
             if this_datum_type_a != datum_type {
-                return false
+                return false;
             };
 
-            let Some(this_datum_type_b) = db.lookup_relations_fields_type(table_id_b, field_id_b) else {
+            let Some(this_datum_type_b) = db.lookup_relations_fields_type(table_id_b, field_id_b)
+            else {
                 return false;
             };
             this_datum_type_b == datum_type
@@ -49,7 +54,12 @@ pub fn join<const SIZE: usize, const N: usize>(
             return Vec::new();
         };
         let Some(datum_type) = db.lookup_relations_fields_type(first.0, first.1) else {
-            logy!("error", "failed to lookup table type of table_id:{:?} field_id:{}", first.0, first.1);
+            logy!(
+                "error",
+                "failed to lookup table type of table_id:{:?} field_id:{}",
+                first.0,
+                first.1
+            );
             return Vec::new();
         };
 
@@ -57,43 +67,40 @@ pub fn join<const SIZE: usize, const N: usize>(
             DatumType::I8 => {
                 let a1 = db.get(first.0).unwrap();
                 let Some(x) = a1.get_i8_iter(first.1) else {
-                    return Vec::new()
+                    return Vec::new();
                 };
-                working = x
-                    .enumerate()
-                    .map(|(k, v)| (k, v.clone()))
-                    .collect();
+                working = x.enumerate().map(|(k, v)| (k, v.clone())).collect();
             }
-            DatumType::String => return Vec::new()/*{
-                let a1 = db.get(first.0).unwrap();
-                let Some(x) = a1.get_string_iter(first.1) else {
-                    return Vec::new()
-                };
-                working = x
-                    .enumerate()
-                    .map(|(k, v)| (k, v.clone()))
-                    .collect();
-            },*/
+            DatumType::String => return Vec::new(), /*{
+                                                        let a1 = db.get(first.0).unwrap();
+                                                        let Some(x) = a1.get_string_iter(first.1) else {
+                                                            return Vec::new()
+                                                        };
+                                                        working = x
+                                                            .enumerate()
+                                                            .map(|(k, v)| (k, v.clone()))
+                                                            .collect();
+                                                    },*/
         };
         for term in iter {
             match datum_type {
                 DatumType::I8 => {
-                    let a1 = db.get(term.0.0).unwrap();
+                    let a1 = db.get(term.0 .0).unwrap();
                     let Some(x) = a1.get_i8_iter(first.1) else {
-                        return Vec::new()
+                        return Vec::new();
                     };
                     foo2(&mut working, &x.map(|x| *x).collect())
                 }
-                DatumType::String =>()/* {
-                    let a1 = db.get(first.0).unwrap();
-                    let Some(x) = a1.get_string_iter(first.1) else {
-                        return Vec::new()
-                    };
-                    working = x
-                        .enumerate()
-                        .map(|(k, v)| (k, v.clone()))
-                        .collect();
-                },*/
+                DatumType::String => (), /* {
+                                             let a1 = db.get(first.0).unwrap();
+                                             let Some(x) = a1.get_string_iter(first.1) else {
+                                                 return Vec::new()
+                                             };
+                                             working = x
+                                                 .enumerate()
+                                                 .map(|(k, v)| (k, v.clone()))
+                                                 .collect();
+                                         },*/
             };
         }
         working.into_iter().map(|(_, v)| Datum::I8(v)).collect()

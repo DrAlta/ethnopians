@@ -1,4 +1,7 @@
-use crate::sandbox::new_ai::{forth::{ProgramCounter, ReturnStack, Stack, StackItem, Status, ThreadId, ThreadPool}, Blackboard, BlackboardKey, BlackboardValue};
+use crate::sandbox::new_ai::{
+    forth::{ProgramCounter, ReturnStack, Stack, StackItem, Status, ThreadId, ThreadPool},
+    Blackboard, BlackboardKey, BlackboardValue,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct CPU {

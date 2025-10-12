@@ -1,5 +1,5 @@
 use crate::{
-    bvh::{expand_bits, MortenCode},
+    broadphase::bvh::{expand_bits, MortenCode},
     Number,
 };
 

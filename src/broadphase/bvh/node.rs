@@ -1,7 +1,11 @@
-use std::collections::BTreeSet;
+use std::{
+    collections::{BTreeSet, HashMap},
+    fmt::Debug,
+    hash::Hash,
+};
 
 use crate::{
-    bvh::{calculate_morton_code, create_subtree, intersect, MortenCode, NodeType},
+    broadphase::bvh::{calculate_morton_code, create_subtree, intersect, MortenCode, NodeType},
     types::AARect,
     Number,
 };
@@ -16,15 +20,9 @@ pub struct Node<Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord 
     pub node_type: NodeType<Id>,
 }
 
-impl<'a, Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::hash::Hash>
-    Node<Id>
-{
-    pub fn create_tree<I, F>(list: I, get_aa_rect: &'a F) -> Result<Self, String>
-    where
-        I: IntoIterator<Item = Id> + Clone,
-        F: Fn(&Id) -> Option<AARect>,
-    {
-        let mut iter1 = list.clone().into_iter();
+impl<Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::hash::Hash> Node<Id> {
+    pub fn create_tree(entities: &HashMap<Id, AARect>) -> Result<Self, String> {
+        let mut iter1 = entities.iter().map(|(k, _)| k.clone());
 
         let Some(first_id) = iter1.next() else {
             return Err("No items to build tree from".to_owned());
@@ -34,7 +32,7 @@ impl<'a, Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::
             min_y,
             width,
             height,
-        }) = get_aa_rect(&first_id)
+        }) = entities.get(&first_id).cloned()
         else {
             return Err(format!(
                 "Couldn't find world size:couldn't get AArect for {first_id:?}"
@@ -51,7 +49,7 @@ impl<'a, Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::
                 min_y,
                 width,
                 height,
-            }) = get_aa_rect(&id)
+            }) = entities.get(&id).cloned()
             else {
                 return Err(format!(
                     "Couldn't find world size::couldn't get AArech for {id:?}"
@@ -63,18 +61,13 @@ impl<'a, Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::
             world_max_y = world_max_y.max(min_y + height);
         }
         let mut acc: Vec<(Id, MortenCode)> = Vec::new();
-        for id in list {
-            let Some(AARect {
+        for (id, aa_ref) in entities {
+            let AARect {
                 min_x,
                 min_y,
                 width,
                 height,
-            }) = get_aa_rect(&id)
-            else {
-                return Err(format!(
-                    "Couldn't build morten codes:couldn't get AArech for {id:?}"
-                ));
-            };
+            } = aa_ref.clone();
             let x = min_x + (width * Number::HALF);
             let y = min_y + (height * Number::HALF);
             let morten = calculate_morton_code(
@@ -85,14 +78,16 @@ impl<'a, Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::
                 &world_max_x,
                 &world_max_y,
             );
-            acc.push((id, morten));
+            acc.push((id.clone(), morten));
         }
-        Self::create_tree_from_morten(acc, get_aa_rect)
+        Self::create_tree_from_morten(acc, entities)
     }
-    pub fn create_tree_from_morten<I, F>(list: I, get_aa_rect: &'a F) -> Result<Self, String>
+    pub fn create_tree_from_morten<'a, I>(
+        list: I,
+        entities: &HashMap<Id, AARect>,
+    ) -> Result<Self, String>
     where
         I: IntoIterator<Item = (Id, MortenCode)>,
-        F: Fn(&Id) -> Option<AARect>,
     {
         let mut sorted_by_morten: Vec<(Id, MortenCode)> = list.into_iter().collect();
         sorted_by_morten
@@ -100,7 +95,7 @@ impl<'a, Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::
 
         let end = sorted_by_morten.len() - 1;
 
-        create_subtree(&sorted_by_morten, 0, end, get_aa_rect)
+        create_subtree(&sorted_by_morten, 0, end, entities)
     }
     pub fn qurry(
         &self,

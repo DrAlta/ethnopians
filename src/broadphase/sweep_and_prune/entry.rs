@@ -1,4 +1,4 @@
-use crate::{sweep_and_prune::SpatialId, types::AARect};
+use crate::{broadphase::SpatialId, types::AARect};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Entry {

@@ -1,7 +1,7 @@
 use std::collections::{BTreeSet, HashMap};
 
 use crate::{
-    sweep_and_prune::{SpatialId, SweepAndPrune},
+    broadphase::{Broadphase, SpatialId},
     types::AARect,
 };
 
@@ -17,10 +17,10 @@ use super::Avalibility;
 /// - `map`: Mutable reference to the spatial map for collision detection.
 /// - `prev`: Provides access to previous state information of entities.
 /// - `collisions`: Mutable reference to the set recording collision pairs.
-pub fn collision<T: Prev>(
+pub fn collision<T: Prev, B: Broadphase>(
     mut todo: BTreeSet<EntityId>,
     aval: &mut HashMap<SpatialId, Avalibility>,
-    map: &mut SweepAndPrune,
+    map: &mut B,
     prev: &T,
     collisions: &mut BTreeSet<(EntityId, EntityId)>,
 ) {

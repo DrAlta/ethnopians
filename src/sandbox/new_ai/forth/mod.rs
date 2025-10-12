@@ -9,7 +9,6 @@ pub use status::Status;
 mod thread_pool;
 pub use thread_pool::ThreadPool;
 
-
 pub type Thread = Vec<Instruction>;
 pub type ThreadId = String;
 

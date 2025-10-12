@@ -12,3 +12,9 @@ mod node;
 pub use node::Node;
 
 pub type MortenCode = u32;
+
+/*
+thecollision needs to be able to insert new items which this can't do.
+mod bvh;
+pub use bvh::BVH;
+*/

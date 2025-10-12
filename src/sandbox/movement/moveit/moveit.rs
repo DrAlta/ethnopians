@@ -1,7 +1,7 @@
 use std::collections::{BTreeSet, HashMap};
 
 use crate::{
-    sweep_and_prune::{SpatialId, SweepAndPrune},
+    broadphase::{Broadphase, SpatialId},
     types::AARect,
     Number,
 };
@@ -35,10 +35,10 @@ use super::{collision, Avalibility, Prev};
 ///   - `[1]`: Entities involved in collisions.
 ///   - `[2]`: Entities that were rear-ended.
 /// - A Vec of tuples of `EntityId`s representing entities involved in collisions.
-pub fn moveit<T: Prev>(
+pub fn moveit<T: Prev, B: Broadphase>(
     desired: HashMap<EntityId, (Number, Number)>,
     mut avals: HashMap<SpatialId, Avalibility>,
-    mut map: SweepAndPrune,
+    mut map: B,
     prev: &T,
 ) -> (
     [HashMap<EntityId, AARect>; 3],

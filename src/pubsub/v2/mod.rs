@@ -1,8 +1,8 @@
-use std::{sync::Arc};
 use std::collections::HashMap;
+use std::sync::Arc;
 
 mod column;
-pub use column::{Column, empty_i8, empty_string}; 
+pub use column::{empty_i8, empty_string, Column};
 mod datum;
 pub use datum::Datum;
 mod get_datum_type;

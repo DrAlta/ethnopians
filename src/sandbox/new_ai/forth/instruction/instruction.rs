@@ -1,4 +1,7 @@
-use crate::sandbox::new_ai::{forth::{Prayer, ProgramCounter, ReturnStack, Stack, StackItem, Status, ThreadId}, InpulseId};
+use crate::sandbox::new_ai::{
+    forth::{Prayer, ProgramCounter, ReturnStack, Stack, StackItem, Status, ThreadId},
+    InpulseId,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Instruction {
@@ -111,4 +114,3 @@ impl Instruction {
         Ok((nos, tos))
     }
 }
-

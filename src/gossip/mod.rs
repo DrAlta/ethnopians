@@ -143,7 +143,7 @@ impl Character {
         all_characters: &HashMap<CharId, Character>,
     ) -> Number {
         let mut sum_weighted_opinions = Number::ZERO; // Accumulates the weighted opinions.
-        let mut sum_weights = Number::ZERO;           // Accumulates the weights.
+        let mut sum_weights = Number::ZERO; // Accumulates the weights.
 
         // Iterate over each acquaintance (characters with whom this character has a relationship).
         for (&other_id, relationship) in &self.relationships {
@@ -201,7 +201,7 @@ impl Character {
         all_characters: &HashMap<CharId, Character>,
     ) -> Number {
         let mut sum_weighted_opinions = Number::ZERO; // Accumulates the weighted opinions.
-        let mut sum_weights = Number::ZERO;           // Accumulates the weights.
+        let mut sum_weights = Number::ZERO; // Accumulates the weights.
 
         // Iterate over each acquaintance.
         for (&other_id, _) in &self.relationships {
@@ -280,21 +280,15 @@ impl Character {
         // Determine if the gossip is direct or third-party
         if gossip_content.subject_id == gossiper.id {
             // Direct gossip: Gossiper shares their own opinion about the victim
-            let impact = self.calculate_direct_gossip_impact(
-                gossiper,
-                gossip_content,
-                all_characters,
-            );
+            let impact =
+                self.calculate_direct_gossip_impact(gossiper, gossip_content, all_characters);
 
             trust_change = impact.trust_change;
             affection_change_towards_victim = impact.affection_change_towards_victim;
         } else {
             // Third-party gossip: Gossiper shares someone else's opinion about the victim
-            let impact = self.calculate_third_party_gossip_impact(
-                gossiper,
-                gossip_content,
-                all_characters,
-            );
+            let impact =
+                self.calculate_third_party_gossip_impact(gossiper, gossip_content, all_characters);
 
             trust_change = impact.trust_change;
             perceptions_update = impact.perceptions_update;
@@ -303,11 +297,8 @@ impl Character {
         // Assuming we've defined a function `get_weighted_social_consensus` as before
 
         // Get the weighted social consensus about the victim, excluding the gossiper
-        let consensus = self.direct_consensus(
-            gossip_content.victim_id,
-            Some(gossiper.id),
-            all_characters,
-        );
+        let consensus =
+            self.direct_consensus(gossip_content.victim_id, Some(gossiper.id), all_characters);
 
         // Calculate the forgiveness factor
         let forgiveness = self.personality.forgiveness_for_common_beliefs * consensus;
@@ -335,8 +326,12 @@ impl Character {
         let victim_id = gossip_content.victim_id;
 
         // 1. Assess alignment between the gossip and this character's existing beliefs about the victim.
-        let existing_opinion = self.relationships.get(&victim_id).map_or(Number::ZERO, |rel| rel.affection);
-        let alignment = Number::ONE - (existing_opinion - gossip_content.affection).abs() / Number::TWO; // Normalize to 0.0 - 1.0
+        let existing_opinion = self
+            .relationships
+            .get(&victim_id)
+            .map_or(Number::ZERO, |rel| rel.affection);
+        let alignment =
+            Number::ONE - (existing_opinion - gossip_content.affection).abs() / Number::TWO; // Normalize to 0.0 - 1.0
 
         // 2. Calculate trust change towards the gossiper.
         // Increase trust if gossip aligns with beliefs, decrease if not.
@@ -373,7 +368,10 @@ impl Character {
         let victim_id = gossip_content.victim_id;
 
         // 1. Assess credibility of the gossiper.
-        let gossiper_trust = self.relationships.get(&gossiper.id).map_or(Number::ZERO, |rel| rel.trust);
+        let gossiper_trust = self
+            .relationships
+            .get(&gossiper.id)
+            .map_or(Number::ZERO, |rel| rel.trust);
         let skepticism = self.personality.skepticism;
         let credibility = gossiper_trust * (Number::ONE - skepticism);
 
@@ -470,7 +468,9 @@ impl Character {
                         .clamp(Number::NEG_ONE, Number::ONE);
                 })
                 .or_insert(Opinion {
-                    affection: opinion_change.affection_change.clamp(Number::NEG_ONE, Number::ONE),
+                    affection: opinion_change
+                        .affection_change
+                        .clamp(Number::NEG_ONE, Number::ONE),
                 });
         }
     }

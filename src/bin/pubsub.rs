@@ -9,21 +9,17 @@ fn main() {
         Relation::new(
             ["A".into(), "B".into()],
             [
-                Column::I8(vec![1, 2, 4, 4, 2,]),
-                Column::I8(vec![2, 3, 5, 6, 42])
-            ]
-        )
+                Column::I8(vec![1, 2, 4, 4, 2]),
+                Column::I8(vec![2, 3, 5, 6, 42]),
+            ],
+        ),
     )]);
 
-    let x: BTreeSet<_>= join([
-        vec![
-            (
-                ("Table1", "A"), 
-                ("Table1", "B"),
-            )
-        ]
-    ], &a).unwrap().into_iter().collect();
-    println!("{x:?}", );
+    let x: BTreeSet<_> = join([vec![(("Table1", "A"), ("Table1", "B"))]], &a)
+        .unwrap()
+        .into_iter()
+        .collect();
+    println!("{x:?}",);
     use ethnolib::pubsub::v2::Datum::I8;
     assert_specimen!(
         x,

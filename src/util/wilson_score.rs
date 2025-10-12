@@ -20,7 +20,7 @@ use crate::Number;
 ///
 /// ```
 /// use ethnolib::util::calculate_wilson_score;
-/// 
+///
 /// let upvotes = 100;
 /// let downvotes = 40;
 /// let score = calculate_wilson_score(upvotes, downvotes);
@@ -40,7 +40,7 @@ pub fn calculate_wilson_score(upvotes: u64, downvotes: u64) -> Number {
     // For simplicity, we'll use a fixed z-score here. In a more robust
     // implementation, you'd calculate this based on the confidence_level
     // using a statistical library or approximation.
-    let z = Into::<Number>::into(1.96); 
+    let z = Into::<Number>::into(1.96);
 
     let numerator = p + (z * z) / (Number::TWO * n) - error_bound(z, p, n);
     let denominator = Number::ONE + (z * z) / n;
@@ -50,9 +50,8 @@ pub fn calculate_wilson_score(upvotes: u64, downvotes: u64) -> Number {
 
 fn error_bound(z: Number, p: Number, n: Number) -> Number {
     z * ((p * (Number::ONE - p) + (z * z) / (Number::FOUR * n)) / n).sqrt()
-
 }
-pub fn calculate_error_bound(upvotes: u64, downvotes: u64)-> Option<Number>{
+pub fn calculate_error_bound(upvotes: u64, downvotes: u64) -> Option<Number> {
     let n = Into::<Number>::into(upvotes + downvotes);
 
     // If no votes, return 0 to avoid division by zero and represent an unknown ranking.

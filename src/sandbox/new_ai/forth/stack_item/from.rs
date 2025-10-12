@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::sandbox::{
-    new_ai::{BlackboardValue, forth::StackItem},
+    new_ai::{forth::StackItem, BlackboardValue},
     EntityId,
 };
 

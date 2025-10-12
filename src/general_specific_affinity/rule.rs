@@ -1,5 +1,5 @@
+use super::Preference;
 use std::collections::BTreeSet;
- use super::Preference;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct Rule {

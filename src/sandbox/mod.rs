@@ -62,5 +62,4 @@ use bevy::prelude::Event;
 #[cfg(not(feature = "bevy"))]
 use macros::Event;
 
-
 pub const MAX_ENERGY: i32 = 100;

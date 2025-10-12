@@ -1,6 +1,9 @@
 use qol::{assert_specimen, pout};
 
-use crate::sandbox::new_ai::{forth::{cpu::CPU, Instruction, Status, ThreadPool}, Blackboard};
+use crate::sandbox::new_ai::{
+    forth::{cpu::CPU, Instruction, Status, ThreadPool},
+    Blackboard,
+};
 
 #[test]
 fn step_test() {
@@ -10,10 +13,7 @@ fn step_test() {
     let action1 = "act1".to_owned();
     task_db.insert(
         action1.clone(),
-        vec![
-            Instruction::Action(1),
-            Instruction::Return,
-        ],
+        vec![Instruction::Action(1), Instruction::Return],
     );
     let action3 = "act3".to_owned();
     task_db.insert(
@@ -69,6 +69,4 @@ fn step_test() {
     assert_specimen!(&cpu.return_stack, &vec![]);
 
     assert_specimen!(&cpu.pc, &None);
-
-
 }

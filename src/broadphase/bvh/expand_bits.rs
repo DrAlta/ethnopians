@@ -1,4 +1,4 @@
-use crate::bvh::MortenCode;
+use crate::broadphase::bvh::MortenCode;
 
 pub fn expand_bits(t: u16) -> MortenCode {
     let mut t = t as u32;

@@ -1,4 +1,4 @@
-use crate::{sweep_and_prune::Entry, types::AARect};
+use crate::{broadphase::sweep_and_prune::Entry, types::AARect};
 
 pub fn sortie(
     Entry {

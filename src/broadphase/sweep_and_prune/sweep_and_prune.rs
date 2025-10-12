@@ -1,11 +1,12 @@
 use std::collections::BTreeSet;
 
 use crate::{
-    Number,
-    {
-        sweep_and_prune::{sortie, Entry, SpatialId},
-        types::AARect,
+    broadphase::{
+        sweep_and_prune::{sortie, Entry},
+        Broadphase, SpatialId,
     },
+    types::AARect,
+    Number,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -114,5 +115,33 @@ impl SweepAndPrune {
             }
         }
         ret
+    }
+}
+
+impl Broadphase for SweepAndPrune {
+    fn new<I: Iterator<Item = AARect>>(entities: I) -> Self {
+        SweepAndPrune::new(entities)
+    }
+
+    fn insert(&mut self, aabb: AARect) -> SpatialId {
+        SweepAndPrune::insert(self, aabb)
+    }
+
+    fn ready(&mut self) -> bool {
+        SweepAndPrune::ready(self)
+    }
+
+    fn qurry(
+        &self,
+        min_x: Number,
+        min_y: Number,
+        max_x: Number,
+        max_y: Number,
+    ) -> BTreeSet<SpatialId> {
+        SweepAndPrune::qurry(self, min_x, min_y, max_x, max_y)
+    }
+
+    fn get_entity(&self, k: &SpatialId) -> Option<AARect> {
+        SweepAndPrune::get_entity(self, k)
     }
 }

@@ -2,7 +2,10 @@ use std::sync::Arc;
 
 use qol::logy;
 
-use crate::sandbox::new_ai::{forth::{Instruction, Prayer, ProgramCounter, ReturnStack, Stack, StackItem, Status}, Blackboard, BlackboardKey, BlackboardValue, Variable};
+use crate::sandbox::new_ai::{
+    forth::{Instruction, Prayer, ProgramCounter, ReturnStack, Stack, StackItem, Status},
+    Blackboard, BlackboardKey, BlackboardValue, Variable,
+};
 
 impl Instruction {
     pub fn tick(
@@ -332,10 +335,7 @@ impl Instruction {
                 let Some(nos) = stack.pop() else {
                     unreachable!()
                 };
-                blackboard.insert(
-                    (*key).clone(),
-                    Variable::Chit(nos.into()),
-                );
+                blackboard.insert((*key).clone(), Variable::Chit(nos.into()));
                 Self::next(Status::None, pc)
             }
             Instruction::Stuff => {
@@ -505,7 +505,6 @@ impl Instruction {
                 };
                 stack.pop();
                 Self::next(Status::RetainEntitiesOfType(item_type_from_stack), pc)
-
             }
         };
         println!("ending Stack is:");
