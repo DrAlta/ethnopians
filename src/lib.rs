@@ -21,6 +21,7 @@ pub use ring::{ring, Box};
 pub mod sandbox;
 pub mod seven_emotions;
 //pub mod social_sim;//! this is supersecced by the ensemblage crate
+pub mod stock_market_fractal;
 pub mod trauma;
 pub mod types;
 pub use types::{vec2, Vec2};
@@ -28,3 +29,5 @@ pub mod util;
 
 pub type Number = ordered_f32::OrderedF32;
 pub const IOTA: Number = ordered_f32::OrderedF32(0.0000001);
+
+
