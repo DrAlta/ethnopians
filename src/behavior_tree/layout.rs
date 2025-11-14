@@ -1,4 +1,6 @@
-use crate::{vec2, Number, Vec2};
+use geometwo::vec2;
+
+use crate::{Number, Vec2};
 pub struct Layout {
     child: Vec<Layout>,
 }

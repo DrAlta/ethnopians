@@ -2,10 +2,8 @@ use std::collections::HashMap;
 
 //use broad_phase::{Entity, EntityId as SpatialId, SpatialBloom};
 
-use crate::{
-    broadphase::{Broadphase, SpatialId},
-    types::AARect,
-};
+
+use geometwo::{AARect, broadphase::{Broadphase, SpatialId}};
 
 use crate::sandbox::EntityId;
 

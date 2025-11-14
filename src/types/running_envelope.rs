@@ -131,7 +131,7 @@ impl RunningEnvelope {
     pub fn position(&self, value: Number) -> Number {
         // Use the envelope's low and high as the endpoints.
         let range = self.high - self.low;
-        if range.abs() < IOTA {
+        if range.abs() < *IOTA {
             return Number::ZERO;
         }
         // Normalize the input value: t in [0,1]
@@ -140,7 +140,7 @@ impl RunningEnvelope {
         let t_avg = ((self.avg - self.low) / range).clamp(Number::ZERO, Number::ONE);
 
         // Avoid division-by-zero if avg is extremely close to low or high.
-        if t_avg.abs() < IOTA || (Number::ONE - t_avg).abs() < IOTA {
+        if t_avg.abs() < *IOTA || (Number::ONE - t_avg).abs() < *IOTA {
             // Fall back to a simple linear mapping from -1 to 1.
             return Number::TWO * t - Number::ONE;
         }

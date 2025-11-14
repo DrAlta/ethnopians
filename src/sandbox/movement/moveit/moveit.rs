@@ -1,10 +1,9 @@
 use std::collections::{BTreeSet, HashMap};
 
-use crate::{
-    broadphase::{Broadphase, SpatialId},
-    types::AARect,
-    Number,
-};
+use geometwo::{AARect, broadphase::{Broadphase, SpatialId}};
+
+use crate::Number;
+
 use qol::logy;
 
 use crate::sandbox::EntityId;

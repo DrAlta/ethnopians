@@ -21,7 +21,7 @@ pub fn arousal_threshold(
 
     // Calculate the number of tame massages needed to offset the apprehension gained from an erotic massage.
     // If the tame apprehension loss is too small, use a default value of 2 to avoid division by zero.
-    let num_tame_massages = if tame_apprehension_loss <= IOTA {
+    let num_tame_massages = if tame_apprehension_loss <= *IOTA {
         (erotic_apprehension_gain / tame_apprehension_loss).ceil() + Number::ONE
     } else {
         Number::TWO

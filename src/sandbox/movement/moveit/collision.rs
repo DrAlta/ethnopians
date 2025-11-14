@@ -1,9 +1,6 @@
 use std::collections::{BTreeSet, HashMap};
 
-use crate::{
-    broadphase::{Broadphase, SpatialId},
-    types::AARect,
-};
+use geometwo::{AARect, broadphase::{Broadphase, SpatialId}};
 
 use crate::sandbox::{movement::Prev, EntityId};
 
