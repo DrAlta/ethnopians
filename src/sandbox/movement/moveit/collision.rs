@@ -17,7 +17,7 @@ use super::Avalibility;
 /// - `map`: Mutable reference to the spatial map for collision detection.
 /// - `prev`: Provides access to previous state information of entities.
 /// - `collisions`: Mutable reference to the set recording collision pairs.
-pub fn collision<T: Prev, B: Broadphase>(
+pub fn collision<T: Prev, B: Broadphase<SpatialId>>(
     mut todo: BTreeSet<EntityId>,
     aval: &mut HashMap<SpatialId, Avalibility>,
     map: &mut B,
@@ -81,7 +81,7 @@ pub fn collision<T: Prev, B: Broadphase>(
 
         // If necessary, place a 'RearEnded' status at the entity's previous location.
         if add_rearended {
-            let k = map.insert(AARect::new(x.clone(), y.clone(), size.0, size.1));
+            let k = map.insert(AARect::from_min_w_h(x.clone(), y.clone(), size.0, size.1));
             aval.insert(k, Avalibility::RearEnded(unit_id.clone()));
         }
     }

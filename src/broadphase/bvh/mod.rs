@@ -1,3 +1,5 @@
+mod bvh;
+pub use bvh::BVH;
 mod expand_bits;
 pub use expand_bits::expand_bits;
 mod calculate_morton_code;

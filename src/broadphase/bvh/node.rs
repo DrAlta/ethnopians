@@ -1,24 +1,47 @@
 use std::{
-    collections::{BTreeSet, HashMap},
-    fmt::Debug,
-    hash::Hash,
+    collections::{BTreeSet, HashMap}, fmt::Debug, hash::Hash
 };
 
 use crate::{
-    broadphase::bvh::{calculate_morton_code, create_subtree, intersect, MortenCode, NodeType},
-    types::AARect,
-    Number,
+    Number, broadphase::bvh::{MortenCode, NodeType, create_subtree, calculate_morton_code, intersect}, types::AARect
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Node<Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::hash::Hash> {
-    pub min_x: Number,
-    pub min_y: Number,
-    pub max_x: Number,
-    pub max_y: Number,
-
+pub struct Node<Id>{//: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::hash::Hash> {
+    pub bounds: AARect,
     pub node_type: NodeType<Id>,
 }
+impl<Id: Clone> Node<Id> {
+    pub fn add(&mut self, id: Id, aa_rect: AARect, mut path: Vec<bool>) -> Vec<bool> {
+        let new_bounds = self.bounds.union(&aa_rect);
+        let old_bounds = std::mem::replace(&mut self.bounds, new_bounds);
+
+        match &mut self.node_type {
+            NodeType::Leaf(old_id) => {
+
+                let left_node = Node{ bounds: old_bounds, node_type: NodeType::Leaf(old_id.clone()) };
+                let left = Box::new(left_node);
+
+                let right_node = Node{ bounds: aa_rect, node_type: NodeType::Leaf(id) };
+                let right = Box::new(right_node);
+
+                self.node_type = NodeType::Branch { left, right };
+                path.push(false);
+                path
+            },
+            NodeType::Branch { left, right } => {
+                if aa_rect.better_to_merg_with_a_than_b_ka(&left.bounds, &right.bounds) {
+                    path.push(true);
+                    left.add(id, aa_rect, path)
+                } else {
+                    path.push(false);
+                    right.add(id, aa_rect, path)
+                }
+
+            },
+        }
+    }
+} 
 
 impl<Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::hash::Hash> Node<Id> {
     pub fn create_tree(entities: &HashMap<Id, AARect>) -> Result<Self, String> {
@@ -27,49 +50,34 @@ impl<Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::hash
         let Some(first_id) = iter1.next() else {
             return Err("No items to build tree from".to_owned());
         };
-        let Some(AARect {
-            min_x,
-            min_y,
-            width,
-            height,
-        }) = entities.get(&first_id).cloned()
+        let Some(aa_rect) = entities.get(&first_id).cloned()
         else {
             return Err(format!(
                 "Couldn't find world size:couldn't get AArect for {first_id:?}"
             ));
         };
-        let mut world_min_x = min_x;
-        let mut world_min_y = min_y;
-        let mut world_max_x = min_x + width;
-        let mut world_max_y = min_y + height;
+        let mut world_min_x = aa_rect.min_x();
+        let mut world_min_y = aa_rect.min_y();
+        let mut world_max_x = aa_rect.max_x();
+        let mut world_max_y = aa_rect.max_y();
 
         for id in iter1 {
-            let Some(AARect {
-                min_x,
-                min_y,
-                width,
-                height,
-            }) = entities.get(&id).cloned()
+            let Some(aa_rect2) = entities.get(&id).cloned()
             else {
                 return Err(format!(
                     "Couldn't find world size::couldn't get AArech for {id:?}"
                 ));
             };
-            world_min_x = world_min_x.min(min_x);
-            world_min_y = world_min_y.min(min_y);
-            world_max_x = world_max_x.max(min_x + width);
-            world_max_y = world_max_y.max(min_y + height);
+            world_min_x = world_min_x.min(aa_rect2.min_x());
+            world_min_y = world_min_y.min(aa_rect2.min_y());
+            world_max_x = world_max_x.max(aa_rect2.max_x());
+            world_max_y = world_max_y.max(aa_rect2.max_y());
         }
         let mut acc: Vec<(Id, MortenCode)> = Vec::new();
         for (id, aa_ref) in entities {
-            let AARect {
-                min_x,
-                min_y,
-                width,
-                height,
-            } = aa_ref.clone();
-            let x = min_x + (width * Number::HALF);
-            let y = min_y + (height * Number::HALF);
+            let aa_rect3 = aa_ref.clone();
+            let x = aa_rect3.min_x() + (aa_rect3.width() * Number::HALF);
+            let y = aa_rect3.min_y() + (aa_rect3.height() * Number::HALF);
             let morten = calculate_morton_code(
                 &x,
                 &y,
@@ -109,10 +117,10 @@ impl<Id: std::fmt::Debug + Clone + PartialEq + Eq + PartialOrd + Ord + std::hash
             min_y,
             max_x,
             max_y,
-            &self.min_x,
-            &self.min_y,
-            &self.max_x,
-            &self.max_y,
+            &self.bounds.min_x(),
+            &self.bounds.min_y(),
+            &self.bounds.max_x(),
+            &self.bounds.max_y(),
         ) {
             return BTreeSet::new();
         }

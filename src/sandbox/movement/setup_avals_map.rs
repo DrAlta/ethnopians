@@ -11,7 +11,7 @@ use crate::sandbox::EntityId;
 
 use super::moveit::Avalibility;
 
-pub fn setup_avals_map<B: Broadphase>(
+pub fn setup_avals_map<B: Broadphase<SpatialId>>(
     collisions: HashMap<EntityId, AARect>,
     rearendings: HashMap<EntityId, AARect>,
 ) -> (HashMap<SpatialId, Avalibility>, B) {

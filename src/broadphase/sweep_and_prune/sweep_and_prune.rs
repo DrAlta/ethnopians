@@ -61,14 +61,14 @@ impl SweepAndPrune {
         for i in 0..sorted.len() {
             let Entry { aabb, entity_id } = &sorted[i];
 
-            if aabb.min_x > max_x {
+            if aabb.min_x() > max_x {
                 break;
             }
 
-            if max_y > aabb.min_y
-                && aabb.min_y + aabb.height > min_y
-                && max_x > aabb.min_x
-                && aabb.min_x + aabb.width > min_x
+            if max_y > aabb.min_y()
+                && aabb.min_y() + aabb.height() > min_y
+                && max_x > aabb.min_x()
+                && aabb.min_x() + aabb.width() > min_x
             {
                 ret.insert(*entity_id);
             }
@@ -94,21 +94,21 @@ impl SweepAndPrune {
                 entity_id: one_id,
             } = &self.sorted[i];
             //let one_left = one.min_x;
-            let one_right = one.min_x + one.width;
+            let one_right = one.min_x() + one.width();
 
             for j in i..self.sorted.len() {
                 let Entry {
                     aabb: two,
                     entity_id: two_id,
                 } = &self.sorted[j];
-                let two_left = two.min_x;
+                let two_left = two.min_x();
                 //let two_right = two.min_x + two.width;
 
                 if two_left > one_right {
                     break;
                 }
 
-                if one.min_y + one.height > two.min_y && two.min_y + two.height > one.min_y {
+                if one.min_y() + one.height() > two.min_y() && two.min_y() + two.height() > one.min_y() {
                     ret.insert(*one_id);
                     ret.insert(*two_id);
                 }
@@ -118,7 +118,7 @@ impl SweepAndPrune {
     }
 }
 
-impl Broadphase for SweepAndPrune {
+impl Broadphase<SpatialId> for SweepAndPrune {
     fn new<I: Iterator<Item = AARect>>(entities: I) -> Self {
         SweepAndPrune::new(entities)
     }

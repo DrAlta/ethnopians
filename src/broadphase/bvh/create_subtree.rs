@@ -16,20 +16,12 @@ where
 {
     if begin == end {
         let id = sorted_list[begin].0.clone();
-        let Some(AARect {
-            min_x,
-            min_y,
-            width,
-            height,
-        }) = entities.get(&id).cloned()
+        let Some(aa_rect) = entities.get(&id).cloned()
         else {
             return Err(format!("faild fo find AArect for {id:?}"));
         };
-        return Ok(Node {
-            min_x,
-            min_y,
-            max_x: min_x + width,
-            max_y: min_y + height,
+        return Ok(Node{
+            bounds: aa_rect,
             node_type: NodeType::Leaf(id),
         });
     } else {
@@ -44,17 +36,18 @@ where
         );
 
         // Update node's AABB to encompass children's AABBs
-        let min_x = left.min_x.min(right.min_x);
-        let min_y = left.min_y.min(right.min_y);
+        let min_x = left.bounds.min_x().min(right.bounds.min_x());
+        let min_y = left.bounds.min_y().min(right.bounds.min_y());
 
-        let max_x = left.max_x.min(right.max_x);
-        let max_y = left.max_y.min(right.max_y);
+        let max_x = left.bounds.max_x().min(right.bounds.max_x());
+        let max_y = left.bounds.max_y().min(right.bounds.max_y());
 
         return Ok(Node {
+            bounds: AARect::from_min_max(
             min_x,
             min_y,
             max_x,
-            max_y,
+            max_y),
             node_type: NodeType::Branch { left, right },
         });
     }
