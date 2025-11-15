@@ -15,7 +15,7 @@ macros = {path = "./macros"}
 base64 = "0.22.1"
 bevy = {version = "0.15.1", features = ["dynamic_linking"], optional = true }
 derive_more = { version = "1.0.0", features = ["add", "add_assign", "mul"] }
-geometwo = { git ="ssh://hsingai@altaserver.local:/media/hsingai/bigdrive/smb/Gits/rust-geometried-2d.git" , version = "0.1.9", features = ["macroquad"] }
+geometwo = { git ="ssh://hsingai@altaserver.local:/media/hsingai/bigdrive/smb/Gits/rust-geometried-2d.git" , version = "0.1.10", features = ["macroquad"] }
 nom = "7.1.3"
 
 fraction64 = { version = "0.1.15", git = "https://github.com/DrAlta/fraction64.git"}
