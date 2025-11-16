@@ -1,3 +1,7 @@
+use std::collections::BTreeMap;
+
+use ethnolib::stand_alone_complex::gossip::{Character, Opinion, PersonalityTraits, Relationship};
+
 fn main() {
     use std::collections::HashMap;
 
@@ -11,15 +15,15 @@ fn main() {
         id: 1,
         name: String::from("Alice"),
         personality: PersonalityTraits {
-            forgiveness_for_common_beliefs: 0.7,
-            confirmation_bias: 0.6,
-            gullibility_for_confirmation: 0.5,
-            conformity: 0.4,
-            skepticism: 0.3,
-            opinion_weight_bias: 0.0, // Equally weighs affection and trust.
+            forgiveness_for_common_beliefs: 0.7.into(),
+            confirmation_bias: 0.6.into(),
+            gullibility_for_confirmation: 0.5.into(),
+            conformity: 0.4.into(),
+            skepticism: 0.3.into(),
+            opinion_weight_bias: 0.0.into(), // Equally weighs affection and trust.
         },
-        relationships: HashMap::new(),
-        perceptions: HashMap::new(),
+        relationships: BTreeMap::new(),
+        perceptions: BTreeMap::new(),
     };
 
     // Bob
@@ -27,15 +31,15 @@ fn main() {
         id: 2,
         name: String::from("Bob"),
         personality: PersonalityTraits {
-            forgiveness_for_common_beliefs: 0.5,
-            confirmation_bias: 0.5,
-            gullibility_for_confirmation: 0.5,
-            conformity: 0.5,
-            skepticism: 0.5,
-            opinion_weight_bias: -0.5, // Favors trust over affection.
+            forgiveness_for_common_beliefs: 0.5.into(),
+            confirmation_bias: 0.5.into(),
+            gullibility_for_confirmation: 0.5.into(),
+            conformity: 0.5.into(),
+            skepticism: 0.5.into(),
+            opinion_weight_bias: (-0.5).into(), // Favors trust over affection.
         },
-        relationships: HashMap::new(),
-        perceptions: HashMap::new(),
+        relationships: BTreeMap::new(),
+        perceptions: BTreeMap::new(),
     };
 
     // Carol
@@ -43,15 +47,15 @@ fn main() {
         id: 3,
         name: String::from("Carol"),
         personality: PersonalityTraits {
-            forgiveness_for_common_beliefs: 0.6,
-            confirmation_bias: 0.7,
-            gullibility_for_confirmation: 0.4,
-            conformity: 0.5,
-            skepticism: 0.6,
-            opinion_weight_bias: 0.5, // Favors affection over trust.
+            forgiveness_for_common_beliefs: 0.6.into(),
+            confirmation_bias: 0.7.into(),
+            gullibility_for_confirmation: 0.4.into(),
+            conformity: 0.5.into(),
+            skepticism: 0.6.into(),
+            opinion_weight_bias: 0.5.into(), // Favors affection over trust.
         },
-        relationships: HashMap::new(),
-        perceptions: HashMap::new(),
+        relationships: BTreeMap::new(),
+        perceptions: BTreeMap::new(),
     };
 
     // --- Add Characters to the Global Collection ---
@@ -67,16 +71,16 @@ fn main() {
         alice.relationships.insert(
             2, // Bob's ID
             Relationship {
-                affection: 0.8, // Alice likes Bob a lot.
-                trust: 0.9,     // Alice trusts Bob highly.
+                affection: 0.8.into(), // Alice likes Bob a lot.
+                trust: 0.9.into(),     // Alice trusts Bob highly.
             },
         );
         // Relationship with Carol
         alice.relationships.insert(
             3, // Carol's ID
             Relationship {
-                affection: 0.4, // Alice somewhat likes Carol.
-                trust: 0.7,     // Alice somewhat trusts Carol.
+                affection: 0.4.into(), // Alice somewhat likes Carol.
+                trust: 0.7.into(),     // Alice somewhat trusts Carol.
             },
         );
     }
@@ -87,27 +91,27 @@ fn main() {
         bob.relationships.insert(
             1, // Alice's ID
             Relationship {
-                affection: 0.6, // Bob likes Alice.
-                trust: 0.8,     // Bob trusts Alice.
+                affection: 0.6.into(), // Bob likes Alice.
+                trust: 0.8.into(),     // Bob trusts Alice.
             },
         );
         // Relationship with Carol
         bob.relationships.insert(
             3, // Carol's ID
             Relationship {
-                affection: -0.2, // Bob slightly dislikes Carol.
-                trust: 0.5,      // Bob has neutral trust in Carol.
+                affection: (-0.2).into(), // Bob slightly dislikes Carol.
+                trust: 0.5.into(),      // Bob has neutral trust in Carol.
             },
         );
 
         // Bob's perception of Alice's feelings towards Carol
         bob.perceptions
             .entry(1) // Subject: Alice
-            .or_insert_with(HashMap::new)
+            .or_insert_with(BTreeMap::new)
             .insert(
                 3, // Target/Victim: Carol
                 Opinion {
-                    affection: -0.5, // Bob believes Alice dislikes Carol.
+                    affection: (-0.5).into(), // Bob believes Alice dislikes Carol.
                 },
             );
     }
@@ -118,27 +122,27 @@ fn main() {
         carol.relationships.insert(
             1, // Alice's ID
             Relationship {
-                affection: 0.7, // Carol likes Alice.
-                trust: 0.6,     // Carol somewhat trusts Alice.
+                affection: 0.7.into(), // Carol likes Alice.
+                trust: 0.6.into(),     // Carol somewhat trusts Alice.
             },
         );
         // Relationship with Bob
         carol.relationships.insert(
             2, // Bob's ID
             Relationship {
-                affection: -0.6, // Carol dislikes Bob.
-                trust: 0.4,      // Carol doesn't trust Bob much.
+                affection: (-0.6).into(), // Carol dislikes Bob.
+                trust: 0.4.into(),      // Carol doesn't trust Bob much.
             },
         );
 
         // Carol's perception of Bob's feelings towards Alice
         carol.perceptions
             .entry(2) // Subject: Bob
-            .or_insert_with(HashMap::new)
+            .or_insert_with(BTreeMap::new)
             .insert(
                 1, // Target/Victim: Alice
                 Opinion {
-                    affection: 0.3, // Carol thinks Bob somewhat likes Alice.
+                    affection: 0.3.into(), // Carol thinks Bob somewhat likes Alice.
                 },
             );
     }
