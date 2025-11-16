@@ -2,9 +2,7 @@ use std::collections::HashMap;
 
 use qol::logy;
 
-use crate::pubsub::v2::{join::foo2, Datum, DatumType, Relation};
-
-use super::Lookup;
+use super::{foo2, Lookup, super::{Datum, DatumType, Relation}};
 
 pub fn join<const SIZE: usize, const N: usize>(
     variables: [Vec<((&str, &str), (&str, &str))>; N],

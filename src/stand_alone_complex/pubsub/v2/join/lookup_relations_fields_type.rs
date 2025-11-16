@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::pubsub::v2::{DatumType, Relation};
+use super::super::{DatumType, Relation};
 pub(super) trait Lookup {
     fn lookup_relations_fields_type(&self, table_id: &str, field_id: &str) -> Option<DatumType>;
 }

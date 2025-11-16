@@ -1,5 +1,6 @@
-use crate::pubsub::v2::{empty_i8, empty_string, Column, Datum, DatumType, Foo, Sting};
 use std::sync::Arc;
+
+use super::{empty_i8, empty_string, Column, Datum, DatumType, Foo, Sting};
 
 #[derive(Debug)]
 pub struct Relation<const SIZE: usize> {

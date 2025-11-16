@@ -1,7 +1,6 @@
-use crate::{
-    probing::{MassageSkill, Massagee, Masseuse},
-    Number,
-};
+use crate::Number;
+
+use super::{MassageSkill, Massagee, Masseuse};
 
 /// Calculate the change in the massagee's arousal based on their current state, the masseuse's skills, and the massage skill being used.
 /// This function is used to determine how the massagee's arousal changes in response to different massage techniques.

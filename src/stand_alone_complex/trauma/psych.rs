@@ -2,10 +2,9 @@ use std::collections::BTreeMap;
 
 use qol::AddOrInsert;
 
-use crate::{
-    trauma::{Event, TraumaExperience, TraumaExperienceId, TraumaExperienceType},
-    Number,
-};
+use crate::Number;
+
+use super::{Event, TraumaExperience, TraumaExperienceId, TraumaExperienceType};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Psych {

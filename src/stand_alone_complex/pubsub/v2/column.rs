@@ -1,7 +1,7 @@
-use crate::pubsub::v2::DatumType;
 use std::sync::LazyLock;
 
-use super::Sting;
+use super::{DatumType, Sting};
+
 #[derive(Debug)]
 pub enum Column {
     I8(Vec<i8>),

@@ -1,6 +1,8 @@
 use qol::AsA;
 
-use crate::{Number, museum::Exhibit};
+use crate::Number;
+
+use super::Exhibit;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Guest {

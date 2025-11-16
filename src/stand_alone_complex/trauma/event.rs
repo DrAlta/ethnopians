@@ -1,4 +1,5 @@
-use crate::{trauma::TraumaExperienceType, Number};
+use crate::Number;
+use super::TraumaExperienceType;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Event {
