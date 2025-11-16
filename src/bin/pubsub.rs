@@ -1,6 +1,6 @@
 use std::collections::{BTreeSet, HashMap};
 
-use ethnolib::pubsub::v2::{join, Column, Relation};
+use ethnolib::stand_alone_complex::pubsub::v2::{join, Column, Relation};
 use qol::assert_specimen;
 
 fn main() {
@@ -20,7 +20,7 @@ fn main() {
         .into_iter()
         .collect();
     println!("{x:?}",);
-    use ethnolib::pubsub::v2::Datum::I8;
+    use ethnolib::stand_alone_complex::pubsub::v2::Datum::I8;
     assert_specimen!(
         x,
         BTreeSet::from([[I8(4)], [I8(1)], [I8(2)], [I8(4)], [I8(2)]])
