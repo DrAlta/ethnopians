@@ -54,26 +54,4 @@ impl Customer{
 }
 
 
-type Number =f64;
 
-pub fn kelly_criterion(probability_of_winning: Number, fraction_gain_on_win: Number, fraction_lost_on_lose: Number) -> Number {
-    let probability_of_loosing = 1.0 - probability_of_winning;
-    let fraction_to_bet = (probability_of_winning / fraction_lost_on_lose)- ( probability_of_loosing / fraction_gain_on_win);
-    fraction_to_bet
-}
-
-pub fn kelly_simple(probability_of_winning: Number, fraction_gain_on_win: Number) -> Number {
-    probability_of_winning - ((1.0 - probability_of_winning)/fraction_gain_on_win)
-}
-
-fn main(){
-    let fraction_gain_on_win = 1.0;   
-    let fraction_lost_on_lose = 1.0;
-    let probability_of_winning = 0.6;
-    
-    assert_eq!(
-        kelly_simple(probability_of_winning, fraction_gain_on_win),
-        kelly_criterion(probability_of_winning, fraction_gain_on_win, fraction_lost_on_lose)
-    );
-    
-}
