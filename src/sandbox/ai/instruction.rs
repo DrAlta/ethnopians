@@ -167,10 +167,10 @@ impl Instruction {
             }
             Instruction::ForthDistance => {
                 let Some(StackItem::Coord { .. }) = stack.last() else {
-                    return Err("top of stack not a number".into());
+                    return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
                 };
                 let Some(StackItem::Coord { .. }) = stack.get(stack.len() - 2) else {
-                    return Err("next of stack not a number".into());
+                    return Err(format!("{}:{}:next of stack not a number", file!(), line!()));
                 };
                 let Some(StackItem::Coord { x: tos_x, y: tos_y }) = stack.pop() else {
                     unreachable!()
@@ -190,14 +190,14 @@ impl Instruction {
             }
             Instruction::ForthDrop => {
                 if stack.is_empty() {
-                    return Err("nothing on sack".into());
+                    return Err(format!("{}:{}:nothing on sack", file!(), line!()));
                 };
                 stack.pop();
                 Self::next(Status::None, pc)
             }
             Instruction::ForthDup => {
                 let Some(tos) = stack.last() else {
-                    return Err("top of stack not a number".into());
+                    return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
                 };
                 stack.push(tos.clone());
                 Self::next(Status::None, pc)
@@ -213,10 +213,10 @@ impl Instruction {
             }
             Instruction::ForthFindNearest => {
                 let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos wasn't a sting".to_owned());
+                    return Err(format!("{}:{}:tos wasn't a sting".to_owned());
                 };
                 let Some(StackItem::Coord { .. }) = stack.get(stack.len() - 2) else {
-                    return Err("nos wasn't an coord".to_owned());
+                    return Err(format!("{}:{}:nos wasn't an coord".to_owned());
                 };
                 let Some(StackItem::String(item_class)) = stack.pop() else {
                     unreachable!()
@@ -243,7 +243,7 @@ impl Instruction {
             }
             Instruction::ForthGetEnergy => {
                 let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos wasn't a sting".to_owned());
+                    return Err(format!("{}:{}:tos wasn't a sting".to_owned());
                 };
                 let Some(StackItem::String(key)) = stack.pop() else {
                     unreachable!()
@@ -261,7 +261,7 @@ impl Instruction {
             }
             Instruction::ForthGetLocation => {
                 let Some(StackItem::EntityId(_)) = stack.last() else {
-                    return Err("tos wasn't an EntityId".to_owned());
+                    return Err(format!("{}:{}:tos wasn't an EntityId".to_owned());
                 };
                 let Some(StackItem::EntityId(entity_id)) = stack.pop() else {
                     unreachable!()
@@ -282,7 +282,7 @@ impl Instruction {
             }
             Instruction::ForthGetHP => {
                 let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos wasn't a sting".to_owned());
+                    return Err(format!("{}:{}:tos wasn't a sting".to_owned());
                 };
                 let Some(StackItem::String(key)) = stack.pop() else {
                     unreachable!()
@@ -309,7 +309,7 @@ impl Instruction {
             }
             Instruction::ForthGetBlackboard => {
                 let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos wasn't a sting".to_owned());
+                    return Err(format!("{}:{}:tos wasn't a sting".to_owned());
                 };
                 let Some(StackItem::String(key)) = stack.pop() else {
                     unreachable!()
@@ -343,7 +343,7 @@ impl Instruction {
             }
             Instruction::ForthIf(skip) => {
                 let Some((_, idx)) = pc else {
-                    return Err("unexptect end of program".to_owned());
+                    return Err(format!("{}:{}:unexptect end of program".to_owned());
                 };
                 *idx += 1;
                 if Some(StackItem::True) != stack.pop() {
@@ -461,7 +461,7 @@ impl Instruction {
             }
             Instruction::ForthSwap => {
                 let Some(_) = stack.get(stack.len() - 2) else {
-                    return Err("no nos".to_owned());
+                    return Err(format!("{}:{}:no nos".to_owned());
                 };
                 let Some(tos) = stack.pop() else {
                     unreachable!()
@@ -476,7 +476,7 @@ impl Instruction {
             Instruction::ForthReturn => Self::exit(Status::None, return_stack, pc),
             Instruction::ToDoIsEmpty => {
                 let Some(StackItem::Todo(x)) = stack.last() else {
-                    return Err("TOS wasn't a ToDo".to_owned());
+                    return Err(format!("{}:{}:TOS wasn't a ToDo".to_owned());
                 };
                 stack.push(if x.is_empty(){StackItem::True}else{StackItem::False});
                 Self::next(Status::None, pc)
@@ -484,12 +484,12 @@ impl Instruction {
             Instruction::ToDoGetEntities => {
                 let (nos, tos) = Self::get_two_coords(stack)?;
                 let Some((sb, map)) = world.get_spatial_bloom() else {
-                    return Err("world had no SpatailBloom".to_owned());
+                    return Err(format!("{}:{}:world had no SpatailBloom".to_owned());
                 };
                 let mut x =Vec::new();
                 for y in sb.qurry(nos.0 as f32,nos.1 as f32, tos.0 as f32, tos.1 as f32) {
                     let Some(thing) = map.get(&y) else {
-                        return Err(format!("SpatialBloom returned {y:?} but that id isn't mapped to any entities"))
+                        return Err(format!("{}:{}:SpatialBloom returned {y:?} but that id isn't mapped to any entities", file!(), line!()))
                     };
                     x.push(thing.clone());
                 };
@@ -498,15 +498,15 @@ impl Instruction {
             }
             Instruction::ToDoRemoveEntitiesOfType => {
                 let Some(StackItem::String(stack_string)) = stack.last() else {
-                    return Err("top of stack not a number".into());
+                    return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
                 };
                 let stack_str: &str = stack_string;
                 let Ok(item_type_from_stack) = stack_str.try_into() else {
-                    return Err(format!("couldn't convert {stack_str:?} to type"));
+                    return Err(format!("{}:{}:couldn't convert {stack_str:?} to type", file!(), line!()));
                 };
 
                 let Some(StackItem::Todo(_)) = stack.get(stack.len() - 2) else {
-                    return Err("next of stack not a number".into());
+                    return Err(format!("{}:{}:next of stack not a number", file!(), line!()));
                 };
                 let Some(StackItem::String(_)) = stack.pop() else {
                     unreachable!()
@@ -599,10 +599,10 @@ impl Instruction {
     }
     pub fn get_two_coords(stack: &mut Stack) -> Result<((i32,i32), (i32,i32)), String> {
         let Some(StackItem::Coord{..}) = stack.last() else {
-            return Err("top of stack not a number".into());
+            return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
         };
         let Some(StackItem::Coord{..}) = stack.get(stack.len() - 2) else {
-            return Err("next of stack not a number".into());
+            return Err(format!("{}:{}:next of stack not a number", file!(), line!()));
         };
         let Some(StackItem::Coord{x:tos_x, y:tos_y}) = stack.pop() else {
             unreachable!()
@@ -614,10 +614,10 @@ impl Instruction {
     }
     pub fn get_two_ints(stack: &mut Stack) -> Result<(i32, i32), String> {
         let Some(StackItem::Int(_)) = stack.last() else {
-            return Err("top of stack not a number".into());
+            return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
         };
         let Some(StackItem::Int(_)) = stack.get(stack.len() - 2) else {
-            return Err("next of stack not a number".into());
+            return Err(format!("{}:{}:next of stack not a number", file!(), line!()));
         };
         let Some(StackItem::Int(tos)) = stack.pop() else {
             unreachable!()

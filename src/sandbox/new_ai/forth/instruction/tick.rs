@@ -51,13 +51,13 @@ impl Instruction {
             }
             Instruction::Distance => {
                 if stack.len() < 2 {
-                    return Err("less that 2 items on stack".to_owned());
+                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
                 };
                 let Some(StackItem::Coord { .. }) = stack.last() else {
-                    return Err("top of stack not a number".into());
+                    return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
                 };
                 let Some(StackItem::Coord { .. }) = stack.get(stack.len() - 2) else {
-                    return Err("next of stack not a number".into());
+                    return Err(format!("{}:{}:next of stack not a number", file!(), line!()));
                 };
                 let Some(StackItem::Coord { x: tos_x, y: tos_y }) = stack.pop() else {
                     unreachable!()
@@ -77,21 +77,21 @@ impl Instruction {
             }
             Instruction::Drop => {
                 if stack.is_empty() {
-                    return Err("nothing on sack".into());
+                    return Err(format!("{}:{}:nothing on sack", file!(), line!()));
                 };
                 stack.pop();
                 Self::next(Status::None, pc)
             }
             Instruction::Dup => {
                 let Some(tos) = stack.last() else {
-                    return Err("top of stack not a number".into());
+                    return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
                 };
                 stack.push(tos.clone());
                 Self::next(Status::None, pc)
             }
             Instruction::Eq => {
                 if stack.len() < 2 {
-                    return Err("less that two items on the stack".to_owned());
+                    return Err(format!("{}:{}:less that two items on the stack", file!(), line!()));
                 };
                 let tos = stack.pop().unwrap();
                 let nos = stack.pop().unwrap();
@@ -104,26 +104,26 @@ impl Instruction {
             }
             Instruction::FindInInventory => {
                 let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos wasn't a sting".to_owned());
+                    return Err(format!("{}:{}:tos wasn't a sting", file!(), line!()));
                 };
                 let Some(StackItem::String(item_class_string)) = stack.pop() else {
                     unreachable!()
                 };
                 let Ok(item_class) = item_class_string.try_into() else {
-                    return Err("item class was not valid".to_owned());
+                    return Err(format!("{}:{}:item class was not valid", file!(), line!()));
                 };
                 Self::next(Status::FindInInventory { item_class }, pc)
             }
             // ForthFindNearest should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::FindNearest => {
                 if stack.len() < 2 {
-                    return Err("less that 2 items on stack".to_owned());
+                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
                 };
                 let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos wasn't a sting".to_owned());
+                    return Err(format!("{}:{}:tos wasn't a sting", file!(), line!()));
                 };
                 let Some(StackItem::Coord { .. }) = stack.get(stack.len() - 2) else {
-                    return Err("nos wasn't an coord".to_owned());
+                    return Err(format!("{}:{}:nos wasn't an coord", file!(), line!()));
                 };
                 let Some(StackItem::String(item_class_string)) = stack.pop() else {
                     unreachable!()
@@ -132,14 +132,14 @@ impl Instruction {
                     unreachable!()
                 };
                 let Ok(item_class) = item_class_string.try_into() else {
-                    return Err("item class was not valid".to_owned());
+                    return Err(format!("{}:{}:item class was not valid", file!(), line!()));
                 };
                 Self::next(Status::FindNearest { x, y, item_class }, pc)
             }
             // ForthGetEnergy should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::GetEnergy => {
                 let Some(StackItem::EntityId(_)) = stack.last() else {
-                    return Err("tos wasn't an EntityId".to_owned());
+                    return Err(format!("{}:{}:tos wasn't an EntityId", file!(), line!()));
                 };
                 let Some(StackItem::EntityId(entity_id)) = stack.pop() else {
                     unreachable!()
@@ -149,7 +149,7 @@ impl Instruction {
             // ForthGetLocation should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::GetLocation => {
                 let Some(StackItem::EntityId(_)) = stack.last() else {
-                    return Err("tos wasn't an EntityId".to_owned());
+                    return Err(format!("{}:{}:tos wasn't an EntityId", file!(), line!()));
                 };
                 let Some(StackItem::EntityId(entity_id)) = stack.pop() else {
                     unreachable!()
@@ -159,7 +159,7 @@ impl Instruction {
             // ForthGetHP should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::GetHP => {
                 let Some(StackItem::EntityId(_)) = stack.last() else {
-                    return Err("tos wasn't an EntityId".to_owned());
+                    return Err(format!("{}:{}:tos wasn't an EntityId", file!(), line!()));
                 };
                 let Some(StackItem::EntityId(entity_id)) = stack.pop() else {
                     unreachable!()
@@ -177,7 +177,7 @@ impl Instruction {
             }
             Instruction::GetBlackboard => {
                 let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos wasn't a sting".to_owned());
+                    return Err(format!("{}:{}:tos wasn't a sting", file!(), line!()));
                 };
                 let Some(StackItem::String(key)) = stack.pop() else {
                     unreachable!()
@@ -200,7 +200,7 @@ impl Instruction {
             }
             Instruction::If(skip) => {
                 let Some((_, idx)) = pc else {
-                    return Err("unexptect end of program".to_owned());
+                    return Err(format!("{}:{}:unexptect end of program", file!(), line!()));
                 };
                 *idx += 1;
                 if Some(StackItem::True) != stack.pop() {
@@ -210,27 +210,27 @@ impl Instruction {
             }
             Instruction::InventoryGE => {
                 if stack.len() < 2 {
-                    return Err("less that 2 items on stack".to_owned());
+                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
                 };
                 let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos was not an string".to_owned());
+                    return Err(format!("{}:{}:tos was not an string", file!(), line!()));
                 };
                 let Some(StackItem::Int(_)) = stack.get(stack.len() - 2) else {
-                    return Err("nos was not an Int".to_owned());
+                    return Err(format!("{}:{}:nos was not an Int", file!(), line!()));
                 };
                 let Some(StackItem::String(item_class_string)) = stack.pop() else {
-                    return Err("tos was not an string".to_owned());
+                    return Err(format!("{}:{}:tos was not an string", file!(), line!()));
                 };
                 let Some(StackItem::Int(amount)) = stack.pop() else {
-                    return Err("nos was not an INt".to_owned());
+                    return Err(format!("{}:{}:nos was not an INt", file!(), line!()));
                 };
                 let item_class_str: &str = &item_class_string;
                 let Ok(item_class) = item_class_str.try_into() else {
-                    return Err(format!("{item_class_string} is not a valid item class"));
+                    return Err(format!("{}:{}:{item_class_string} is not a valid item class", file!(), line!()));
                 };
 
                 let Some(&BlackboardValue::EntityId(agent)) = blackboard.get("self") else {
-                    return Err(format!("self not found in blackboard"));
+                    return Err(format!("{}:{}:self not found in blackboard", file!(), line!()));
                 };
                 Self::next(
                     Status::GetIsInventoryGE {
@@ -290,13 +290,13 @@ impl Instruction {
                     Some(_) => {
                         stack.push(StackItem::True);
                     }
-                    None => return Err("no top of stack".to_owned()),
+                    None => return Err(format!("{}:{}:no top of stack", file!(), line!())),
                 };
                 Self::next(Status::None, pc)
             }
             Instruction::Or => {
                 if stack.len() < 2 {
-                    return Err("less that 2 items on stack".to_owned());
+                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
                 };
                 let tos = stack.pop().unwrap();
                 let nos = stack.pop().unwrap();
@@ -315,7 +315,7 @@ impl Instruction {
             }
             Instruction::Rot => {
                 if stack.len() < 3 {
-                    return Err("less that 3 items on stack".to_owned());
+                    return Err(format!("{}:{}:less that 3 items on stack", file!(), line!()));
                 };
                 let x = stack.remove(stack.len() - 3);
                 stack.push(x);
@@ -324,10 +324,10 @@ impl Instruction {
             // like "!"'s stack diagram is "( n adr -- ). This uses TOS of the key and stores NOS under it
             Instruction::SetBlackboard => {
                 if stack.len() < 2 {
-                    return Err("less that 2 items on stack".to_owned());
+                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
                 };
                 let Some(StackItem::String(_)) = stack.last() else {
-                    return Err("tos not a string".to_owned());
+                    return Err(format!("{}:{}:tos not a string", file!(), line!()));
                 };
                 let Some(StackItem::String(key)) = stack.pop() else {
                     unreachable!()
@@ -340,7 +340,7 @@ impl Instruction {
             }
             Instruction::Stuff => {
                 let Some(StackItem::Table(_)) = stack.get(stack.len() - 3) else {
-                    return Err("3rd item wasn't a table".to_owned());
+                    return Err(format!("{}:{}:3rd item wasn't a table", file!(), line!()));
                 };
                 let Some(key) = stack.pop() else {
                     unreachable!()
@@ -398,7 +398,7 @@ impl Instruction {
             }
             Instruction::IsEmpty => {
                 let Some(StackItem::Table(x)) = stack.last() else {
-                    return Err("TOS wasn't a table".to_owned());
+                    return Err(format!("{}:{}:TOS wasn't a table", file!(), line!()));
                 };
                 let map_empty_ka = x.map.is_empty();
                 stack.push(if map_empty_ka {
@@ -410,7 +410,7 @@ impl Instruction {
             }
             Instruction::PopLast => {
                 let Some(StackItem::Table(x)) = stack.last_mut() else {
-                    return Err("TOS wasn't a table".to_owned());
+                    return Err(format!("{}:{}:TOS wasn't a table", file!(), line!()));
                 };
                 let last_maybe = Arc::make_mut(x).map.pop_last();
 
@@ -455,10 +455,10 @@ impl Instruction {
             }
             Instruction::Swap => {
                 if stack.len() < 2 {
-                    return Err("less that 2 items on stack".to_owned());
+                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
                 };
                 let Some(_) = stack.get(stack.len() - 2) else {
-                    return Err("no nos".to_owned());
+                    return Err(format!("{}:{}:no nos", file!(), line!()));
                 };
                 let Some(tos) = stack.pop() else {
                     unreachable!()
@@ -486,22 +486,22 @@ impl Instruction {
             }
             Instruction::RemoveEntitiesOfType => {
                 let Some(StackItem::String(stack_string)) = stack.last() else {
-                    return Err("top of stack not a number".into());
+                    return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
                 };
                 let stack_str: &str = stack_string;
                 let Ok(item_type_from_stack) = stack_str.try_into() else {
-                    return Err(format!("couldn't convert {stack_str:?} to type"));
+                    return Err(format!("{}:{}:couldn't convert {stack_str:?} to type", file!(), line!()));
                 };
                 stack.pop();
                 Self::next(Status::RemoveEntitiesOfType(item_type_from_stack), pc)
             }
             Instruction::RetainEntitiesOfType => {
                 let Some(StackItem::String(stack_string)) = stack.last() else {
-                    return Err("top of stack not a number".into());
+                    return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
                 };
                 let stack_str: &str = stack_string;
                 let Ok(item_type_from_stack) = stack_str.try_into() else {
-                    return Err(format!("couldn't convert {stack_str:?} to type"));
+                    return Err(format!("{}:{}:couldn't convert {stack_str:?} to type", file!(), line!()));
                 };
                 stack.pop();
                 Self::next(Status::RetainEntitiesOfType(item_type_from_stack), pc)

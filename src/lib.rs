@@ -2,6 +2,11 @@
 #![feature(btree_cursors)]
 use std::sync::LazyLock;
 
+pub use geometwo;
+
+#[cfg(feature = "bevy")]
+pub use bevy;
+
 pub mod sandbox;
 //pub mod social_sim;//! this is supersecced by the ensemblage crate
 pub mod stand_alone_complex;

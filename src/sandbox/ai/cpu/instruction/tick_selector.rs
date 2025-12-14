@@ -15,7 +15,7 @@ pub fn tick_selector(
     logy!("trace-tick-selector", "return stack:{return_stack:?}");
 
     let Some(tos) = stack.pop() else {
-        return Err("Nothing on stack when checking result of child".into());
+        return Err(format!("{}:{}:Nothing on stack when checking result of child", file!(), line!()));
     };
 
     if StackItem::init() == tos {
@@ -26,7 +26,7 @@ pub fn tick_selector(
         );
         stack.push(StackItem::init());
         let Some(child_token) = children.first() else {
-            return Err("failed to get first child".into());
+            return Err(format!("{}:{}:failed to get first child", file!(), line!()));
         };
         logy!("trace-tick-selector", "Initalizing Selector");
         return_stack.push(pc.clone().unwrap());
@@ -43,13 +43,13 @@ pub fn tick_selector(
 
     let Some(StackItem::Table(x)) = stack.pop() else {
         logy!("debug", "stack:{stack:?}");
-        return Err("Selector state not found on stack".into());
+        return Err(format!("{}:{}:Selector state not found on stack", file!(), line!()));
     };
     let TableInterior { map } = x.as_ref();
 
     let Some(StackItem::Int(idx)) = map.table_get("Selector") else {
         logy!("debug", "map:{map:#?}");
-        return Err("Selector state not found on stack".into());
+        return Err(format!("{}:{}:Selector state not found on stack", file!(), line!()));
     };
     logy!("trace-tick-selector", "stack:{stack:?}");
 
@@ -101,7 +101,7 @@ pub fn tick_selector(
             *pc = Some((child_token.clone(), 0));
             return Ok(Status::None);
         }
-        (_, _) => return Err("TOS wasn't a Success or a Failure".into()),
+        (_, _) => return Err(format!("{}:{}:TOS wasn't a Success or a Failure", file!(), line!())),
     }
 }
 #[cfg(test)]

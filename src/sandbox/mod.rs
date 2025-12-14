@@ -23,7 +23,7 @@
 //!
 //!
 
-//pub mod ai;
+pub mod ai;
 //pub mod interaction;
 
 mod acts;
@@ -58,8 +58,8 @@ use bevy::prelude::Component;
 use macros::Component;
 
 #[cfg(feature = "bevy")]
-use bevy::prelude::Event;
+use bevy::prelude::Message;
 #[cfg(not(feature = "bevy"))]
-use macros::Event;
+use macros::Message;
 
 pub const MAX_ENERGY: i32 = 100;

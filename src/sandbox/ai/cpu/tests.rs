@@ -231,7 +231,7 @@ fn step_test() {
     pout!("ticking:{:?}", cpu.pc);
     assert_specimen!(
         cpu.step(&task_db, &mut blackboard),
-        Err("program halted".into())
+        Err(format!("{}:{}:program halted", file!(), line!()))
     );
     assert_specimen!(&cpu.stack, &vec![StackItem::success()]);
     assert_specimen!(&cpu.return_stack, &ReturnStack::new());

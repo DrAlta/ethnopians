@@ -7,7 +7,7 @@ use super::{foo2, Lookup, super::{Datum, DatumType, Relation}};
 pub fn join<const SIZE: usize, const N: usize>(
     variables: [Vec<((&str, &str), (&str, &str))>; N],
     db: &HashMap<String, Relation<SIZE>>,
-) -> Result<Vec<[Datum; N]>, &'static str> {
+) -> Result<Vec<[Datum; N]>, String> {
     let matched_types: [_; N] = std::array::from_fn(|i| {
         let variable = &variables[i];
         let mut x = variable.iter();
@@ -40,7 +40,7 @@ pub fn join<const SIZE: usize, const N: usize>(
     });
     if !matched_types.into_iter().all(|t| t) {
         logy!("error", "(matched_types{matched_types:?}");
-        return Err("relations types mismatched");
+        return Err(format!("{}:{}:relations types mismatched", file!(), line!()));
     }
 
     let mut final_fields: [_; N] = std::array::from_fn(|i| {

@@ -28,15 +28,15 @@ impl CPU {
         blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
     ) -> Result<Status, String> {
         let Some((token, idx)) = &self.pc else {
-            return Err("program halted".into());
+            return Err(format!("{}:{}:program halted", file!(), line!()));
         };
 
         let Some(thread) = bt.get(token) else {
-            return Err("failed to get thread {token}".into());
+            return Err(format!("{}:{}:failed to get thread {token}", file!(), line!()));
         };
         let Some(i) = thread.get(*idx) else {
-            return Err(format!(
-                "failed to get instruction{idx} from thread {token}"
+            return Err(format!("{}:{}:failed to get instruction{idx} from thread {token}"
+            , file!(), line!()
             ));
         };
         i.tick(

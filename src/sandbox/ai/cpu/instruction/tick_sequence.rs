@@ -12,7 +12,7 @@ pub fn tick_sequence(
     pc: &mut ProgramCounter,
 ) -> Result<Status, String> {
     let Some(tos) = stack.pop() else {
-        return Err("Nothing on stack when checking result of child".into());
+        return Err(format!("{}:{}:Nothing on stack when checking result of child", file!(), line!()));
     };
 
     if if let StackItem::String(x)/*Init*/ = &tos {
@@ -25,7 +25,7 @@ pub fn tick_sequence(
         stack.push(StackItem::sequence(1));
         stack.push(StackItem::init());
         let Some(child_token) = children.first() else {
-            return Err("failed to get first child".into());
+            return Err(format!("{}:{}:failed to get first child", file!(), line!()));
         };
         logy!("trace-tick-sequence", "Initalizing Sequence");
         return_stack.push(pc.clone().unwrap());
@@ -41,12 +41,12 @@ pub fn tick_sequence(
 
     let Some(StackItem::Table(x)) = stack.pop() else {
         logy!("debug", "{stack:#?}");
-        return Err("Sequence state not found on stack".into());
+        return Err(format!("{}:{}:Sequence state not found on stack", file!(), line!()));
     };
     let TableInterior { map } = x.as_ref();
     let Some(StackItem::Int(idx)) = map.table_get("Sequence") else {
         logy!("debug", "{map:#?}");
-        return Err("Sequence state not found on stack".into());
+        return Err(format!("{}:{}:Sequence state not found on stack", file!(), line!()));
     };
 
     match (*idx as usize >= children.len(), tos) {
@@ -87,7 +87,7 @@ pub fn tick_sequence(
             *pc = Some((child_token.clone(), 0));
             return Ok(Status::None);
         }
-        (_, _) => return Err("TOS wasn't a Success or a Failure".into()),
+        (_, _) => return Err(format!("{}:{}:TOS wasn't a Success or a Failure", file!(), line!())),
     }
 }
 #[cfg(test)]

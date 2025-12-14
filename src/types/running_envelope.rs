@@ -33,7 +33,7 @@ pub struct RunningEnvelope {
     /// The further smoothed low envelope value.
     ///
     /// This field is a filtered version of `fast_attack_low` meant to yield a
-    /// stable lower bound, preventing overly reactive changes due to brief
+    /// stable lower bound, prMessageing overly reactive changes due to brief
     /// dips.
     pub low: Number,
 

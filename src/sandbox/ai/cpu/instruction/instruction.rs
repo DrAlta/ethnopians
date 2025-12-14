@@ -104,10 +104,10 @@ impl Instruction {
     }
     pub fn get_two_coords(stack: &mut Stack) -> Result<((i32, i32), (i32, i32)), String> {
         let Some(StackItem::Coord { .. }) = stack.last() else {
-            return Err("top of stack not a number".into());
+            return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
         };
         let Some(StackItem::Coord { .. }) = stack.get(stack.len() - 2) else {
-            return Err("next of stack not a number".into());
+            return Err(format!("{}:{}:next of stack not a number", file!(), line!()));
         };
         let Some(StackItem::Coord { x: tos_x, y: tos_y }) = stack.pop() else {
             unreachable!()
@@ -119,10 +119,10 @@ impl Instruction {
     }
     pub fn get_two_ints(stack: &mut Stack) -> Result<(i32, i32), String> {
         let Some(StackItem::Int(_)) = stack.last() else {
-            return Err("top of stack not a number".into());
+            return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
         };
         let Some(StackItem::Int(_)) = stack.get(stack.len() - 2) else {
-            return Err("next of stack not a number".into());
+            return Err(format!("{}:{}:next of stack not a number", file!(), line!()));
         };
         let Some(StackItem::Int(tos)) = stack.pop() else {
             unreachable!()
