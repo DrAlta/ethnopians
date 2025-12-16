@@ -54,4 +54,21 @@ impl Node {
             Node::InventoryGE { .. } => "InventoryGE",
         }
     }
+    pub fn get_child(&self, idx: usize) -> Result<&Self, String>{
+        let x = match self {
+            Node::Selector { children } => children.get(idx),
+            Node::Sequence { children } => children.get(idx),
+            // Handle other node types...
+            _ => todo!(),
+/*                            _ => {
+                                self.handle_failure(format!("[{}:{}] node has no children", file!(), line!()));
+                                return Status::Waiting { state: self };
+                            },
+                            */
+        };
+        match x {
+            Some(y) => Ok(y),
+            None => Err(format!("[{}:{}] {idx} is out of range of nodes childs", file!(), line!())),
+        }
+    }
 }

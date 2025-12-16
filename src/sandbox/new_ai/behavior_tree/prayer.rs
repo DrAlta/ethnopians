@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use crate::sandbox::{EntityId, Item};
 
-use super::{State, Status};
+use super::{State, super::Status};
 
 #[derive(Debug, Clone, PartialEq)]
 
@@ -16,7 +16,7 @@ pub enum Prayer {
         children_states: BTreeMap<usize, Option<State>>,
     },
     Status {
-        status: Status,
+        status: Status<State>,
     },
     // #####
     // # Action

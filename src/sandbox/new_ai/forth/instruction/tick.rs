@@ -3,8 +3,8 @@ use std::sync::Arc;
 use qol::logy;
 
 use crate::sandbox::new_ai::{
-    forth::{Instruction, Prayer, ProgramCounter, ReturnStack, Stack, StackItem, Status},
-    Blackboard, BlackboardKey, BlackboardValue, Variable,
+    forth::{Instruction, ProgramCounter, ReturnStack, Stack, StackItem},
+    Blackboard, BlackboardKey, BlackboardValue, Prayer, Variable,
 };
 
 impl Instruction {
@@ -14,7 +14,7 @@ impl Instruction {
         return_stack: &mut ReturnStack,
         pc: &mut ProgramCounter,
         blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
-    ) -> Prayer {
+    ) -> Result<Option<Prayer>, String> {
         logy!("debug", "ticking:{pc:?}:{self:?}");
         println!("Stack is:");
         for c in &*stack {
@@ -25,29 +25,29 @@ impl Instruction {
             Instruction::Action(action_id) => {
                 //*pc = return_stack.pop();
 
-                return Self::next(Status::Running(action_id.clone()), pc);
+                return Self::next(Prayer::Inpulse(action_id.clone()).into(), pc);
             }
             Instruction::Debug(_x) => {
                 logy!("debug", "{_x}");
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::Add => {
                 if let Ok((nos, tos)) = Self::get_two_ints(stack) {
                     stack.push(StackItem::Int(nos + tos));
-                    Self::next(Status::None, pc)
+                    Self::next(None, pc)
                 } else {
                     let (nos, tos) = Self::get_two_coords(stack)?;
                     stack.push(StackItem::Coord {
                         x: nos.0 + tos.0,
                         y: nos.1 + tos.1,
                     });
-                    Self::next(Status::None, pc)
+                    Self::next(None, pc)
                 }
             }
             Instruction::Call(token) => {
                 let old_pc = std::mem::replace(pc, Some((token.clone(), 0))).unwrap();
                 return_stack.push((old_pc.0, old_pc.1 + 1));
-                Ok(Status::None)
+                Ok(None)
             }
             Instruction::Distance => {
                 if stack.len() < 2 {
@@ -68,26 +68,26 @@ impl Instruction {
                 let distance =
                     ((nos_x - tos_x).abs().pow(2) + (nos_y - tos_y).abs().pow(2)).isqrt();
                 stack.push(StackItem::Int(distance));
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::Div => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
                 stack.push(StackItem::Int(nos / tos));
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::Drop => {
                 if stack.is_empty() {
                     return Err(format!("{}:{}:nothing on sack", file!(), line!()));
                 };
                 stack.pop();
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::Dup => {
                 let Some(tos) = stack.last() else {
                     return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
                 };
                 stack.push(tos.clone());
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::Eq => {
                 if stack.len() < 2 {
@@ -100,7 +100,7 @@ impl Instruction {
                 } else {
                     stack.push(StackItem::False);
                 }
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::FindInInventory => {
                 let Some(StackItem::String(_)) = stack.last() else {
@@ -112,7 +112,7 @@ impl Instruction {
                 let Ok(item_class) = item_class_string.try_into() else {
                     return Err(format!("{}:{}:item class was not valid", file!(), line!()));
                 };
-                Self::next(Status::FindInInventory { item_class }, pc)
+                Self::next(Prayer::FindInInventory { item_class }.into(), pc)
             }
             // ForthFindNearest should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::FindNearest => {
@@ -134,7 +134,7 @@ impl Instruction {
                 let Ok(item_class) = item_class_string.try_into() else {
                     return Err(format!("{}:{}:item class was not valid", file!(), line!()));
                 };
-                Self::next(Status::FindNearest { x, y, item_class }, pc)
+                Self::next(Prayer::FindNearest { x, y, item_class }.into(), pc)
             }
             // ForthGetEnergy should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::GetEnergy => {
@@ -144,7 +144,7 @@ impl Instruction {
                 let Some(StackItem::EntityId(entity_id)) = stack.pop() else {
                     unreachable!()
                 };
-                return Self::next(Status::GetEnergy(entity_id.clone()), pc);
+                return Self::next(Prayer::GetEnergy(entity_id.clone()).into(), pc);
             }
             // ForthGetLocation should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::GetLocation => {
@@ -154,7 +154,7 @@ impl Instruction {
                 let Some(StackItem::EntityId(entity_id)) = stack.pop() else {
                     unreachable!()
                 };
-                Self::next(Status::GetLocation(entity_id.clone()), pc)
+                Self::next(Prayer::GetLocation(entity_id.clone()).into(), pc)
             }
             // ForthGetHP should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::GetHP => {
@@ -164,7 +164,7 @@ impl Instruction {
                 let Some(StackItem::EntityId(entity_id)) = stack.pop() else {
                     unreachable!()
                 };
-                Self::next(Status::GetHp(entity_id.clone()), pc)
+                Self::next(Prayer::GetHp(entity_id.clone()).into(), pc)
             }
             Instruction::GE => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
@@ -173,7 +173,7 @@ impl Instruction {
                 } else {
                     stack.push(StackItem::False);
                 }
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::GetBlackboard => {
                 let Some(StackItem::String(_)) = stack.last() else {
@@ -187,7 +187,7 @@ impl Instruction {
                     Some(x) => StackItem::Option(Box::new(x.into())),
                     None => StackItem::none(),
                 });
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::GT => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
@@ -196,7 +196,7 @@ impl Instruction {
                 } else {
                     stack.push(StackItem::False);
                 }
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::If(skip) => {
                 let Some((_, idx)) = pc else {
@@ -206,7 +206,7 @@ impl Instruction {
                 if Some(StackItem::True) != stack.pop() {
                     *idx += skip;
                 }
-                Ok(Status::None)
+                Ok(None)
             }
             Instruction::InventoryGE => {
                 if stack.len() < 2 {
@@ -233,11 +233,11 @@ impl Instruction {
                     return Err(format!("{}:{}:self not found in blackboard", file!(), line!()));
                 };
                 Self::next(
-                    Status::GetIsInventoryGE {
+                    Prayer::GetIsInventoryGE {
                         agent,
                         item_class,
                         amount,
-                    },
+                    }.into(),
                     pc,
                 )
             }
@@ -248,11 +248,11 @@ impl Instruction {
                     StackItem::False
                 };
                 stack.push(value);
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::Jump(token) => {
                 *pc = Some((token.clone(), 0));
-                Ok(Status::None)
+                Ok(None)
             }
             Instruction::LE => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
@@ -261,7 +261,7 @@ impl Instruction {
                 } else {
                     stack.push(StackItem::False);
                 }
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::LT => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
@@ -270,16 +270,16 @@ impl Instruction {
                 } else {
                     stack.push(StackItem::False);
                 }
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::Lit(value) => {
                 stack.push(value.clone());
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::Mul => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
                 stack.push(StackItem::Int(nos * tos));
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::NotTrue => {
                 //stack.push(ifSome(StackItem::True) ==
@@ -292,7 +292,7 @@ impl Instruction {
                     }
                     None => return Err(format!("{}:{}:no top of stack", file!(), line!())),
                 };
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::Or => {
                 if stack.len() < 2 {
@@ -305,13 +305,13 @@ impl Instruction {
                 } else {
                     StackItem::False
                 });
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
 
             Instruction::Rem => {
                 let (nos, tos) = Self::get_two_ints(stack)?;
                 stack.push(StackItem::Int(nos % tos));
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::Rot => {
                 if stack.len() < 3 {
@@ -319,7 +319,7 @@ impl Instruction {
                 };
                 let x = stack.remove(stack.len() - 3);
                 stack.push(x);
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             // like "!"'s stack diagram is "( n adr -- ). This uses TOS of the key and stores NOS under it
             Instruction::SetBlackboard => {
@@ -336,7 +336,7 @@ impl Instruction {
                     unreachable!()
                 };
                 blackboard.insert((*key).clone(), Variable::Chit(nos.into()));
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::Stuff => {
                 let Some(StackItem::Table(_)) = stack.get(stack.len() - 3) else {
@@ -356,18 +356,18 @@ impl Instruction {
                     Err(_) => StackItem::False,
                 };
                 stack.push(ret);
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::SomeCoord => {
                 let Some(StackItem::Option(x)) = stack.last() else {
                     stack.push(StackItem::False);
-                    return Self::next(Status::None, pc);
+                    return Self::next(None, pc);
                 };
                 match x.as_ref() {
                     StackItem::Coord { .. } => (),
                     _ => {
                         stack.push(StackItem::False);
-                        return Self::next(Status::None, pc);
+                        return Self::next(None, pc);
                     }
                 }
                 let Some(StackItem::Option(y)) = stack.pop() else {
@@ -375,18 +375,18 @@ impl Instruction {
                 };
                 stack.push(Box::into_inner(y));
                 stack.push(StackItem::True);
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::SomeEntityId => {
                 let Some(StackItem::Option(x)) = stack.last() else {
                     stack.push(StackItem::False);
-                    return Self::next(Status::None, pc);
+                    return Self::next(None, pc);
                 };
                 match x.as_ref() {
                     StackItem::EntityId(_) => (),
                     _ => {
                         stack.push(StackItem::False);
-                        return Self::next(Status::None, pc);
+                        return Self::next(None, pc);
                     }
                 }
                 let Some(StackItem::Option(y)) = stack.pop() else {
@@ -394,7 +394,7 @@ impl Instruction {
                 };
                 stack.push(Box::into_inner(y));
                 stack.push(StackItem::True);
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::IsEmpty => {
                 let Some(StackItem::Table(x)) = stack.last() else {
@@ -406,7 +406,7 @@ impl Instruction {
                 } else {
                     StackItem::False
                 });
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::PopLast => {
                 let Some(StackItem::Table(x)) = stack.last_mut() else {
@@ -419,18 +419,18 @@ impl Instruction {
                 } else {
                     stack.push(StackItem::False);
                 };
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::SomeInt => {
                 let Some(StackItem::Option(x)) = stack.last() else {
                     stack.push(StackItem::False);
-                    return Self::next(Status::None, pc);
+                    return Self::next(None, pc);
                 };
                 match x.as_ref() {
                     StackItem::Int(_) => (),
                     _ => {
                         stack.push(StackItem::False);
-                        return Self::next(Status::None, pc);
+                        return Self::next(None, pc);
                     }
                 }
                 let Some(StackItem::Option(y)) = stack.pop() else {
@@ -438,19 +438,19 @@ impl Instruction {
                 };
                 stack.push(Box::into_inner(y));
                 stack.push(StackItem::True);
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
             Instruction::Sub => {
                 if let Ok((nos, tos)) = Self::get_two_ints(stack) {
                     stack.push(StackItem::Int(nos - tos));
-                    Self::next(Status::None, pc)
+                    Self::next(None, pc)
                 } else {
                     let (nos, tos) = Self::get_two_coords(stack)?;
                     stack.push(StackItem::Coord {
                         x: nos.0 - tos.0,
                         y: nos.1 - tos.1,
                     });
-                    Self::next(Status::None, pc)
+                    Self::next(None, pc)
                 }
             }
             Instruction::Swap => {
@@ -468,19 +468,19 @@ impl Instruction {
                 };
                 stack.push(tos);
                 stack.push(nos);
-                Self::next(Status::None, pc)
+                Self::next(None, pc)
             }
-            Instruction::Return => Self::exit(Status::None, return_stack, pc),
+            Instruction::Return => Self::exit(None, return_stack, pc),
             // ToDoGetEntities should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::GetEntities => {
                 let ((min_x, min_y), (max_x, max_y)) = Self::get_two_coords(stack)?;
                 Self::next(
-                    Status::GetEntities {
+                    Prayer::GetEntities {
                         min_x,
                         min_y,
                         max_x,
                         max_y,
-                    },
+                    }.into(),
                     pc,
                 )
             }
@@ -493,7 +493,7 @@ impl Instruction {
                     return Err(format!("{}:{}:couldn't convert {stack_str:?} to type", file!(), line!()));
                 };
                 stack.pop();
-                Self::next(Status::RemoveEntitiesOfType(item_type_from_stack), pc)
+                Self::next(Some(Prayer::RemoveEntitiesOfType(item_type_from_stack)), pc)
             }
             Instruction::RetainEntitiesOfType => {
                 let Some(StackItem::String(stack_string)) = stack.last() else {
@@ -504,7 +504,7 @@ impl Instruction {
                     return Err(format!("{}:{}:couldn't convert {stack_str:?} to type", file!(), line!()));
                 };
                 stack.pop();
-                Self::next(Status::RetainEntitiesOfType(item_type_from_stack), pc)
+                Self::next(Prayer::RetainEntitiesOfType(item_type_from_stack).into(), pc)
             }
         };
         println!("ending Stack is:");

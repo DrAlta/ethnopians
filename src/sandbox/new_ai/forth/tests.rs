@@ -1,8 +1,7 @@
 use qol::{assert_specimen, pout};
 
 use crate::sandbox::new_ai::{
-    forth::{cpu::CPU, Instruction, Status, ThreadPool},
-    Blackboard,
+    Blackboard, Prayer, forth::{Instruction, ThreadPool, cpu::CPU}
 };
 
 #[test]
@@ -27,14 +26,14 @@ fn step_test() {
     let mut cpu = CPU::load(action3.clone());
     //step 1 selectpr does its init and sets the cpu up to call its first child, sequence.
     pout!("ticking:{:?}", cpu.pc);
-    assert_specimen!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
+    assert_specimen!(cpu.step(&task_db, &mut blackboard), Ok(None));
     pout!("ticking:{:#?}", cpu);
 
     assert_specimen!(&cpu.stack, &vec![]);
     assert_specimen!(&cpu.pc, &Some((action3.clone(), 1)));
     // step 2
     pout!("ticking:{:?}", cpu.pc);
-    assert_specimen!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
+    assert_specimen!(cpu.step(&task_db, &mut blackboard), Ok(None));
     pout!("ticking:{:#?}", cpu);
 
     assert_specimen!(&cpu.stack, &vec![]);
@@ -43,7 +42,7 @@ fn step_test() {
     assert_specimen!(&cpu.pc, &Some((action1.clone(), 0)));
     // step 3
     pout!("ticking:{:?}", cpu.pc);
-    assert_specimen!(cpu.step(&task_db, &mut blackboard), Ok(Status::Running(1)));
+    assert_specimen!(cpu.step(&task_db, &mut blackboard), Ok(Prayer::Inpulse(1).into()));
     pout!("ticking:{:#?}", cpu);
 
     assert_specimen!(&cpu.stack, &vec![]);
@@ -52,7 +51,7 @@ fn step_test() {
     assert_specimen!(&cpu.pc, &Some((action1.clone(), 1)));
     // step 4
     pout!("ticking:{:?}", cpu.pc);
-    assert_specimen!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
+    assert_specimen!(cpu.step(&task_db, &mut blackboard), Ok(None));
     pout!("ticking:{:#?}", cpu);
 
     assert_specimen!(&cpu.stack, &vec![]);
@@ -62,7 +61,7 @@ fn step_test() {
 
     // step 5
     pout!("ticking:{:?}", cpu.pc);
-    assert_specimen!(cpu.step(&task_db, &mut blackboard), Ok(Status::None));
+    assert_specimen!(cpu.step(&task_db, &mut blackboard), Ok(None));
     pout!("ticking:{:#?}", cpu);
 
     assert_specimen!(&cpu.stack, &vec![]);

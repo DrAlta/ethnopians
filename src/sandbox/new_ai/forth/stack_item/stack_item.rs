@@ -36,7 +36,7 @@ impl StackItem {
             .get_or_init(|| StackItem::String(Arc::new("Success".to_owned())))
             .clone()
     }
-    pub fn failure() -> StackItem {
+    pub fn failure(_reason: String) -> StackItem {
         static FAILURE: OnceLock<StackItem> = OnceLock::new();
         FAILURE
             .get_or_init(|| StackItem::String(Arc::new("Failure".to_owned())))

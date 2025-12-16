@@ -1,9 +1,8 @@
-use crate::sandbox::{new_ai::InpulseId, EntityId, Item};
+use crate::sandbox::{EntityId, Item, InpulseId};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum Status {
-    Success,
-    Failure,
+pub enum Prayer{
+    Running(InpulseId),
     FindInInventory {
         item_class: Item,
     },
@@ -44,6 +43,4 @@ pub enum Status {
     // prey for the the items of the type to be removes from the array on top of the stack
     RemoveEntitiesOfType(Item),
     RetainEntitiesOfType(Item),
-    Running(InpulseId),
-    None,
 }

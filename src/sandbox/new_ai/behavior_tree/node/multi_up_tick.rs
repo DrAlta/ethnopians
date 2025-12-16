@@ -1,13 +1,13 @@
 use std::collections::BTreeMap;
 
-use crate::sandbox::new_ai::behavior_tree::{Node, Prayer, State, Status};
+use crate::sandbox::new_ai::{behavior_tree::{Node, ExecReport, State}, Status};
 
 impl Node {
     pub fn multi_up_tick(
         &self,
         state: State,
-        childerns_returned_statuses: BTreeMap<usize, Status>,
-    ) -> Prayer {
+        childerns_returned_statuses: BTreeMap<usize, Status<State>>,
+    ) -> ExecReport {
         match self {
             Node::Parallel {
                 children: _,
@@ -20,14 +20,14 @@ impl Node {
                     children_states_maybe,
                 } = state
                 else {
-                    return Prayer::Status {
+                    return ExecReport::Status {
                         status: Status::Failure {
                             reason: format!("Excepted a Parallel state, got {state:?}"),
                         },
                     };
                 };
                 if children_states_maybe.is_some() {
-                    return Prayer::Status {
+                    return ExecReport::Status {
                         status: Status::Failure {
                             reason: format!(
                                 "Excepted a Parallel state, to not have any states for children"
@@ -52,19 +52,19 @@ impl Node {
                     .collect();
 
                 if &succeeded_children.len() >= needed_successed {
-                    return Prayer::Status {
+                    return ExecReport::Status {
                         status: Status::Success,
                     };
                 };
                 if &failed_children.len() >= failure_abort_limit {
-                    return Prayer::Status {
+                    return ExecReport::Status {
                         status: Status::Failure {
                             reason: format!("Too many child tasks failed"),
                         },
                     };
                 };
 
-                return Prayer::Status {
+                return ExecReport::Status {
                     status: Status::Waiting {
                         state: State::Parallel {
                             succeeded_children,
@@ -79,7 +79,7 @@ impl Node {
             | x @ Node::Inverter { .. }
             | x @ Node::Combine { .. }
             | x @ Node::InventoryGE { .. } => {
-                return Prayer::Status {
+                return ExecReport::Status {
                     status: Status::Failure {
                         reason: format!("{} nodes are invalidfor multi_up_tick", x.name()),
                     },

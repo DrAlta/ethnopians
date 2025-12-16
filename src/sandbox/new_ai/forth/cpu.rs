@@ -1,6 +1,5 @@
 use crate::sandbox::new_ai::{
-    forth::{ProgramCounter, ReturnStack, Stack, StackItem, Status, ThreadId, ThreadPool},
-    Blackboard, BlackboardKey, BlackboardValue,
+    Blackboard, BlackboardKey, BlackboardValue, Prayer, forth::{ProgramCounter, ReturnStack, Stack, StackItem, ThreadId, ThreadPool}
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -26,7 +25,7 @@ impl CPU {
         &mut self,
         bt: &ThreadPool,
         blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
-    ) -> Result<Status, String> {
+    ) -> Result<Option<Prayer>, String> {
         let Some((token, idx)) = &self.pc else {
             return Err(format!("{}:{}:program halted", file!(), line!()));
         };

@@ -1,6 +1,5 @@
 use crate::sandbox::new_ai::{
-    forth::{Prayer, ProgramCounter, ReturnStack, Stack, StackItem, Status, ThreadId},
-    InpulseId,
+    InpulseId, Prayer, forth::{ProgramCounter, ReturnStack, Stack, StackItem, ThreadId}
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -66,13 +65,13 @@ pub enum Instruction {
     GetEntities,
 }
 impl Instruction {
-    pub fn next(status: Status, pc: &mut ProgramCounter) -> Prayer {
+    pub fn next(status: Option<Prayer>, pc: &mut ProgramCounter) -> Result<Option<Prayer>, String> {
         if let Some((_, idx)) = pc {
             *idx += 1;
         }
         return Ok(status);
     }
-    pub fn exit(status: Status, return_stack: &mut ReturnStack, pc: &mut ProgramCounter) -> Prayer {
+    pub fn exit(status: Option<Prayer>, return_stack: &mut ReturnStack, pc: &mut ProgramCounter) -> Result<Option<Prayer>, String> {
         if let Some(parent_token) = return_stack.pop() {
             // return to calling fuction
             *pc = Some(parent_token);

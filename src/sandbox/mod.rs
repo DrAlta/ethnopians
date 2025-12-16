@@ -50,6 +50,7 @@ pub type EntityId = bevy::prelude::Entity;
 #[cfg(not(feature = "bevy"))]
 pub type EntityId = u64;
 
+pub type InpulseId = usize;
 pub type ItemClass = Arc<String>;
 
 #[cfg(feature = "bevy")]
