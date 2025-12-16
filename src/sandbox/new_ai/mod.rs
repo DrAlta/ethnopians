@@ -8,7 +8,7 @@ pub use prayer::Prayer;
 mod status;
 pub use status::Status;
 mod task_master;
-pub use task_master::{TaskMaster, TastMasterRet};
+pub use task_master::{TaskMaster, TastMasterReport};
 
 
 type InpulseId = usize;
