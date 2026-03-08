@@ -12,6 +12,7 @@ pub mod kill_share;
 pub mod mate;
 pub mod multi_party_dialogue;
 pub mod museum;
+pub mod orgasm;
 pub mod preferences;
 pub mod probing;
 pub mod pubsub;
