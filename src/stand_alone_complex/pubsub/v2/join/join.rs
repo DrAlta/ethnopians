@@ -2,7 +2,9 @@ use std::collections::HashMap;
 
 use qol::logy;
 
-use super::{foo2, Lookup, super::{Datum, DatumType, Relation}};
+use crate::stand_alone_complex::pubsub::v2::join::package_fields;
+
+use super::{intersect_values, Lookup, super::{Datum, DatumType, Relation}};
 
 pub fn join<const SIZE: usize, const N: usize>(
     variables: [Vec<((&str, &str), (&str, &str))>; N],
@@ -43,7 +45,7 @@ pub fn join<const SIZE: usize, const N: usize>(
         return Err(format!("{}:{}:relations types mismatched", file!(), line!()));
     }
 
-    let mut final_fields: [_; N] = std::array::from_fn(|i| {
+    let final_fields: [_; N] = std::array::from_fn(|i| {
         let mut working;
         let variable = &variables[i];
         let mut iter = variable.into_iter();
@@ -87,7 +89,7 @@ pub fn join<const SIZE: usize, const N: usize>(
                     let Some(x) = a1.get_i8_iter(first.1) else {
                         return Vec::new();
                     };
-                    foo2(&mut working, &x.map(|x| *x).collect())
+                    intersect_values(&mut working, &x.map(|x| *x).collect())
                 }
                 DatumType::String => (), /* {
                                              let a1 = db.get(first.0).unwrap();
@@ -104,10 +106,7 @@ pub fn join<const SIZE: usize, const N: usize>(
         working.into_iter().map(|(_, v)| Datum::I8(v)).collect()
     });
 
-    let mut ret = Vec::new();
-    for _ in 0..final_fields[0].len() {
-        let x: [Datum; N] = std::array::from_fn(|i| final_fields[i].pop().unwrap());
-        ret.push(x)
-    }
-    Ok(ret)
+
+    Ok(package_fields(final_fields))
 }
+

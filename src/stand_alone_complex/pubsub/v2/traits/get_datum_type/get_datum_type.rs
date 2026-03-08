@@ -1,35 +1,7 @@
-use super::Sting;
+use super::{super::super::Sting, DatumType};
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum DatumType {
-    I8,
-    String,
-}
 
-impl DatumType {
-    #[allow(private_bounds)]
-    pub fn get<T>() -> DatumType
-    where
-        DatumType: Foo<T>,
-    {
-        <DatumType as Foo<T>>::foo()
-    }
-}
 
-trait Foo<T> {
-    fn foo() -> DatumType;
-}
-
-impl Foo<i8> for DatumType {
-    fn foo() -> DatumType {
-        DatumType::I8
-    }
-}
-impl Foo<Sting> for DatumType {
-    fn foo() -> DatumType {
-        DatumType::String
-    }
-}
 
 pub trait GetDatumType<const INDEX: usize> {
     fn get_data_type(&self) -> Option<DatumType>;
