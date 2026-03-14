@@ -15,7 +15,7 @@ pub fn bump(
     last_pleasure: Number,
 ){
     // Calculate the 'Taboo Weight': Both appeal and aversion (abs) increase mental load/arousal.
-    let moralethic_tension = (((moralethic_appeal - moralethic_adversion) * moralethic_importance) + moralethic_appeal + moralethic_adversion.abs()).abs();
+    let moralethic_tension = compute_moralethic_tension(moralethic_appeal, moralethic_adversion, moralethic_importance);
 
     // The threshold for release is the sum of moral friction and physical/psychological fullness (satiety).
     let tipping_point =  moralethic_tension + satiety_threshold;
@@ -60,7 +60,7 @@ fn pleasure_type_orgasm(
     // Sensation 'Gluttony': Any pleasure received during orgasm builds the refractory debt.
     over_taxation += pleasure;
 
-    let moralethic_tension = (((moralethic_appeal - moralethic_adversion) * moralethic_importance) + moralethic_appeal + moralethic_adversion.abs()).abs();
+    let moralethic_tension = compute_moralethic_tension(moralethic_appeal, moralethic_adversion, moralethic_importance);
     let tipping_point =  moralethic_tension + satiety_threshold;
 
     // The 'Leverage': How far we are above the limit.
@@ -104,7 +104,7 @@ fn tension_type_orgasm(
     // Accumulate refractory debt from the input pleasure.
     over_taxation += pleasure;
 
-    let moralethic_tension = (((moralethic_appeal - moralethic_adversion) * moralethic_importance) + moralethic_appeal + moralethic_adversion.abs()).abs();
+    let moralethic_tension = compute_moralethic_tension(moralethic_appeal, moralethic_adversion, moralethic_importance);
 
     let tipping_point =  moralethic_tension + satiety_threshold;
 
@@ -141,7 +141,7 @@ fn orgasm_ended_ka(
 
     orgasn_intensity: Number,
 ) -> bool {
-    let moralethic_tension = (((moralethic_appeal - moralethic_adversion) * moralethic_importance) + moralethic_appeal + moralethic_adversion.abs()).abs();
+    let moralethic_tension = compute_moralethic_tension(moralethic_appeal, moralethic_adversion, moralethic_importance);
 
     let tipping_point =  moralethic_tension + satiety_threshold;
 
@@ -166,3 +166,17 @@ fn refactory(
 fn orgasm(_orgasm_intensity: Number){}
 
 fn end_refactory_state(){}
+
+fn compute_moralethic_tension(
+    moralethic_appeal: Number,
+    moralethic_adversion: Number,
+    moralethic_importance: Number,
+)-> Number {
+    let base = (moralethic_appeal - moralethic_adversion)
+        .max(moralethic_appeal.max(Number::ZERO).sqrt())
+        .max(moralethic_adversion.max(Number::ZERO).sqrt());
+
+    base * moralethic_importance.abs()
+    // + moralethic_appeal.abs() + moralethic_adversion.abs();
+
+}

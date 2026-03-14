@@ -9,12 +9,14 @@ pub mod general_specific_affinity;
 pub mod gossip;
 pub mod kelly_criterion;
 pub mod kill_share;
+pub mod latadog;
 pub mod mate;
 pub mod multi_party_dialogue;
 pub mod museum;
 pub mod orgasm;
 pub mod preferences;
 pub mod probing;
+#[cfg(feature = "pubsub")]
 pub mod pubsub;
 pub mod seven_emotions;
 pub mod stock_market_fractal;

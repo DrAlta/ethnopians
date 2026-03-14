@@ -3,6 +3,12 @@ name = "ethnopians"
 version = "0.3.6"
 edition = "2021"
 
+[[bin]]
+name = "pubsub"
+path = "src/bin/pubsub.rs"
+required-features = ["pubsub"]
+
+
 [lib]
 name = "ethnolib"
 path = "src/lib.rs"
@@ -37,6 +43,8 @@ defaults = ["log", "debug", "error", "todo", "trace", "trace-tests"]
 # systems
 sandbox = []
 gossip = []
+pubsub = []
+taskmaster = []
 # externals
 bevy = ["dep:bevy"]
 # logging

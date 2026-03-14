@@ -7,7 +7,9 @@ mod prayer;
 pub use prayer::Prayer;
 mod status;
 pub use status::Status;
+#[cfg(feature = "taskmaster")]
 mod task_master;
+#[cfg(feature = "taskmaster")]
 pub use task_master::{TaskMaster, TastMasterReport};
 
 
