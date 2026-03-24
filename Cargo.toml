@@ -19,10 +19,10 @@ path = "src/lib.rs"
 macros = {path = "./macros"}
 
 base64 = "0.22.1"
-bevy = {version = "0.17.0", features = ["dynamic_linking"], optional = true }
+bevy = {version = "0.17.0", default-features = false, features = ["dynamic_linking"], optional = true }
 derive_more = { version = "1.0.0", features = ["add", "add_assign", "mul"] }
 #geometwo = { git ="ssh://hsingai@altaserver.local:/media/hsingai/bigdrive/smb/Gits/rust-geometried-2d.git" , version = "0.1.10", features = ["macroquad"] }
-geometwo = { path ="../geometried-2d/geometwo" , version = "0.1.10", features = ["macroquad"] }
+geometried = { path ="../rust-geometried" , version = "0.1.10" }
 nom = "7.1.3"
 
 fraction64 = { version = "0.1.15", git = "https://github.com/DrAlta/fraction64.git"}
@@ -38,7 +38,7 @@ opt-level = 1
 opt-level = 3
 
 [features]
-default = ["defaults", "sandbox"]
+default = ["defaults", "sandbox", "taskmaster"]
 defaults = ["log", "debug", "error", "todo", "trace", "trace-tests"]
 # systems
 sandbox = []

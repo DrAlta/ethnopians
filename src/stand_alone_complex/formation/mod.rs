@@ -1,4 +1,4 @@
-use geometwo::vec2;
+use geometried::geometwo::vec2;
 use qol::{AsA, logy};
 
 use crate::{Number, Vec2};

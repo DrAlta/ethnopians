@@ -2,7 +2,7 @@
 #![feature(btree_cursors)]
 use std::sync::LazyLock;
 
-pub use geometwo;
+pub use geometried::geometwo;
 
 #[cfg(feature = "bevy")]
 pub use bevy;
@@ -15,8 +15,8 @@ pub mod util;
 mod ring;
 pub use ring::{ring, Box};
 
-pub type Vec2 = geometwo::Vector2;
-pub type Number = geometwo::Number;
+pub type Vec2 = geometried::geometwo::Vector2;
+pub type Number = geometried::Number;
 pub static IOTA: LazyLock<Number> = LazyLock::new(||0.0000001.into());
 
 

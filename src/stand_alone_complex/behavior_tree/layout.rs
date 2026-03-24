@@ -1,4 +1,4 @@
-use geometwo::vec2;
+use geometried::geometwo::vec2;
 
 use crate::{Number, Vec2};
 pub struct Layout {
