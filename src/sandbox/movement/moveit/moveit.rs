@@ -1,6 +1,6 @@
 use std::collections::{BTreeSet, HashMap};
 
-use geometwo::{AARect, broadphase::{Broadphase, SpatialId}};
+use geometried::geometwo::{AARect, broadphase::{Broadphase, SpatialId}};
 
 use crate::Number;
 
