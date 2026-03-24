@@ -1,6 +1,6 @@
-use std::{collections::HashMap, fmt::format};
+use std::collections::HashMap;
 
-use crate::sandbox::new_ai::{Blackboard, BlackboardKey, BlackboardValue, Prayer, Status, behavior_tree, forth::StackItem, task_master::BehaviorTreeTaskId};
+use crate::sandbox::new_ai::{Blackboard, BlackboardKey, BlackboardValue, Prayer, behavior_tree::{self, ExecReport, Node, State}, task_master::{BehaviorTreeTaskId, sub_system_state::Branch}};
 
 use super::{SubSystemState, TastMasterReport, handle_failure};
 
@@ -27,7 +27,7 @@ impl TaskMaster {
             );
         };
         match sub_system_state {
-            SubSystemState::BehaviorTree{tree_id , root_state, execution_path, returned, child_to_tick_next_maybe, state_tick_next_maybe} => {
+            SubSystemState::BehaviorTree{tree_id, execution_limb, state_tick_next_maybe} => {
                 // this does a down_tick() then queues the next down_tick() proccessing up_ticks untill one return a require for a down_tick
                 let tree_id2= tree_id.clone();
                 let Some(tree) = behavoir_tree_tasks.get(tree_id) else {
@@ -37,76 +37,12 @@ impl TaskMaster {
                     };
                 };
 
-                let mut this_node = tree;
-                let mut path = Vec::new();
-                for (stem_idx, (child_idx, _)) in execution_path.iter().enumerate() {
-                    path.push((this_node, stem_idx));
-                    this_node = match this_node.get_child(*child_idx){
-                        Ok(c) => c,
-                        Err(err) => {
-                            match handle_failure(&mut self.stack, format!("[{}:{}] while walking execution_path{path:?} got err{err:?}", file!(), line!())) {
-                                Ok(_) => {return TastMasterReport::Ok},
-                                Err(reason) => {return TastMasterReport::Failure { reason }},
-                            };
-                        }
-                    };
-                }
-                let this_node_idx_maybe = {
-                    if let Some(next_child_idx) = child_to_tick_next_maybe {
-                        // there is tail to set it up for a down tick
-                        this_node = match this_node.get_child(*next_child_idx){
-                            Ok(c) => c,
-                            Err(err) => {
-                                match handle_failure(&mut self.stack, format!("[{}:{}] while walking execution_path{path:?} got err{err:?}", file!(), line!())) {
-                                    Ok(_) => {return TastMasterReport::Ok},
-                                    Err(reason) => {return TastMasterReport::Failure { reason }},
-                                };
-                            }
-                        };
-                        Some(*next_child_idx)
-                    } else { 
-                        // there was no tail end to the path 
-                        path.pop();
-                        if let Some((this_node_idx, _up_tick_state)) = execution_path.pop() {
-                            unreachable!("We should never get here the only time there shoul't be a tail is whrn were ticking the root"); //Some(this_node_idx)
-                        } else {
-                            None
-                        }
-                     }
-            
+                let (path, this_node) = match walk_down(tree, execution_limb) {
+                    Ok(x) => x,
+                    Err(err) => return TastMasterReport::Err(err)
                 };
-                let mut exec_report = this_node.down_tick(std::mem::replace(state_tick_next_maybe, None), &mut self.blackboard);
-                loop {
-                    match exec_report {
-                        behavior_tree::ExecReport::TickChild { child_index, my_state, child_state_maybe } => {
-                            if let Some(this_node_idx) = this_node_idx_maybe {
-                                execution_path.push((this_node_idx, my_state));
-                            } else {
-                                *root_state = my_state;
-                            };
-                            *state_tick_next_maybe = child_state_maybe;
-                            *child_to_tick_next_maybe = Some(child_index);
-                        },
-                        behavior_tree::ExecReport::TickChildren { children_states } => todo!(),
-                        behavior_tree::ExecReport::Status { status } => {
-                            if let Some((parent_node, parent_idx)) = path.pop() {
-                                let Some((parent_node_idx, parent_state)) = execution_path.pop() else {
-                                    let path: Vec<usize> = path.into_iter().map(|(_, x)| x).chain([parent_idx].into_iter()).collect();
-                
-                                    let reason = format!("failed to pop state for {path:?} of {tree:?}");
-                                    return TastMasterReport::Failure { reason }
-                                };
-                                exec_report = parent_node.up_tick(parent_state, status)
-                            } else {
-                                // returning to the root node
-                                assert!(execution_path.is_empty());
-                                exec_report = tree.up_tick(root_state.clone(), status)
-                            }
-                        },
-                        behavior_tree::ExecReport::Prayer(prayer) => todo!(),
-                    }
-                    unreachable!()
-                }
+                let exec_report = this_node.down_tick(std::mem::replace(state_tick_next_maybe, None), &mut self.blackboard);
+                return walk_up(state_tick_next_maybe, execution_limb, exec_report, this_node, path, tree, &mut self.blackboard);
             },
             SubSystemState::Forth{cpu, word_id: _} => {
                 todo!()
@@ -114,4 +50,55 @@ impl TaskMaster {
         }
 
     }
+}
+
+type Path<'a>  = Vec<&'a Node>;
+fn walk_down<'a, 'b>(tree: &'a Node, execution_limb: &'b Vec::<Branch>) -> Result<(Path<'a>, &'a Node), String>{
+let mut path = Vec::new();
+    let mut this_node = tree;
+    for Branch{ child_index, .. } in execution_limb {
+        path.push(this_node);
+        this_node = match this_node.get_child(*child_index){
+            Ok(c) => c,
+            Err(err) => {
+                return Err(format!("[{}:{}] while walking execution_limb{tree:?}:{path:?} got err{err:?}", file!(), line!()))
+            }
+        };
+    }
+    Ok((path, this_node))
+}
+fn walk_up(state_tick_next_maybe: & mut Option<State>, execution_limb: &mut Vec::<Branch>, mut exec_report: ExecReport, this_node: &Node, mut path: Path, tree: &Node, blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>) -> TastMasterReport {
+    let mut exec_report = this_node.down_tick(std::mem::replace(state_tick_next_maybe, None), blackboard);
+    loop {
+        match exec_report {
+            behavior_tree::ExecReport::TickChild { child_index, my_state, child_state_maybe } => {
+                *state_tick_next_maybe = child_state_maybe;
+                execution_limb.push(Branch { child_index, parent_up_tick_state: my_state });
+                return TastMasterReport::Ok;
+            },
+            behavior_tree::ExecReport::TickChildren { children_states } => todo!("{children_states:?}"),
+            behavior_tree::ExecReport::Status { status } => {
+                let Some(Branch { parent_up_tick_state, .. }) = execution_limb.pop() else {
+                    // it must have been the root node that is upticking, report the task finished
+                    return match status {
+                        crate::sandbox::new_ai::Status::Success => TastMasterReport::Success,
+                        crate::sandbox::new_ai::Status::Failure { reason } => TastMasterReport::Failure { reason },
+                        crate::sandbox::new_ai::Status::Waiting { state } => TastMasterReport::Err(format!("{tree:?} returned that is was waiting with {state:?}")),
+                    }
+                };
+                path.pop(); // remove the current node from the path
+                let parent_node = if let Some(parent_node) = path.last() {
+                    parent_node
+                } else {
+                    tree
+                };
+
+                exec_report = parent_node.up_tick(parent_up_tick_state, status);
+                continue
+            },
+            behavior_tree::ExecReport::Prayer(prayer) => todo!(),
+        }
+        unreachable!()
+    }
+
 }

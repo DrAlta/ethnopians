@@ -1,4 +1,4 @@
-use crate::sandbox::new_ai::{Status, forth::StackItem, task_master::SubSystemState};
+use crate::sandbox::new_ai::{forth::StackItem, task_master::SubSystemState};
 
 pub fn handle_failure(stack: &mut Vec<SubSystemState>, reason: String) -> Result<(), String> {
     stack.pop();
@@ -6,8 +6,7 @@ pub fn handle_failure(stack: &mut Vec<SubSystemState>, reason: String) -> Result
         return Err(reason)
     };
     match sub_system_state {
-        SubSystemState::BehaviorTree { returned, .. } => {
-            *returned = Status::Failure{ reason };
+        SubSystemState::BehaviorTree { .. } => {
             return Ok(());
         },
         SubSystemState::Forth{cpu, ..} => {
