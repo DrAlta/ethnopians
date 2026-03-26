@@ -9,6 +9,7 @@ pub use bevy;
 
 pub mod sandbox;
 //pub mod social_sim;//! this is supersecced by the ensemblage crate
+#[cfg(feature = "standalone")]
 pub mod stand_alone_complex;
 pub mod types;
 pub mod util;
