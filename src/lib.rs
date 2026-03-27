@@ -7,9 +7,11 @@ pub use geometried::geometwo;
 #[cfg(feature = "bevy")]
 pub use bevy;
 
+#[cfg(feature = "ai")]
+pub mod ai;
+#[cfg(feature = "sandbox")]
 pub mod sandbox;
 //pub mod social_sim;//! this is supersecced by the ensemblage crate
-#[cfg(feature = "standalone")]
 pub mod stand_alone_complex;
 pub mod types;
 pub mod util;

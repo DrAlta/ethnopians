@@ -38,12 +38,14 @@ opt-level = 1
 opt-level = 3
 
 [features]
-default = ["defaults", "sandbox", "taskmaster"]
+default = ["defaults", "ai", "taskmaster"]
 defaults = ["log", "debug", "error", "todo", "trace", "trace-tests"]
 # systems
+ai = []
 sandbox = []
-taskmaster = []
-## SAC
+## ai
+taskmaster = ["ai"]
+# SAC
 anger = []
 behavior_tree = []
 brothel = []
