@@ -13,8 +13,6 @@ mod task_master;
 pub use task_master::{TaskMaster, TastMasterReport};
 
 
-type InpulseId = usize;
-
 pub type BlackboardKey = String;
 
 #[cfg(test)]

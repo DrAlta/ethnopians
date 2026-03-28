@@ -1,7 +1,5 @@
 use std::fmt;
 
-use geometried::geometwo::broad_phase::EntityId;
-
 use crate::ai::forth::StackItem;
 
 impl<EntityId: fmt::Display>  fmt::Display for StackItem<EntityId> {

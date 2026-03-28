@@ -4,9 +4,19 @@ version = "0.3.6"
 edition = "2021"
 
 [[bin]]
+name = "gossip"
+path = "src/bin/gossip.rs"
+required-features = ["gossip"]
+
+[[bin]]
 name = "pubsub"
 path = "src/bin/pubsub.rs"
 required-features = ["pubsub"]
+
+[[bin]]
+name = "latadog"
+path = "src/bin/latadog.rs"
+required-features = ["latadog"]
 
 
 [lib]

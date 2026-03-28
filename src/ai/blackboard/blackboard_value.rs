@@ -53,7 +53,7 @@ impl<EntityId: std::fmt::Display> From<StackItem<EntityId>> for BlackboardValue<
 }
 impl<EntityId> /*TryInto<EntityId> for*/ BlackboardValue<EntityId> {
     ///type Error = ();
-    fn try_into_entity(self) -> Result<EntityId, ()> {
+    pub fn try_into_entity(self) -> Result<EntityId, ()> {
         match self {
             BlackboardValue::EntityId(entity) => Ok(entity),
             BlackboardValue::String(_) | BlackboardValue::Coord { .. } => Err(()),
