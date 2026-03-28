@@ -11,13 +11,13 @@ pub use stack_item::{StackItem, TableGet, TableInterior};
 mod thread_pool;
 pub use thread_pool::ThreadPool;
 
-pub type Thread = Vec<Instruction>;
+pub type Thread<InpulseId, EntityId> = Vec<Instruction<InpulseId, EntityId>>;
 pub type ThreadId = String;
 
 type ExecutionPointer = (ThreadId, usize);
 
 pub type ProgramCounter = Option<ExecutionPointer>;
-pub type Stack = Vec<StackItem>;
+pub type Stack<EntityId> = Vec<StackItem<EntityId>>;
 pub type ReturnStack = Vec<ExecutionPointer>;
 
 #[cfg(test)]

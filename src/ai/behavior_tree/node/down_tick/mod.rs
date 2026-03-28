@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 
-use crate::sandbox::new_ai::{
+use crate::ai::{
     Blackboard, BlackboardKey, BlackboardValue, Prayer, Status, behavior_tree::{ExecReport, Node, State}
 };
 
@@ -8,11 +8,11 @@ mod selector;
 use selector::down_tick_selector;
 
 impl Node {
-    pub fn down_tick(
-        &self,
+    pub fn down_tick<'a, 'b, InpulseId, EntityId: Clone + std::fmt::Debug + std::hash::Hash, Item: TryFrom<&'a str>>(
+        &'b self,
         state_maybe: Option<State>,
-        blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
-    ) -> ExecReport {
+        blackboard: &'a mut Blackboard<BlackboardKey, BlackboardValue<EntityId>>,
+    ) -> ExecReport<InpulseId, EntityId, Item> {
         match self {
             Node::Selector { children: _ } => {
                 down_tick_selector(state_maybe)
@@ -194,13 +194,14 @@ impl Node {
                         },
                     };
                 };
-                let &BlackboardValue::EntityId(agent) = self_value else {
+                let BlackboardValue::EntityId(agent1) = self_value else {
                     return ExecReport::Status {
                         status: Status::Failure {
                             reason: format!("self not an EntityId"),
                         },
                     };
                 };
+                let agent = agent1.clone();
                 let Some(item_class_value) = blackboard.get(key_to_item_class) else {
                     return ExecReport::Status {
                         status: Status::Failure {

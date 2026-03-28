@@ -1,8 +1,10 @@
 use std::fmt;
 
-use crate::sandbox::new_ai::forth::StackItem;
+use geometried::geometwo::broad_phase::EntityId;
 
-impl fmt::Display for StackItem {
+use crate::ai::forth::StackItem;
+
+impl<EntityId: fmt::Display>  fmt::Display for StackItem<EntityId> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             StackItem::Int(i) => write!(f, "{}", i),

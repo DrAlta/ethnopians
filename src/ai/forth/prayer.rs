@@ -44,3 +44,4 @@ pub enum Prayer{
     RemoveEntitiesOfType(Item),
     RetainEntitiesOfType(Item),
 }
+impl 

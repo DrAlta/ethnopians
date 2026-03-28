@@ -1,20 +1,20 @@
 use std::{borrow::Borrow, collections::BTreeMap};
 
-use crate::sandbox::new_ai::forth::{Thread, ThreadId};
+use crate::ai::forth::{Thread, ThreadId};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct ThreadPool(BTreeMap<ThreadId, Thread>);
-impl ThreadPool {
+pub struct ThreadPool<InpulseId, EntityId>(BTreeMap<ThreadId, Thread<InpulseId, EntityId>>);
+impl<InpulseId, EntityId> ThreadPool<InpulseId, EntityId> {
     pub fn new() -> Self {
         Self(BTreeMap::new())
     }
-    pub fn get<Q: ?Sized + Ord>(&self, k: &Q) -> Option<&Thread>
+    pub fn get<Q: ?Sized + Ord>(&self, k: &Q) -> Option<&Thread<InpulseId, EntityId>>
     where
         ThreadId: Borrow<Q>,
     {
         self.0.get(k)
     }
-    pub fn insert(&mut self, key: ThreadId, value: Thread) -> Option<Thread> {
+    pub fn insert(&mut self, key: ThreadId, value: Thread<InpulseId, EntityId>) -> Option<Thread<InpulseId, EntityId>> {
         self.0.insert(key, value)
     }
     pub fn contains_key<Q: ?Sized + Ord>(&self, key: &Q) -> bool
@@ -23,30 +23,30 @@ impl ThreadPool {
     {
         self.0.contains_key(key)
     }
-    pub fn extend<I: IntoIterator<Item = (ThreadId, Thread)>>(&mut self, iter: I) {
+    pub fn extend<I: IntoIterator<Item = (ThreadId, Thread<InpulseId, EntityId>)>>(&mut self, iter: I) {
         self.0.extend(iter);
     }
 }
 
-impl IntoIterator for ThreadPool {
-    type Item = (ThreadId, Thread); // The items produced by the iterator
-    type IntoIter = std::collections::btree_map::IntoIter<ThreadId, Thread>; // The iterator type
+impl<InpulseId, EntityId> IntoIterator for ThreadPool<InpulseId, EntityId> {
+    type Item = (ThreadId, Thread<InpulseId, EntityId>); // The items produced by the iterator
+    type IntoIter = std::collections::btree_map::IntoIter<ThreadId, Thread<InpulseId, EntityId>>; // The iterator type
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter() // Delegates to the BTreeMap's into_iter
     }
 }
 
-impl<'a> IntoIterator for &'a ThreadPool {
-    type Item = (&'a ThreadId, &'a Thread); // The iterator produces references
-    type IntoIter = std::collections::btree_map::Iter<'a, ThreadId, Thread>; // The iterator type
+impl<'a, InpulseId, EntityId> IntoIterator for &'a ThreadPool<InpulseId, EntityId> {
+    type Item = (&'a ThreadId, &'a Thread<InpulseId, EntityId>); // The iterator produces references
+    type IntoIter = std::collections::btree_map::Iter<'a, ThreadId, Thread<InpulseId, EntityId>>; // The iterator type
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.iter() // Delegates to the BTreeMap's iter method
     }
 }
 
-impl<T: Into<BTreeMap<ThreadId, Thread>>> From<T> for ThreadPool {
+impl<InpulseId, EntityId, T: Into<BTreeMap<ThreadId, Thread<InpulseId, EntityId>>>> From<T> for ThreadPool<InpulseId, EntityId> {
     fn from(value: T) -> Self {
         Self(value.into())
     }

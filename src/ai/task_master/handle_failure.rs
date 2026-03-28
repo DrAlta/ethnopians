@@ -1,6 +1,6 @@
-use crate::sandbox::new_ai::{forth::StackItem, task_master::SubSystemState};
+use crate::ai::{forth::StackItem, task_master::SubSystemState};
 
-pub fn handle_failure(stack: &mut Vec<SubSystemState>, reason: String) -> Result<(), String> {
+pub fn handle_failure<EntityId>(stack: &mut Vec<SubSystemState<EntityId>>, reason: String) -> Result<(), String> {
     stack.pop();
     let Some(sub_system_state) = stack.last_mut() else {
         return Err(reason)

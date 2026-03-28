@@ -1,9 +1,9 @@
 use qol::logy;
 
-use crate::sandbox::new_ai::{behavior_tree::{Node, State, ExecReport}, Status};
+use crate::ai::{behavior_tree::{Node, State, ExecReport}, Status};
 
 impl Node {
-    pub fn up_tick(&self, state: State, childs_returned_status: Status<State>) -> ExecReport {
+    pub fn up_tick<InpulseId, EntityId, Item>(&self, state: State, childs_returned_status: Status<State>) -> ExecReport<InpulseId, EntityId, Item> {
         match self {
             Node::Selector { children } => {
                 let State::Selector {

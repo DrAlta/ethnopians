@@ -1,4 +1,4 @@
-use crate::sandbox::new_ai::BlackboardKey;
+use crate::ai::BlackboardKey;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Node {

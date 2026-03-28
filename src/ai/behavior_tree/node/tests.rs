@@ -2,16 +2,14 @@ use std::sync::Arc;
 
 use qol::assert_specimen;
 
-use crate::sandbox::{
-    Item, new_ai::{Blackboard, BlackboardValue, Prayer, Status, Variable, behavior_tree::*}
-};
+use crate::ai::{test::Item, Blackboard, BlackboardValue, Prayer, Status, Variable, behavior_tree::*};
 
 #[test]
 fn test() {
     let mut blackboard = Blackboard::new();
     blackboard.insert(
         "self".to_owned(),
-        Variable::Chit(BlackboardValue::EntityId(42_u64.into())),
+        Variable::Chit(BlackboardValue::<u64>::EntityId(42_u64.into())),
     );
     blackboard.insert(
         "A".to_owned(),
@@ -34,7 +32,7 @@ fn test() {
         ],
     };
 
-    let x1 = tree.down_tick(None, &mut blackboard);
+    let x1: ExecReport<i8, u64, Item> = tree.down_tick(None, &mut blackboard);
     assert_specimen!(
         &x1,
         &ExecReport::TickChild {
@@ -58,7 +56,7 @@ fn test() {
     else {
         panic!()
     };
-    let x2;
+    let x2: ExecReport<i8, u64, Item>;
     x2 = children[child_index].down_tick(child_state_maybe, &mut blackboard);
     assert_specimen!(
         x2,
@@ -68,7 +66,7 @@ fn test() {
         })
     );
     // I'm leaning for when a condition prayer is made the sky daddy up ticks the parent with the answer
-    let x3 = tree.up_tick(my_state, Status::Success);
+    let x3: ExecReport<i8, u64, Item> = tree.up_tick(my_state, Status::Success);
     let ExecReport::TickChild {
         child_index,
         my_state,
@@ -77,7 +75,7 @@ fn test() {
     else {
         panic!()
     };
-    let x4 = children[child_index].down_tick(child_state_maybe, &mut blackboard);
+    let x4: ExecReport<i8, u64, Item> = children[child_index].down_tick(child_state_maybe, &mut blackboard);
     assert_specimen!(
         x4,
         ExecReport::Prayer(Prayer::GetIsInventoryGE {
@@ -86,7 +84,7 @@ fn test() {
             amount: 1
         })
     );
-    let x5 = tree.up_tick(my_state, Status::Success);
+    let x5: ExecReport<i8, u64, Item> = tree.up_tick(my_state, Status::Success);
     assert_specimen!(
         x5,
         ExecReport::Status {

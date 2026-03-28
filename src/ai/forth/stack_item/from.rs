@@ -1,12 +1,8 @@
 use std::sync::Arc;
 
-use crate::sandbox::{
-    new_ai::{forth::StackItem, BlackboardValue},
-    EntityId,
-};
-
-impl From<BlackboardValue> for StackItem {
-    fn from(value: BlackboardValue) -> Self {
+use crate::ai::{forth::StackItem, BlackboardValue};
+impl<EntityId> From<BlackboardValue<EntityId>> for StackItem<EntityId> {
+    fn from(value: BlackboardValue<EntityId>) -> Self {
         match value {
             BlackboardValue::EntityId(entity) => Self::EntityId(entity),
             BlackboardValue::String(x) => Self::String(x),
@@ -14,8 +10,8 @@ impl From<BlackboardValue> for StackItem {
         }
     }
 }
-impl From<&BlackboardValue> for StackItem {
-    fn from(value: &BlackboardValue) -> Self {
+impl<EntityId: Clone> From<&BlackboardValue<EntityId>> for StackItem<EntityId> {
+    fn from(value: &BlackboardValue<EntityId>) -> Self {
         match value {
             BlackboardValue::EntityId(entity) => Self::EntityId(entity.clone()),
             BlackboardValue::String(x) => Self::String(x.clone()),
@@ -27,7 +23,7 @@ impl From<&BlackboardValue> for StackItem {
     }
 }
 
-impl From<bool> for StackItem {
+impl<EntityId> From<bool> for StackItem<EntityId> {
     fn from(value: bool) -> Self {
         if value {
             Self::True
@@ -36,57 +32,61 @@ impl From<bool> for StackItem {
         }
     }
 }
-impl From<&bool> for StackItem {
+impl<EntityId> From<&bool> for StackItem<EntityId> {
     fn from(value: &bool) -> Self {
-        (*value).into()
+        if *value {
+            Self::True
+        } else {
+            Self::False
+        }
     }
 }
 
-impl From<EntityId> for StackItem {
-    fn from(value: EntityId) -> Self {
+impl<EntityId> /*From<EntityId> for*/ StackItem<EntityId> {
+    fn from_entity(value: EntityId) -> Self {
         Self::EntityId(value)
     }
 }
-impl From<&EntityId> for StackItem {
+/*impl<EntityId> From<&EntityId> for StackItem<EntityId> {
     fn from(value: &EntityId) -> Self {
         Self::EntityId(*value)
     }
-}
+}*/
 
-impl From<i32> for StackItem {
+impl<EntityId> From<i32> for StackItem<EntityId> {
     fn from(value: i32) -> Self {
         Self::Int(value)
     }
 }
-impl From<&i32> for StackItem {
+impl<EntityId> From<&i32> for StackItem<EntityId> {
     fn from(value: &i32) -> Self {
         Self::Int(*value)
     }
 }
 
-impl From<usize> for StackItem {
+impl<EntityId> From<usize> for StackItem<EntityId> {
     fn from(value: usize) -> Self {
         Self::Int(value as i32)
     }
 }
-impl From<&usize> for StackItem {
+impl<EntityId> From<&usize> for StackItem<EntityId> {
     fn from(value: &usize) -> Self {
         Self::Int(*value as i32)
     }
 }
 
-impl From<String> for StackItem {
+impl<EntityId> From<String> for StackItem<EntityId> {
     fn from(value: String) -> Self {
         Self::String(Arc::new(value))
     }
 }
-impl From<&str> for StackItem {
+impl<EntityId> From<&str> for StackItem<EntityId> {
     fn from(value: &str) -> Self {
         Self::String(Arc::new(value.to_owned()))
     }
 }
 
-impl<T: Into<StackItem>> From<Option<T>> for StackItem {
+impl<EntityId, T: Into<StackItem<EntityId>>> From<Option<T>> for StackItem<EntityId> {
     fn from(value: Option<T>) -> Self {
         let Some(thing) = value else {
             return StackItem::False;
@@ -94,9 +94,9 @@ impl<T: Into<StackItem>> From<Option<T>> for StackItem {
         StackItem::some(thing.into())
     }
 }
-impl<'a, T> From<&'a Option<T>> for StackItem
+impl<'a, T, EntityId> From<&'a Option<T>> for StackItem<EntityId>
 where
-    &'a T: Into<StackItem>,
+    &'a T: Into<StackItem<EntityId>>,
 {
     fn from(value: &'a Option<T>) -> Self {
         value.as_ref().into()

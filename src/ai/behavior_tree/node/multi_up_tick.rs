@@ -1,13 +1,13 @@
 use std::collections::BTreeMap;
 
-use crate::sandbox::new_ai::{behavior_tree::{Node, ExecReport, State}, Status};
+use crate::ai::{behavior_tree::{Node, ExecReport, State}, Status};
 
 impl Node {
-    pub fn multi_up_tick(
+    pub fn multi_up_tick<InpulseId, EntityId, Item>(
         &self,
         state: State,
         childerns_returned_statuses: BTreeMap<usize, Status<State>>,
-    ) -> ExecReport {
+    ) -> ExecReport<InpulseId, EntityId, Item> {
         match self {
             Node::Parallel {
                 children: _,

@@ -1,9 +1,9 @@
 use std::collections::BTreeMap;
 
-use crate::sandbox::new_ai::{Prayer, Status, behavior_tree::State};
+use crate::ai::{Prayer, Status, behavior_tree::State};
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum ExecReport{
+pub enum ExecReport<InpulseId, EntityId, Item> {
     TickChild {
         child_index: usize,
         my_state: State,
@@ -15,5 +15,5 @@ pub enum ExecReport{
     Status {
         status: Status<State>,
     },
-    Prayer(Prayer),
+    Prayer(Prayer<InpulseId, EntityId, Item>),
 }

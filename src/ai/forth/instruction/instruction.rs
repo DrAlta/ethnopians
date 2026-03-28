@@ -1,9 +1,9 @@
-use crate::sandbox::new_ai::{
-    InpulseId, Prayer, forth::{ProgramCounter, ReturnStack, Stack, StackItem, ThreadId}
+use crate::ai::{
+    Prayer, forth::{ProgramCounter, ReturnStack, Stack, StackItem, ThreadId}
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum Instruction {
+pub enum Instruction<InpulseId, EntityId> {
     Debug(String),
     // signels the process runing virtual machine to proform an action (? -- ?)
     // InpulseId::GoTo ( Coord -- (Success or Failure))
@@ -35,7 +35,7 @@ pub enum Instruction {
     //(x -- (x false) or (Int true))
     IsInt,
     LE,
-    Lit(StackItem),
+    Lit(StackItem<EntityId>),
     LT,
     Mul,
     NotTrue,
@@ -64,14 +64,21 @@ pub enum Instruction {
     // (coord coord -- Table) gets all entities in a TOS rectanle at NOS
     GetEntities,
 }
-impl Instruction {
-    pub fn next(status: Option<Prayer>, pc: &mut ProgramCounter) -> Result<Option<Prayer>, String> {
+impl<InpulseId, EntityId> Instruction<InpulseId,EntityId> {
+    pub fn next<Item>(
+        status: Option<Prayer<InpulseId, EntityId, Item>>,
+        pc: &mut ProgramCounter
+    ) -> Result<Option<Prayer<InpulseId, EntityId, Item>>, String> {
         if let Some((_, idx)) = pc {
             *idx += 1;
         }
         return Ok(status);
     }
-    pub fn exit(status: Option<Prayer>, return_stack: &mut ReturnStack, pc: &mut ProgramCounter) -> Result<Option<Prayer>, String> {
+    pub fn exit<Item>(
+        status: Option<Prayer<InpulseId, EntityId, Item>>,
+        return_stack: &mut ReturnStack,
+        pc: &mut ProgramCounter
+    ) -> Result<Option<Prayer<InpulseId, EntityId, Item>>, String> {
         if let Some(parent_token) = return_stack.pop() {
             // return to calling fuction
             *pc = Some(parent_token);
@@ -82,7 +89,7 @@ impl Instruction {
             return Ok(status);
         };
     }
-    pub fn get_two_coords(stack: &mut Stack) -> Result<((i32, i32), (i32, i32)), String> {
+    pub fn get_two_coords(stack: &mut Stack<EntityId>) -> Result<((i32, i32), (i32, i32)), String> {
         let Some(StackItem::Coord { .. }) = stack.last() else {
             return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
         };
@@ -97,7 +104,7 @@ impl Instruction {
         };
         Ok(((nos_x, nos_y), (tos_x, tos_y)))
     }
-    pub fn get_two_ints(stack: &mut Stack) -> Result<(i32, i32), String> {
+    pub fn get_two_ints(stack: &mut Stack<EntityId>) -> Result<(i32, i32), String> {
         let Some(StackItem::Int(_)) = stack.last() else {
             return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
         };

@@ -2,19 +2,23 @@ use std::sync::Arc;
 
 use qol::logy;
 
-use crate::sandbox::new_ai::{
+use crate::ai::{
     forth::{Instruction, ProgramCounter, ReturnStack, Stack, StackItem},
     Blackboard, BlackboardKey, BlackboardValue, Prayer, Variable,
 };
 
-impl Instruction {
-    pub fn tick(
+impl<InpulseId: std::fmt::Debug + Clone, EntityId: std::hash::Hash + std::fmt::Debug + std::fmt::Display + Clone + std::cmp::PartialEq + Ord> Instruction<InpulseId, EntityId> {
+    pub fn tick<Item>(
         &self,
-        stack: &mut Stack,
+        stack: &mut Stack<EntityId>,
         return_stack: &mut ReturnStack,
         pc: &mut ProgramCounter,
-        blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
-    ) -> Result<Option<Prayer>, String> {
+        blackboard: &mut Blackboard<BlackboardKey, BlackboardValue<EntityId>>,
+     ) -> Result<Option<Prayer<InpulseId, EntityId, Item>>, String>
+    where 
+        Arc<String>: TryInto<Item>,
+        for<'b>  Item: TryFrom<&'b str>,
+    {
         logy!("debug", "ticking:{pc:?}:{self:?}");
         println!("Stack is:");
         for c in &*stack {
@@ -229,9 +233,10 @@ impl Instruction {
                     return Err(format!("{}:{}:{item_class_string} is not a valid item class", file!(), line!()));
                 };
 
-                let Some(&BlackboardValue::EntityId(agent)) = blackboard.get("self") else {
+                let Some(BlackboardValue::EntityId(agent1)) = blackboard.get("self") else {
                     return Err(format!("{}:{}:self not found in blackboard", file!(), line!()));
                 };
+                let agent = agent1.clone();
                 Self::next(
                     Prayer::GetIsInventoryGE {
                         agent,

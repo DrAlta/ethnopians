@@ -1,7 +1,7 @@
-use crate::sandbox::{InpulseId, EntityId, Item};
+//use crate::sandbox::{InpulseId, EntityId, Item};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum Prayer {
+pub enum Prayer<InpulseId, EntityId, Item> {
     // query world
     FindInInventory {
         item_class: Item,

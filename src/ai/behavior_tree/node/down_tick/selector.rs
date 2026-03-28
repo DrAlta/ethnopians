@@ -1,6 +1,6 @@
-use crate::sandbox::new_ai::{Status, behavior_tree::{ExecReport, State}};
+use crate::ai::{Status, behavior_tree::{ExecReport, State}};
 
-pub fn down_tick_selector (state_maybe: Option<State>,) -> ExecReport {
+pub fn down_tick_selector<InpulseId, EntityId, Item> (state_maybe: Option<State>,) -> ExecReport<InpulseId, EntityId, Item> {
     let (child_index, child_state_maybe, reason_for_failure) =
         if let Some(state) = state_maybe {
             if let State::Selector {

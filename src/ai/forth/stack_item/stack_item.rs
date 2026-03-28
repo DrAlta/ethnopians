@@ -3,12 +3,10 @@ use std::{
     sync::{Arc, OnceLock},
 };
 
-use crate::sandbox::EntityId;
-
 use super::table::TableInterior;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum StackItem {
+pub enum StackItem<EntityId> {
     /*
     //Behaior states
     Sequence(usize),
@@ -25,45 +23,54 @@ pub enum StackItem {
     EntityId(EntityId),
     //    Todo(Vec<EntityId>),
     // vvv sure to keep these vvvv
-    Option(Box<StackItem>),
+    Option(Box<Self>),
     String(Arc<String>),
-    Table(Arc<TableInterior>),
+    Table(Arc<TableInterior<EntityId>>),
 }
-impl StackItem {
-    pub fn success() -> StackItem {
-        static SUCCESS: OnceLock<StackItem> = OnceLock::new();
-        SUCCESS
-            .get_or_init(|| StackItem::String(Arc::new("Success".to_owned())))
-            .clone()
+impl<EntityId> StackItem<EntityId> {
+    pub fn success() -> Self {
+        static SUCCESS: OnceLock<Arc<String>> = OnceLock::new();
+        StackItem::String(SUCCESS
+            .get_or_init(
+                || 
+                Arc::new("Success".to_owned())
+            ).clone()
+        )
     }
-    pub fn failure(_reason: String) -> StackItem {
-        static FAILURE: OnceLock<StackItem> = OnceLock::new();
-        FAILURE
-            .get_or_init(|| StackItem::String(Arc::new("Failure".to_owned())))
-            .clone()
+    pub fn failure(_reason: String) -> Self {
+        static FAILURE: OnceLock<Arc<String>> = OnceLock::new();
+        StackItem::String(FAILURE
+            .get_or_init(
+                || 
+                Arc::new("Failure".to_owned())
+            ).clone()
+        )
     }
-    pub fn init() -> StackItem {
+    pub fn init() -> Self {
         // static INIT: OnceLock<StackItem> = OnceLock::new();
         //  INIT.get_or_init(|| {
         StackItem::String(Arc::new("Init".to_owned()))
         // }).clone()
     }
+}
+impl<EntityId: Ord> StackItem<EntityId> {
+
     pub fn selector(value: i32) -> Self {
-        static SELECTOR: OnceLock<StackItem> = OnceLock::new();
+        static SELECTOR: OnceLock<Arc<String>> = OnceLock::new();
 
         let inner = TableInterior {
             map: BTreeMap::from([(
-                SELECTOR.get_or_init(|| "Selector".into()).clone(),
+                StackItem::String(SELECTOR.get_or_init(|| Arc::new("Selector".to_owned())).clone()),
                 value.into(),
             )]),
         };
         Self::Table(Arc::new(inner))
     }
     pub fn sequence(value: i32) -> Self {
-        static SEQUENCE: OnceLock<StackItem> = OnceLock::new();
+        static SEQUENCE: OnceLock<Arc<String>> = OnceLock::new();
         let inner = TableInterior {
             map: BTreeMap::from([(
-                SEQUENCE.get_or_init(|| "Sequence".into()).clone(),
+                StackItem::String(SEQUENCE.get_or_init(|| Arc::new("Sequence".to_owned())).clone()),
                 value.into(),
             )]),
         };
@@ -71,20 +78,20 @@ impl StackItem {
     }
 }
 
-impl StackItem {
-    pub fn some(value: StackItem) -> StackItem {
+impl<EntityId> StackItem<EntityId> {
+    pub fn some(value: Self) -> Self {
         Self::Option(Box::new(value))
     }
-    pub fn none() -> StackItem {
+    pub fn none() -> Self {
         Self::False
     }
-    pub fn new_table() -> StackItem {
+    pub fn new_table() -> Self {
         StackItem::Table(Arc::new(TableInterior::new()))
     }
 }
 
-impl StackItem {
-    pub fn from_iter<T: Into<StackItem>, I: Iterator<Item = T>>(value: I) -> Self {
+impl<EntityId: Ord> StackItem<EntityId> {
+    pub fn from_iter<T: Into<Self>, I: Iterator<Item = T>>(value: I) -> Self {
         let mut inner = TableInterior::new();
         value.enumerate().for_each(|(idx, x)| {
             inner.insert(idx.into(), x.into());
@@ -94,9 +101,10 @@ impl StackItem {
 
     pub fn stuff(
         &mut self,
-        stuffing: StackItem,
-        key: StackItem,
-    ) -> Result<Option<StackItem>, String> {
+        stuffing: Self,
+        key: Self,
+    ) -> Result<Option<Self>, String>
+    where TableInterior<EntityId>: Clone {
         match self {
             StackItem::Table(stuffee) => {
                 let x = Arc::make_mut(stuffee);
@@ -107,10 +115,10 @@ impl StackItem {
     }
 }
 
-impl<const N: usize> TryFrom<[(StackItem, StackItem); N]> for StackItem {
+impl<const N: usize, EntityId: Ord> TryFrom<[(StackItem<EntityId>, StackItem<EntityId>); N]> for StackItem<EntityId> {
     type Error = String;
 
-    fn try_from(value: [(StackItem, StackItem); N]) -> Result<StackItem, Self::Error> {
+    fn try_from(value: [(StackItem<EntityId>, StackItem<EntityId>); N]) -> Result<StackItem<EntityId>, Self::Error> {
         let mut inner = TableInterior::new();
         for (key, stuffing) in value.into_iter() {
             inner.insert(key, stuffing);
@@ -118,10 +126,10 @@ impl<const N: usize> TryFrom<[(StackItem, StackItem); N]> for StackItem {
         Ok(Self::Table(Arc::new(inner)))
     }
 }
-impl<const N: usize> TryFrom<[(&str, StackItem); N]> for StackItem {
+impl<const N: usize, EntityId: Ord> TryFrom<[(&str, StackItem<EntityId>); N]> for StackItem<EntityId> {
     type Error = String;
 
-    fn try_from(value: [(&str, StackItem); N]) -> Result<StackItem, Self::Error> {
+    fn try_from(value: [(&str, StackItem<EntityId>); N]) -> Result<StackItem<EntityId>, Self::Error> {
         let mut inner = TableInterior::new();
         for (key, stuffing) in value.into_iter() {
             inner.insert(key.into(), stuffing);
@@ -132,5 +140,5 @@ impl<const N: usize> TryFrom<[(&str, StackItem); N]> for StackItem {
 
 #[test]
 fn fo() {
-    assert_eq!(StackItem::success(), StackItem::success(),)
+    assert_eq!(StackItem::<i8>::success(), StackItem::<i8>::success(),)
 }

@@ -1,15 +1,17 @@
-use crate::sandbox::new_ai::{
+use std::sync::Arc;
+
+use crate::ai::{
     Blackboard, BlackboardKey, BlackboardValue, Prayer, forth::{ProgramCounter, ReturnStack, Stack, StackItem, ThreadId, ThreadPool}
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct CPU {
+pub struct CPU<EntityId> {
     pub pc: ProgramCounter,
-    pub stack: Stack,
+    pub stack: Stack<EntityId>,
     pub return_stack: ReturnStack,
 }
 
-impl CPU {
+impl<EntityId> CPU<EntityId> {
     pub fn load(token: ThreadId) -> Self {
         let pc = Some((token.clone(), 0));
         let stack = vec![StackItem::init()];
@@ -21,11 +23,15 @@ impl CPU {
             return_stack,
         }
     }
-    pub fn step(
+}
+impl<EntityId: std::hash::Hash + std::fmt::Debug + std::fmt::Display + Clone + std::cmp::PartialEq + Ord> CPU<EntityId> {
+
+    pub fn step<InpulseId: std::fmt::Debug + Clone, Item: TryFrom<Arc<String>>> (
         &mut self,
-        bt: &ThreadPool,
-        blackboard: &mut Blackboard<BlackboardKey, BlackboardValue>,
-    ) -> Result<Option<Prayer>, String> {
+        bt: &ThreadPool<InpulseId, EntityId>,
+        blackboard: &mut Blackboard<BlackboardKey, BlackboardValue<EntityId>>,
+    ) -> Result<Option<Prayer<InpulseId, EntityId, Item>>, String>
+    where for<'a> Item: TryFrom<&'a str> {
         let Some((token, idx)) = &self.pc else {
             return Err(format!("{}:{}:program halted", file!(), line!()));
         };

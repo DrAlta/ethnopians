@@ -1,8 +1,8 @@
-use crate::sandbox::new_ai::Prayer;
+use crate::ai::Prayer;
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum TastMasterReport {
-    Prayer(Prayer),
+pub enum TastMasterReport <InpulseId, EntityId, Item>{
+    Prayer(Prayer<InpulseId, EntityId, Item>),
     WaitingOnPrayer,
     Err(String),
     Ok,
