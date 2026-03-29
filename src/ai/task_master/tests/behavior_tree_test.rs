@@ -55,15 +55,15 @@ fn behavior_treee_test_of_task_master() {
         ],
     };
 
-    let behavoir_tree_tasks = HashMap::from([
+    let behavior_tree_tasks = HashMap::from([
         ("test".to_owned(), tree)
     ]);
-    let x1 = task_master.tick(&behavoir_tree_tasks, None);
+    let x1 = task_master.tick(&behavior_tree_tasks, None);
     assert_specimen!(
         x1,
         crate::ai::TastMasterReport::Ok
     );
-    let SubSystemState::BehaviorTree { tree_id:_, execution_limb, state_tick_next_maybe } = task_master.stack.last().unwrap() else {
+    let SubSystemState::BehaviorTree { tree_id:_, execution_limb, state_tick_next_maybe: _ } = task_master.stack.last().unwrap() else {
         panic!()
     };
     let b1= execution_limb.last().unwrap();
@@ -78,7 +78,7 @@ fn behavior_treee_test_of_task_master() {
         }
     );
 
-    let x2 = task_master.tick(&behavoir_tree_tasks, None);
+    let x2 = task_master.tick(&behavior_tree_tasks, None);
     assert_specimen!(
         x2,
         crate::ai::TastMasterReport::Prayer(Prayer::Combine {
@@ -86,7 +86,7 @@ fn behavior_treee_test_of_task_master() {
             indirect_item_class: Item::Axe
         })
     );
-    let SubSystemState::BehaviorTree { tree_id:_, execution_limb, state_tick_next_maybe } = task_master.stack.last().unwrap() else {
+    let SubSystemState::BehaviorTree { tree_id:_, execution_limb, state_tick_next_maybe: _ } = task_master.stack.last().unwrap() else {
         panic!()
     };
     let b2= execution_limb.last().unwrap();
@@ -102,40 +102,44 @@ fn behavior_treee_test_of_task_master() {
     );
 
     let x3 = task_master.tick(
-        &behavoir_tree_tasks, 
+        &behavior_tree_tasks, 
         Some(ExecReport::Status { status: Status::Success }));
     assert_specimen!(
         x3,
         crate::ai::TastMasterReport::Ok
     );
-    panic!("{task_master:#?}");
-    /*
-    // I'm leaning for when a condition prayer is made the sky daddy up ticks the parent with the answer
-    let x3: ExecReport<i8, u64, Item> = tree.up_tick(my_state, Status::Success);
-    let ExecReport::TickChild {
-        child_index,
-        my_state,
-        child_state_maybe,
-    } = x3
-    else {
+
+    let SubSystemState::BehaviorTree { tree_id:_, execution_limb, state_tick_next_maybe: _ } = task_master.stack.last().unwrap() else {
         panic!()
     };
-    let x4: ExecReport<i8, u64, Item> = children[child_index].down_tick(child_state_maybe, &mut blackboard);
+    let b3 = execution_limb.last().unwrap();
+    assert_specimen!(
+        b3,
+        &Branch{
+            child_index: 1,
+            parent_up_tick_state: State::Sequence {
+                child_index: 1,
+                child_state_maybe: None
+            },
+        }
+    );
+
+    let x4 = task_master.tick(&behavior_tree_tasks, None);
     assert_specimen!(
         x4,
-        ExecReport::Prayer(Prayer::GetIsInventoryGE {
-            agent: 42_u64.into(),
+        crate::ai::TastMasterReport::Prayer(Prayer::GetIsInventoryGE {
+            agent: 42_u32.into(),
             item_class: Item::Axe,
             amount: 1
         })
     );
-    let x5: ExecReport<i8, u64, Item> = tree.up_tick(my_state, Status::Success);
+
+    let x5 = task_master.tick(
+        &behavior_tree_tasks,
+        Some(ExecReport::Status { status: Status::Success }),
+    );
     assert_specimen!(
         x5,
-        ExecReport::Status {
-            status: Status::Success
-        }
+        crate::ai::TastMasterReport::Success
     );
-*/
-
 }
