@@ -1,6 +1,9 @@
 use std::collections::{BTreeSet, HashMap};
 
-use geometried::geometwo::{AARect, broadphase::{Broadphase, SpatialId}};
+use geometried::geometwo::{
+    broadphase::{Broadphase, SpatialId},
+    AARect,
+};
 
 use crate::sandbox::{movement::Prev, EntityId};
 

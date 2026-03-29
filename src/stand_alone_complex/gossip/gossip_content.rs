@@ -1,5 +1,5 @@
-use crate::Number;
 use super::CharId;
+use crate::Number;
 
 /// Represents the content of a gossip shared by a gossiper.
 pub struct GossipContent {

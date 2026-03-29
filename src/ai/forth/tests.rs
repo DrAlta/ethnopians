@@ -3,7 +3,8 @@ use qol::{assert_specimen, pout};
 use crate::ai::test::Item;
 
 use crate::ai::{
-    Blackboard, Prayer, forth::{Instruction, ThreadPool, cpu::CPU}
+    forth::{cpu::CPU, Instruction, ThreadPool},
+    Blackboard, Prayer,
 };
 
 type InpulseId = u8;
@@ -31,14 +32,20 @@ fn step_test() {
     let mut cpu = CPU::load(action3.clone());
     //step 1 selectpr does its init and sets the cpu up to call its first child, sequence.
     pout!("ticking:{:?}", cpu.pc);
-    assert_specimen!(cpu.step::<InpulseId, Item>(&task_db, &mut blackboard), Ok(None));
+    assert_specimen!(
+        cpu.step::<InpulseId, Item>(&task_db, &mut blackboard),
+        Ok(None)
+    );
     pout!("ticking:{:#?}", cpu);
 
     assert_specimen!(&cpu.stack, &vec![]);
     assert_specimen!(&cpu.pc, &Some((action3.clone(), 1)));
     // step 2
     pout!("ticking:{:?}", cpu.pc);
-    assert_specimen!(cpu.step::<InpulseId, Item>(&task_db, &mut blackboard), Ok(None));
+    assert_specimen!(
+        cpu.step::<InpulseId, Item>(&task_db, &mut blackboard),
+        Ok(None)
+    );
     pout!("ticking:{:#?}", cpu);
 
     assert_specimen!(&cpu.stack, &vec![]);
@@ -47,7 +54,10 @@ fn step_test() {
     assert_specimen!(&cpu.pc, &Some((action1.clone(), 0)));
     // step 3
     pout!("ticking:{:?}", cpu.pc);
-    assert_specimen!(cpu.step::<InpulseId, Item>(&task_db, &mut blackboard), Ok(Prayer::Inpulse(1).into()));
+    assert_specimen!(
+        cpu.step::<InpulseId, Item>(&task_db, &mut blackboard),
+        Ok(Prayer::Inpulse(1).into())
+    );
     pout!("ticking:{:#?}", cpu);
 
     assert_specimen!(&cpu.stack, &vec![]);
@@ -56,7 +66,10 @@ fn step_test() {
     assert_specimen!(&cpu.pc, &Some((action1.clone(), 1)));
     // step 4
     pout!("ticking:{:?}", cpu.pc);
-    assert_specimen!(cpu.step::<InpulseId, Item>(&task_db, &mut blackboard), Ok(None));
+    assert_specimen!(
+        cpu.step::<InpulseId, Item>(&task_db, &mut blackboard),
+        Ok(None)
+    );
     pout!("ticking:{:#?}", cpu);
 
     assert_specimen!(&cpu.stack, &vec![]);
@@ -66,7 +79,10 @@ fn step_test() {
 
     // step 5
     pout!("ticking:{:?}", cpu.pc);
-    assert_specimen!(cpu.step::<InpulseId, Item>(&task_db, &mut blackboard), Ok(None));
+    assert_specimen!(
+        cpu.step::<InpulseId, Item>(&task_db, &mut blackboard),
+        Ok(None)
+    );
     pout!("ticking:{:#?}", cpu);
 
     assert_specimen!(&cpu.stack, &vec![]);

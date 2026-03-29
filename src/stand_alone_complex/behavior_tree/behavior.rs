@@ -80,10 +80,18 @@ impl Behavior {
     pub fn add_tick(stack: &mut Vec<Item>, running: &mut Vec<NodeId>) -> Result<Treeturn, String> {
         running.pop();
         let Some(Item::Int(a)) = stack.pop() else {
-            return Err(format!("{}:{}:top of stack wasn't an int", file!(), line!()));
+            return Err(format!(
+                "{}:{}:top of stack wasn't an int",
+                file!(),
+                line!()
+            ));
         };
         let Some(Item::Int(b)) = stack.pop() else {
-            return Err(format!("{}:{}:second of stack wasn't an int", file!(), line!()));
+            return Err(format!(
+                "{}:{}:second of stack wasn't an int",
+                file!(),
+                line!()
+            ));
         };
         let x = a + b;
         stack.push(Item::Int(x));
@@ -107,7 +115,11 @@ impl Behavior {
         running.pop();
 
         let Some(a) = stack.pop() else {
-            return Err(format!("{}:{}:Nothing on stack to print!", file!(), line!()));
+            return Err(format!(
+                "{}:{}:Nothing on stack to print!",
+                file!(),
+                line!()
+            ));
         };
         pout!("{:?}", a);
         return Ok(Treeturn::Success);

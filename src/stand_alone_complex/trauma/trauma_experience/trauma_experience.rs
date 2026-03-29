@@ -1,6 +1,6 @@
 use crate::Number;
 
-use super::{InnerEvent, super::TraumaExperienceType};
+use super::{super::TraumaExperienceType, InnerEvent};
 // record on her experine of an event
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct TraumaExperience {

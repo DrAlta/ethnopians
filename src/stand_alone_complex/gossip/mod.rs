@@ -14,6 +14,5 @@ pub use personality_traits::PersonalityTraits;
 mod relationship;
 pub use relationship::Relationship;
 
-
 /// A unique identifier type for each character in the game.
 type CharId = usize;

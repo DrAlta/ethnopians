@@ -84,38 +84,33 @@ impl<const SIZE: usize> Relation<SIZE> {
     }
 }
 
-
-
-
-
-
 //===================================
 impl<const SIZE: usize> GetColumnsDatums for Relation<SIZE> {
     fn get_column<'a>(&'a self, index: usize) -> Option<Vec<Datum>> {
         if index >= SIZE {
-            return None
+            return None;
         };
-        Some(match &self.fields[index]{
-            Column::I8(items) => items.iter().map(|a|(*a).into()).collect(),
-            Column::String(items) => items.iter().map(|a|Arc::clone(a).into()).collect(),
+        Some(match &self.fields[index] {
+            Column::I8(items) => items.iter().map(|a| (*a).into()).collect(),
+            Column::String(items) => items.iter().map(|a| Arc::clone(a).into()).collect(),
         })
     }
-    
+
     fn datum_type_info(&self, index: usize) -> Option<DatumType> {
         if index >= SIZE {
             return None;
         };
         self.fields[index].get_data_type()
     }
-    
+
     fn get<'a>(&'a self, field_id: &str) -> Option<Vec<Datum>> {
-         for (idx, this_field_id) in self.field_names.iter().enumerate() {
+        for (idx, this_field_id) in self.field_names.iter().enumerate() {
             if field_id == &**this_field_id {
-                return GetColumnsDatums::get_column(self, idx)
+                return GetColumnsDatums::get_column(self, idx);
             }
         }
         None
-   }
+    }
     fn lookup_feilds_type(&self, field_id: &str) -> Option<DatumType> {
         for (idx, this_field_id) in self.field_names.iter().enumerate() {
             if field_id == &**this_field_id {

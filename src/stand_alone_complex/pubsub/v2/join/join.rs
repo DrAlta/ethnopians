@@ -4,7 +4,10 @@ use qol::logy;
 
 use crate::stand_alone_complex::pubsub::v2::join::package_fields;
 
-use super::{intersect_values, Lookup, super::{Datum, DatumType, Relation}};
+use super::{
+    super::{Datum, DatumType, Relation},
+    intersect_values, Lookup,
+};
 
 pub fn join<const SIZE: usize, const N: usize>(
     variables: [Vec<((&str, &str), (&str, &str))>; N],
@@ -42,7 +45,11 @@ pub fn join<const SIZE: usize, const N: usize>(
     });
     if !matched_types.into_iter().all(|t| t) {
         logy!("error", "(matched_types{matched_types:?}");
-        return Err(format!("{}:{}:relations types mismatched", file!(), line!()));
+        return Err(format!(
+            "{}:{}:relations types mismatched",
+            file!(),
+            line!()
+        ));
     }
 
     let final_fields: [_; N] = std::array::from_fn(|i| {
@@ -106,7 +113,5 @@ pub fn join<const SIZE: usize, const N: usize>(
         working.into_iter().map(|(_, v)| Datum::I8(v)).collect()
     });
 
-
     Ok(package_fields(final_fields))
 }
-

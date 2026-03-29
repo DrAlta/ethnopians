@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 mod traits;
-pub use traits::{DatumType, GetDatumType, GetColumnsValues, GetColumnsDatums};
+pub use traits::{DatumType, GetColumnsDatums, GetColumnsValues, GetDatumType};
 mod column;
 pub use column::{empty_i8, empty_string, Column};
 mod datum;

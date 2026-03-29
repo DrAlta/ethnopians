@@ -12,7 +12,6 @@ mod task_master;
 #[cfg(feature = "taskmaster")]
 pub use task_master::{TaskMaster, TastMasterReport};
 
-
 pub type BlackboardKey = String;
 
 #[cfg(test)]

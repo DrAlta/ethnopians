@@ -1,6 +1,9 @@
 use std::collections::BTreeMap;
 
-use crate::ai::{behavior_tree::{Node, ExecReport, State}, Status};
+use crate::ai::{
+    behavior_tree::{ExecReport, Node, State},
+    Status,
+};
 
 impl Node {
     pub fn multi_up_tick<InpulseId, EntityId, Item>(

@@ -12,14 +12,12 @@ pub mod ai;
 #[cfg(feature = "sandbox")]
 pub mod sandbox;
 //pub mod social_sim;//! this is supersecced by the ensemblage crate
+mod ring;
 pub mod stand_alone_complex;
 pub mod types;
 pub mod util;
-mod ring;
 pub use ring::{ring, Box};
 
 pub type Vec2 = geometried::geometwo::Vector2;
 pub type Number = geometried::Number;
-pub static IOTA: LazyLock<Number> = LazyLock::new(||0.0000001.into());
-
-
+pub static IOTA: LazyLock<Number> = LazyLock::new(|| 0.0000001.into());

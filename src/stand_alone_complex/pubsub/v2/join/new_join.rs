@@ -4,14 +4,12 @@ use qol::logy;
 
 use crate::stand_alone_complex::pubsub::v2::{join::package_fields, traits::GetColumnsDatums};
 
-use super::{intersect_values, Lookup, super::Datum};
+use super::{super::Datum, intersect_values, Lookup};
 
 pub fn new_join<const N: usize, M: Lookup + DB>(
     variables: [Vec<((&str, &str), (&str, &str))>; N],
     db: &M,
-) -> Result<Vec<[Datum; N]>, String> 
-
-{
+) -> Result<Vec<[Datum; N]>, String> {
     let matched_types: [_; N] = std::array::from_fn(|i| {
         let variable = &variables[i];
         let mut x = variable.iter();
@@ -44,7 +42,11 @@ pub fn new_join<const N: usize, M: Lookup + DB>(
     });
     if !matched_types.into_iter().all(|t| t) {
         logy!("error", "(matched_types{matched_types:?}");
-        return Err(format!("{}:{}:relations types mismatched", file!(), line!()));
+        return Err(format!(
+            "{}:{}:relations types mismatched",
+            file!(),
+            line!()
+        ));
     }
 
     let final_fields: [_; N] = std::array::from_fn(|i| {
@@ -66,15 +68,12 @@ pub fn new_join<const N: usize, M: Lookup + DB>(
             return Vec::new();
         };
         */
-        
 
         let a1 = db.get(first.0).unwrap();
         let Some(x) = a1.get(first.1) else {
             return Vec::new();
         };
         working = x.into_iter().enumerate().map(|(k, v)| (k, v)).collect();
-        
-        
 
         for term in iter {
             let a1 = db.get(term.0 .0).unwrap();
@@ -83,21 +82,19 @@ pub fn new_join<const N: usize, M: Lookup + DB>(
             };
             intersect_values(&mut working, &x)
         }
-            
+
         working.into_iter().map(|(_, v)| v).collect()
     });
-
 
     Ok(package_fields(final_fields))
 }
 
-
 pub trait DB {
-    fn get (&self, k: &str) -> Option<&Box<dyn GetColumnsDatums>>;
+    fn get(&self, k: &str) -> Option<&Box<dyn GetColumnsDatums>>;
 }
 
-impl DB for HashMap<String, Box<dyn GetColumnsDatums>>{
-    fn get (&self, k: &str) -> Option<&Box<dyn GetColumnsDatums>> {
+impl DB for HashMap<String, Box<dyn GetColumnsDatums>> {
+    fn get(&self, k: &str) -> Option<&Box<dyn GetColumnsDatums>> {
         self.get(k)
     }
 }

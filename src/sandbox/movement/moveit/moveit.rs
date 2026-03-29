@@ -1,6 +1,9 @@
 use std::collections::{BTreeSet, HashMap};
 
-use geometried::geometwo::{AARect, broadphase::{Broadphase, SpatialId}};
+use geometried::geometwo::{
+    broadphase::{Broadphase, SpatialId},
+    AARect,
+};
 
 use crate::Number;
 
@@ -98,13 +101,18 @@ pub fn moveit<T: Prev, B: Broadphase<SpatialId>>(
                             "trace-moveit",
                             "putting Rearended in at the original location"
                         );
-                        let rearend_cell_id = map.insert(AARect::from_min_w_h(x, y, size.0, size.1));
+                        let rearend_cell_id =
+                            map.insert(AARect::from_min_w_h(x, y, size.0, size.1));
                         avals.insert(rearend_cell_id, Avalibility::RearEnded(o2));
                     }
 
                     // Mark the desired destination as having a collision.
-                    let new_cell_id =
-                        map.insert(AARect::from_min_w_h(destination.0, destination.1, size.0, size.1));
+                    let new_cell_id = map.insert(AARect::from_min_w_h(
+                        destination.0,
+                        destination.1,
+                        size.0,
+                        size.1,
+                    ));
                     avals.insert(new_cell_id, Avalibility::Collision(unit_id.clone()));
                     blocked = true;
                 }
@@ -144,7 +152,12 @@ pub fn moveit<T: Prev, B: Broadphase<SpatialId>>(
         }
 
         // Insert the availability status into the map at the desired destination
-        let dest_cell_id = map.insert(AARect::from_min_w_h(destination.0, destination.1, size.0, size.1));
+        let dest_cell_id = map.insert(AARect::from_min_w_h(
+            destination.0,
+            destination.1,
+            size.0,
+            size.1,
+        ));
         avals.insert(dest_cell_id, dest_aval);
     }
 

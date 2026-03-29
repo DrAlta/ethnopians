@@ -31,12 +31,16 @@ pub trait TableGet<T, EntityId> {
     fn table_get(&self, k: T) -> Option<&Value<EntityId>>;
 }
 
-impl<EntityId: Ord> TableGet<&Value<EntityId>, EntityId> for BTreeMap<Value<EntityId>, Value<EntityId>> {
+impl<EntityId: Ord> TableGet<&Value<EntityId>, EntityId>
+    for BTreeMap<Value<EntityId>, Value<EntityId>>
+{
     fn table_get(&self, k: &Value<EntityId>) -> Option<&Value<EntityId>> {
         self.get(k)
     }
 }
-impl<EntityId: Ord + std::fmt::Debug, T: Into<Value<EntityId>> + std::fmt::Debug> TableGet<T, EntityId> for BTreeMap<Value<EntityId>, Value<EntityId>> {
+impl<EntityId: Ord + std::fmt::Debug, T: Into<Value<EntityId>> + std::fmt::Debug>
+    TableGet<T, EntityId> for BTreeMap<Value<EntityId>, Value<EntityId>>
+{
     fn table_get(&self, k: T) -> Option<&Value<EntityId>> {
         logy!("debug", "{k:?}");
         let k2: Value<EntityId> = k.into();

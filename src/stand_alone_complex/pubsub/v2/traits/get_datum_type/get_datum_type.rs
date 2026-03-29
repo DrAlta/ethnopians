@@ -1,8 +1,5 @@
 use super::{super::super::Sting, DatumType};
 
-
-
-
 pub trait GetDatumType<const INDEX: usize> {
     fn get_data_type(&self) -> Option<DatumType>;
 }

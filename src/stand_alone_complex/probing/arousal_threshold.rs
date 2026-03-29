@@ -1,5 +1,5 @@
-use crate::{Number, IOTA};
 use super::{apprehension_delta, arousal_delta, MassageSkill, Massagee, Masseuse};
+use crate::{Number, IOTA};
 
 /// Calculate the minimum threshold for the massagee's arousal level, based on their current state, the masseuse's skills, and the massage skills being used.
 /// This function is used to determine when the massagee's arousal level drops below the limit that she will allow the massage to continue.

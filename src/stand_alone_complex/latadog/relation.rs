@@ -9,9 +9,12 @@ pub struct Relation<const INDEX: usize, Key, Tuple> {
 impl<Key: Eq + Ord, V> From<Rc<Vec<(Key, V)>>> for Relation<0, Key, (Key, V)> {
     fn from(value: Rc<Vec<(Key, V)>>) -> Self {
         let mut index: Vec<usize> = (0..value.len()).collect();
-        index.sort_unstable_by(|&a,&b| value[a].0.cmp(&value[b].0));
-        index.dedup_by(|a,b| value[*a].0 == value[*b].0);
-        Relation { elements: value, index, key: PhantomData }
+        index.sort_unstable_by(|&a, &b| value[a].0.cmp(&value[b].0));
+        index.dedup_by(|a, b| value[*a].0 == value[*b].0);
+        Relation {
+            elements: value,
+            index,
+            key: PhantomData,
+        }
     }
 }
-

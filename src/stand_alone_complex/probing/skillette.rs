@@ -1,5 +1,5 @@
-use crate::Number;
 use super::{Massagee, Masseuse};
+use crate::Number;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Skillette {

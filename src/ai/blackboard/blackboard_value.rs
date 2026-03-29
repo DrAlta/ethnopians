@@ -13,7 +13,7 @@ impl<EntityId> From<&str> for BlackboardValue<EntityId> {
         BlackboardValue::String(Arc::new(value.to_owned()))
     }
 }
-impl<EntityId> /* From<EntityId> for*/ BlackboardValue<EntityId> {
+impl<EntityId> BlackboardValue<EntityId> {
     pub fn from_entity(value: EntityId) -> Self {
         BlackboardValue::EntityId(value)
     }
@@ -25,24 +25,12 @@ impl<EntityId: std::fmt::Display> From<StackItem<EntityId>> for BlackboardValue<
             StackItem::EntityId(entity) => BlackboardValue::EntityId(entity),
             StackItem::String(x) => BlackboardValue::String(x),
             StackItem::True => {
-                static TRUE: OnceLock<Arc::<String>> = OnceLock::new();
-                BlackboardValue::String(
-                    TRUE.get_or_init(
-                        || 
-                        Arc::new("True".to_owned())
-                    )
-                    .clone()
-               )
+                static TRUE: OnceLock<Arc<String>> = OnceLock::new();
+                BlackboardValue::String(TRUE.get_or_init(|| Arc::new("True".to_owned())).clone())
             }
             StackItem::False => {
-                static FALSE: OnceLock<Arc::<String>> = OnceLock::new();
-                BlackboardValue::String(
-                    FALSE.get_or_init(
-                        || 
-                        Arc::new("False".to_owned())
-                    )
-                    .clone()
-                )
+                static FALSE: OnceLock<Arc<String>> = OnceLock::new();
+                BlackboardValue::String(FALSE.get_or_init(|| Arc::new("False".to_owned())).clone())
             }
             StackItem::Coord { x, y } => BlackboardValue::Coord { x, y },
             x @ StackItem::Int(_) | x @ StackItem::Option(_) | x @ StackItem::Table(_) => {
@@ -51,7 +39,7 @@ impl<EntityId: std::fmt::Display> From<StackItem<EntityId>> for BlackboardValue<
         }
     }
 }
-impl<EntityId> /*TryInto<EntityId> for*/ BlackboardValue<EntityId> {
+impl<EntityId> BlackboardValue<EntityId> {
     ///type Error = ();
     pub fn try_into_entity(self) -> Result<EntityId, ()> {
         match self {

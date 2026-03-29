@@ -10,7 +10,7 @@ pub struct Variable<const INDEX: usize, Key, Tuple> {
     pub to_add: Vec<Relation<INDEX, Key, Tuple>>,
 }
 impl<'a, const INDEX: usize, Key, Tuple> Variable<INDEX, Key, Tuple> {
-    pub fn insert(&mut self, relation: Relation<INDEX, Key, Tuple>){
+    pub fn insert(&mut self, relation: Relation<INDEX, Key, Tuple>) {
         self.to_add.push(relation)
     }
 }

@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::ai::{Prayer, Status, behavior_tree::State};
+use crate::ai::{behavior_tree::State, Prayer, Status};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ExecReport<InpulseId, EntityId, Item> {

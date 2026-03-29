@@ -42,7 +42,7 @@ impl<EntityId> From<&bool> for StackItem<EntityId> {
     }
 }
 
-impl<EntityId> /*From<EntityId> for*/ StackItem<EntityId> {
+impl<EntityId> StackItem<EntityId> {
     pub fn from_entity(value: EntityId) -> Self {
         Self::EntityId(value)
     }

@@ -1,22 +1,27 @@
 use std::collections::BTreeSet;
 
 use crate::ai::{
-    Blackboard, BlackboardKey, BlackboardValue, Prayer, Status, behavior_tree::{ExecReport, Node, State}
+    behavior_tree::{ExecReport, Node, State},
+    Blackboard, BlackboardKey, BlackboardValue, Prayer, Status,
 };
 
 mod selector;
 use selector::down_tick_selector;
 
 impl Node {
-    pub fn down_tick<'a, 'b, InpulseId, EntityId: Clone + std::fmt::Debug + std::hash::Hash, Item: TryFrom<&'a str>>(
+    pub fn down_tick<
+        'a,
+        'b,
+        InpulseId,
+        EntityId: Clone + std::fmt::Debug + std::hash::Hash,
+        Item: TryFrom<&'a str>,
+    >(
         &'b self,
         state_maybe: Option<State>,
         blackboard: &'a mut Blackboard<BlackboardKey, BlackboardValue<EntityId>>,
     ) -> ExecReport<InpulseId, EntityId, Item> {
         match self {
-            Node::Selector { children: _ } => {
-                down_tick_selector(state_maybe)
-            }
+            Node::Selector { children: _ } => down_tick_selector(state_maybe),
             Node::Sequence { children: _ } => {
                 let (child_index, child_state_maybe) = if let Some(state) = state_maybe {
                     if let State::Sequence {

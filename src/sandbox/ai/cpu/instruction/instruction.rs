@@ -107,7 +107,11 @@ impl Instruction {
             return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
         };
         let Some(StackItem::Coord { .. }) = stack.get(stack.len() - 2) else {
-            return Err(format!("{}:{}:next of stack not a number", file!(), line!()));
+            return Err(format!(
+                "{}:{}:next of stack not a number",
+                file!(),
+                line!()
+            ));
         };
         let Some(StackItem::Coord { x: tos_x, y: tos_y }) = stack.pop() else {
             unreachable!()
@@ -122,7 +126,11 @@ impl Instruction {
             return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
         };
         let Some(StackItem::Int(_)) = stack.get(stack.len() - 2) else {
-            return Err(format!("{}:{}:next of stack not a number", file!(), line!()));
+            return Err(format!(
+                "{}:{}:next of stack not a number",
+                file!(),
+                line!()
+            ));
         };
         let Some(StackItem::Int(tos)) = stack.pop() else {
             unreachable!()

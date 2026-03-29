@@ -3,13 +3,13 @@ use std::sync::Arc;
 
 use qol::assert_specimen;
 
-use crate::ai::task_master::SubSystemState;
-use crate::ai::task_master::sub_system_state::Branch;
-use crate::ai::{Blackboard, BlackboardValue, Prayer, Status, TaskMaster, Variable};
 use crate::ai::behavior_tree::*;
+use crate::ai::task_master::sub_system_state::Branch;
+use crate::ai::task_master::SubSystemState;
 use crate::ai::test::Item;
+use crate::ai::{Blackboard, BlackboardValue, Prayer, Status, TaskMaster, Variable};
 
-type InpulseId = u8; 
+type InpulseId = u8;
 type EntityId = u32;
 
 #[test]
@@ -28,17 +28,15 @@ fn behavior_treee_test_of_task_master() {
         Variable::Chit(BlackboardValue::String(Arc::new("Axe".to_owned()))),
     );
 
-    let stack =Vec::from([
-        SubSystemState::BehaviorTree {
-            tree_id: "test".to_owned(), 
-            execution_limb: Vec::new(), 
-            state_tick_next_maybe: None
-        }
-    ]);
-    let mut task_master = TaskMaster::<InpulseId, EntityId, Item>{
+    let stack = Vec::from([SubSystemState::BehaviorTree {
+        tree_id: "test".to_owned(),
+        execution_limb: Vec::new(),
+        state_tick_next_maybe: None,
+    }]);
+    let mut task_master = TaskMaster::<InpulseId, EntityId, Item> {
         tick_counter: 0,
-        blackboard, 
-        stack, 
+        blackboard,
+        stack,
         prayer_being_waited_on_maybe: None,
     };
 
@@ -55,21 +53,21 @@ fn behavior_treee_test_of_task_master() {
         ],
     };
 
-    let behavior_tree_tasks = HashMap::from([
-        ("test".to_owned(), tree)
-    ]);
+    let behavior_tree_tasks = HashMap::from([("test".to_owned(), tree)]);
     let x1 = task_master.tick(&behavior_tree_tasks, None);
-    assert_specimen!(
-        x1,
-        crate::ai::TastMasterReport::Ok
-    );
-    let SubSystemState::BehaviorTree { tree_id:_, execution_limb, state_tick_next_maybe: _ } = task_master.stack.last().unwrap() else {
+    assert_specimen!(x1, crate::ai::TastMasterReport::Ok);
+    let SubSystemState::BehaviorTree {
+        tree_id: _,
+        execution_limb,
+        state_tick_next_maybe: _,
+    } = task_master.stack.last().unwrap()
+    else {
         panic!()
     };
-    let b1= execution_limb.last().unwrap();
+    let b1 = execution_limb.last().unwrap();
     assert_specimen!(
         b1,
-        &Branch{
+        &Branch {
             child_index: 0,
             parent_up_tick_state: State::Sequence {
                 child_index: 0,
@@ -86,13 +84,18 @@ fn behavior_treee_test_of_task_master() {
             indirect_item_class: Item::Axe
         })
     );
-    let SubSystemState::BehaviorTree { tree_id:_, execution_limb, state_tick_next_maybe: _ } = task_master.stack.last().unwrap() else {
+    let SubSystemState::BehaviorTree {
+        tree_id: _,
+        execution_limb,
+        state_tick_next_maybe: _,
+    } = task_master.stack.last().unwrap()
+    else {
         panic!()
     };
-    let b2= execution_limb.last().unwrap();
+    let b2 = execution_limb.last().unwrap();
     assert_specimen!(
         b2,
-        &Branch{
+        &Branch {
             child_index: 0,
             parent_up_tick_state: State::Sequence {
                 child_index: 0,
@@ -102,20 +105,25 @@ fn behavior_treee_test_of_task_master() {
     );
 
     let x3 = task_master.tick(
-        &behavior_tree_tasks, 
-        Some(ExecReport::Status { status: Status::Success }));
-    assert_specimen!(
-        x3,
-        crate::ai::TastMasterReport::Ok
+        &behavior_tree_tasks,
+        Some(ExecReport::Status {
+            status: Status::Success,
+        }),
     );
+    assert_specimen!(x3, crate::ai::TastMasterReport::Ok);
 
-    let SubSystemState::BehaviorTree { tree_id:_, execution_limb, state_tick_next_maybe: _ } = task_master.stack.last().unwrap() else {
+    let SubSystemState::BehaviorTree {
+        tree_id: _,
+        execution_limb,
+        state_tick_next_maybe: _,
+    } = task_master.stack.last().unwrap()
+    else {
         panic!()
     };
     let b3 = execution_limb.last().unwrap();
     assert_specimen!(
         b3,
-        &Branch{
+        &Branch {
             child_index: 1,
             parent_up_tick_state: State::Sequence {
                 child_index: 1,
@@ -136,10 +144,9 @@ fn behavior_treee_test_of_task_master() {
 
     let x5 = task_master.tick(
         &behavior_tree_tasks,
-        Some(ExecReport::Status { status: Status::Success }),
+        Some(ExecReport::Status {
+            status: Status::Success,
+        }),
     );
-    assert_specimen!(
-        x5,
-        crate::ai::TastMasterReport::Success
-    );
+    assert_specimen!(x5, crate::ai::TastMasterReport::Success);
 }

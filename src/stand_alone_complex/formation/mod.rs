@@ -1,5 +1,5 @@
 use geometried::geometwo::vec2;
-use qol::{AsA, logy};
+use qol::{logy, AsA};
 
 use crate::{Number, Vec2};
 
@@ -18,7 +18,12 @@ pub fn columns(a: Vec2, b: Vec2, num_units: usize, unit_space: Number) -> Vec<Ve
     let mut units = num_units;
     let mut ret = Vec::new();
     while units != 0 {
-        let mut new = fill_row(center.clone(), columns.as_a::<usize>(), left_vector.clone(), units);
+        let mut new = fill_row(
+            center.clone(),
+            columns.as_a::<usize>(),
+            left_vector.clone(),
+            units,
+        );
         if new.len() > units {
             units = 0;
         } else {
@@ -47,14 +52,16 @@ fn fill_row(center1: Vec2, columns: usize, left_vector: Vec2, units: usize) -> V
     while used < units {
         if left {
             left = false;
-            let target = &center - (&left_vector * idx.as_a::<Number>()) + (&back * row.as_a::<Number>());
+            let target =
+                &center - (&left_vector * idx.as_a::<Number>()) + (&back * row.as_a::<Number>());
             if space_free(target.clone()) {
                 ret.push(target.clone());
                 used += 1;
             }
         } else {
             left = true;
-            let target = &center + (&left_vector * idx.as_a::<Number>()) + (&back * row.as_a::<Number>());
+            let target =
+                &center + (&left_vector * idx.as_a::<Number>()) + (&back * row.as_a::<Number>());
             if space_free(target.clone()) {
                 ret.push(target.clone());
                 used += 1;

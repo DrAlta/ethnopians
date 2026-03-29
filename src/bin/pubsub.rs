@@ -1,6 +1,8 @@
 use std::collections::{BTreeSet, HashMap};
 
-use ethnolib::stand_alone_complex::pubsub::v2::{Column, GetColumnsDatums, GetColumnsValues, Relation, join, new_join};
+use ethnolib::stand_alone_complex::pubsub::v2::{
+    join, new_join, Column, GetColumnsDatums, GetColumnsValues, Relation,
+};
 use qol::assert_specimen;
 
 fn main() {
@@ -21,7 +23,6 @@ fn main() {
         .collect();
     println!("{x:?}",);
 
-    
     let db: HashMap<String, Box<dyn GetColumnsDatums>> = HashMap::from([(
         "Table1".to_owned(),
         Box::new(Relation::new(
@@ -38,10 +39,7 @@ fn main() {
         .into_iter()
         .collect();
 
-    assert_specimen!(
-        &x,
-        &y
-    );
+    assert_specimen!(&x, &y);
     use ethnolib::stand_alone_complex::pubsub::v2::Datum::I8;
 
     assert_specimen!(

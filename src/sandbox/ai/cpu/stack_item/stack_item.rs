@@ -102,7 +102,11 @@ impl StackItem {
                 let x = Arc::make_mut(stuffee);
                 Ok(x.insert(key, stuffing))
             }
-            _ => Err(format!("{}:{}:ForthKind::StuffeeNotTable", file!(), line!())),
+            _ => Err(format!(
+                "{}:{}:ForthKind::StuffeeNotTable",
+                file!(),
+                line!()
+            )),
         }
     }
 }

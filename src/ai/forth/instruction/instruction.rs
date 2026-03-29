@@ -1,5 +1,6 @@
 use crate::ai::{
-    Prayer, forth::{ProgramCounter, ReturnStack, Stack, StackItem, ThreadId}
+    forth::{ProgramCounter, ReturnStack, Stack, StackItem, ThreadId},
+    Prayer,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -64,10 +65,10 @@ pub enum Instruction<InpulseId, EntityId> {
     // (coord coord -- Table) gets all entities in a TOS rectanle at NOS
     GetEntities,
 }
-impl<InpulseId, EntityId> Instruction<InpulseId,EntityId> {
+impl<InpulseId, EntityId> Instruction<InpulseId, EntityId> {
     pub fn next<Item>(
         status: Option<Prayer<InpulseId, EntityId, Item>>,
-        pc: &mut ProgramCounter
+        pc: &mut ProgramCounter,
     ) -> Result<Option<Prayer<InpulseId, EntityId, Item>>, String> {
         if let Some((_, idx)) = pc {
             *idx += 1;
@@ -77,7 +78,7 @@ impl<InpulseId, EntityId> Instruction<InpulseId,EntityId> {
     pub fn exit<Item>(
         status: Option<Prayer<InpulseId, EntityId, Item>>,
         return_stack: &mut ReturnStack,
-        pc: &mut ProgramCounter
+        pc: &mut ProgramCounter,
     ) -> Result<Option<Prayer<InpulseId, EntityId, Item>>, String> {
         if let Some(parent_token) = return_stack.pop() {
             // return to calling fuction
@@ -94,7 +95,11 @@ impl<InpulseId, EntityId> Instruction<InpulseId,EntityId> {
             return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
         };
         let Some(StackItem::Coord { .. }) = stack.get(stack.len() - 2) else {
-            return Err(format!("{}:{}:next of stack not a number", file!(), line!()));
+            return Err(format!(
+                "{}:{}:next of stack not a number",
+                file!(),
+                line!()
+            ));
         };
         let Some(StackItem::Coord { x: tos_x, y: tos_y }) = stack.pop() else {
             unreachable!()
@@ -109,7 +114,11 @@ impl<InpulseId, EntityId> Instruction<InpulseId,EntityId> {
             return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
         };
         let Some(StackItem::Int(_)) = stack.get(stack.len() - 2) else {
-            return Err(format!("{}:{}:next of stack not a number", file!(), line!()));
+            return Err(format!(
+                "{}:{}:next of stack not a number",
+                file!(),
+                line!()
+            ));
         };
         let Some(StackItem::Int(tos)) = stack.pop() else {
             unreachable!()

@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::ai::forth::StackItem;
 
-impl<EntityId: fmt::Display>  fmt::Display for StackItem<EntityId> {
+impl<EntityId: fmt::Display> fmt::Display for StackItem<EntityId> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             StackItem::Int(i) => write!(f, "{}", i),

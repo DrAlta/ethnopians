@@ -37,7 +37,6 @@ pub use item::Item;
 mod location;
 pub use location::Location;
 pub mod movement;
-pub mod new_ai;
 mod r#return;
 pub use r#return::Return;
 

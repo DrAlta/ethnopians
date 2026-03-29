@@ -1,6 +1,11 @@
 use std::collections::{BTreeMap, HashMap};
 
-use crate::{Number, stand_alone_complex::gossip::{CharId, GossipContent, GossipImpact, Opinion, OpinionChange, Relationship}};
+use crate::{
+    stand_alone_complex::gossip::{
+        CharId, GossipContent, GossipImpact, Opinion, OpinionChange, Relationship,
+    },
+    Number,
+};
 
 /// Represents a character in the game, including their personality, relationships, and perceptions.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -25,7 +30,7 @@ pub struct Character {
 impl Character {
     /// Normalizes a value from the range -1.0 to 1.0 to the range 0.0 to 1.0.
     ///
-    /// This method transforms signed values into a positive normalized scale, 
+    /// This method transforms signed values into a positive normalized scale,
     /// useful for converting bipolar (-1 to 1) measurements into unipolar (0 to 1) measurements.
     ///
     /// # Key Principles
@@ -39,7 +44,7 @@ impl Character {
     ///
     /// # Returns
     /// A normalized value in the range 0.0 to 1.0
-    /// 
+    ///
     /// # Examples
     /// ```
     /// assert_eq!(Character::normalize(-1.0), 0.0);   // Minimum becomes zero
@@ -50,10 +55,9 @@ impl Character {
         (value + Number::ONE) / Number::TWO
     }
 
-
     /// Calculates the weight of another character's opinion based on relationship dynamics.
     ///
-    /// This method determines how much influence another character's opinion 
+    /// This method determines how much influence another character's opinion
     /// should have, considering:
     /// - Affection between characters
     /// - Trust between characters
@@ -95,7 +99,6 @@ impl Character {
     }
 }
 impl Character {
-
     /// Calculates the direct consensus of opinions about a specific character.
     ///
     /// Determines how a group of acquaintances collectively feel about a victim,
@@ -219,10 +222,9 @@ impl Character {
     }
 }
 impl Character {
-
     /// Calculates the overall impact of gossip on the character's beliefs and relationships.
     ///
-    /// This method is the core of the social dynamics simulation, determining how 
+    /// This method is the core of the social dynamics simulation, determining how
     /// a character processes and internalizes gossip based on:
     /// - Gossip type (direct or third-party)
     /// - Character's personality traits
@@ -293,7 +295,6 @@ impl Character {
     }
 }
 impl Character {
-
     /// Processes the impact of direct gossip (gossip about the gossiper themselves).
     ///
     /// # Gossip Processing Strategy

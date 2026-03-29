@@ -5,12 +5,12 @@ pub enum Datum {
     String(Sting),
 }
 
-impl From<i8> for Datum{
+impl From<i8> for Datum {
     fn from(value: i8) -> Self {
         Datum::I8(value)
     }
 }
-impl From<Sting> for Datum{
+impl From<Sting> for Datum {
     fn from(value: Sting) -> Self {
         Datum::String(value)
     }

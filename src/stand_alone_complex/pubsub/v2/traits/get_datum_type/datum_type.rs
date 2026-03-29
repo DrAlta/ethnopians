@@ -1,5 +1,5 @@
-use super::DatumTypeInfo;
 use super::super::super::Sting;
+use super::DatumTypeInfo;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum DatumType {

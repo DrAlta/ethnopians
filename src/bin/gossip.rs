@@ -100,7 +100,7 @@ fn main() {
             3, // Carol's ID
             Relationship {
                 affection: (-0.2).into(), // Bob slightly dislikes Carol.
-                trust: 0.5.into(),      // Bob has neutral trust in Carol.
+                trust: 0.5.into(),        // Bob has neutral trust in Carol.
             },
         );
 
@@ -131,12 +131,13 @@ fn main() {
             2, // Bob's ID
             Relationship {
                 affection: (-0.6).into(), // Carol dislikes Bob.
-                trust: 0.4.into(),      // Carol doesn't trust Bob much.
+                trust: 0.4.into(),        // Carol doesn't trust Bob much.
             },
         );
 
         // Carol's perception of Bob's feelings towards Alice
-        carol.perceptions
+        carol
+            .perceptions
             .entry(2) // Subject: Bob
             .or_insert_with(BTreeMap::new)
             .insert(

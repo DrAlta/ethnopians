@@ -1,4 +1,4 @@
-pub fn gallop<T>(mut slice: &[T], mut cmp: impl FnMut(&T)->bool) -> &[T] {
+pub fn gallop<T>(mut slice: &[T], mut cmp: impl FnMut(&T) -> bool) -> &[T] {
     // if empty slice, or already >= element, return
     if slice.len() > 0 && cmp(&slice[0]) {
         let mut step = 1;

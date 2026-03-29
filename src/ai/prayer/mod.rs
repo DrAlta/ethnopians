@@ -41,7 +41,7 @@ pub enum Prayer<InpulseId, EntityId, Item> {
     // prey for the the items of the type to be removes from the array on top of the stack
     RemoveEntitiesOfType(Item),
     RetainEntitiesOfType(Item),
-// actions
+    // actions
     Combine {
         direct_item_class: Item,
         indirect_item_class: Item,
@@ -49,5 +49,4 @@ pub enum Prayer<InpulseId, EntityId, Item> {
     Inpulse(InpulseId),
     // UseOn(ToolId, TargetId)
     UseOn(EntityId, EntityId),
-
 }

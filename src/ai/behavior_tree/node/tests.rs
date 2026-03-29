@@ -2,7 +2,9 @@ use std::sync::Arc;
 
 use qol::assert_specimen;
 
-use crate::ai::{test::Item, Blackboard, BlackboardValue, Prayer, Status, Variable, behavior_tree::*};
+use crate::ai::{
+    behavior_tree::*, test::Item, Blackboard, BlackboardValue, Prayer, Status, Variable,
+};
 
 #[test]
 fn test() {
@@ -75,7 +77,8 @@ fn test() {
     else {
         panic!()
     };
-    let x4: ExecReport<i8, u64, Item> = children[child_index].down_tick(child_state_maybe, &mut blackboard);
+    let x4: ExecReport<i8, u64, Item> =
+        children[child_index].down_tick(child_state_maybe, &mut blackboard);
     assert_specimen!(
         x4,
         ExecReport::Prayer(Prayer::GetIsInventoryGE {

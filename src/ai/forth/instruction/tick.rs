@@ -7,17 +7,21 @@ use crate::ai::{
     Blackboard, BlackboardKey, BlackboardValue, Prayer, Variable,
 };
 
-impl<InpulseId: std::fmt::Debug + Clone, EntityId: std::hash::Hash + std::fmt::Debug + std::fmt::Display + Clone + std::cmp::PartialEq + Ord> Instruction<InpulseId, EntityId> {
+impl<
+        InpulseId: std::fmt::Debug + Clone,
+        EntityId: std::hash::Hash + std::fmt::Debug + std::fmt::Display + Clone + std::cmp::PartialEq + Ord,
+    > Instruction<InpulseId, EntityId>
+{
     pub fn tick<Item>(
         &self,
         stack: &mut Stack<EntityId>,
         return_stack: &mut ReturnStack,
         pc: &mut ProgramCounter,
         blackboard: &mut Blackboard<BlackboardKey, BlackboardValue<EntityId>>,
-     ) -> Result<Option<Prayer<InpulseId, EntityId, Item>>, String>
-    where 
+    ) -> Result<Option<Prayer<InpulseId, EntityId, Item>>, String>
+    where
         Arc<String>: TryInto<Item>,
-        for<'b>  Item: TryFrom<&'b str>,
+        for<'b> Item: TryFrom<&'b str>,
     {
         logy!("debug", "ticking:{pc:?}:{self:?}");
         println!("Stack is:");
@@ -55,13 +59,21 @@ impl<InpulseId: std::fmt::Debug + Clone, EntityId: std::hash::Hash + std::fmt::D
             }
             Instruction::Distance => {
                 if stack.len() < 2 {
-                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that 2 items on stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let Some(StackItem::Coord { .. }) = stack.last() else {
                     return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
                 };
                 let Some(StackItem::Coord { .. }) = stack.get(stack.len() - 2) else {
-                    return Err(format!("{}:{}:next of stack not a number", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:next of stack not a number",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let Some(StackItem::Coord { x: tos_x, y: tos_y }) = stack.pop() else {
                     unreachable!()
@@ -95,7 +107,11 @@ impl<InpulseId: std::fmt::Debug + Clone, EntityId: std::hash::Hash + std::fmt::D
             }
             Instruction::Eq => {
                 if stack.len() < 2 {
-                    return Err(format!("{}:{}:less that two items on the stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that two items on the stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let tos = stack.pop().unwrap();
                 let nos = stack.pop().unwrap();
@@ -121,7 +137,11 @@ impl<InpulseId: std::fmt::Debug + Clone, EntityId: std::hash::Hash + std::fmt::D
             // ForthFindNearest should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::FindNearest => {
                 if stack.len() < 2 {
-                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that 2 items on stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let Some(StackItem::String(_)) = stack.last() else {
                     return Err(format!("{}:{}:tos wasn't a sting", file!(), line!()));
@@ -214,7 +234,11 @@ impl<InpulseId: std::fmt::Debug + Clone, EntityId: std::hash::Hash + std::fmt::D
             }
             Instruction::InventoryGE => {
                 if stack.len() < 2 {
-                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that 2 items on stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let Some(StackItem::String(_)) = stack.last() else {
                     return Err(format!("{}:{}:tos was not an string", file!(), line!()));
@@ -230,11 +254,19 @@ impl<InpulseId: std::fmt::Debug + Clone, EntityId: std::hash::Hash + std::fmt::D
                 };
                 let item_class_str: &str = &item_class_string;
                 let Ok(item_class) = item_class_str.try_into() else {
-                    return Err(format!("{}:{}:{item_class_string} is not a valid item class", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:{item_class_string} is not a valid item class",
+                        file!(),
+                        line!()
+                    ));
                 };
 
                 let Some(BlackboardValue::EntityId(agent1)) = blackboard.get("self") else {
-                    return Err(format!("{}:{}:self not found in blackboard", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:self not found in blackboard",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let agent = agent1.clone();
                 Self::next(
@@ -242,7 +274,8 @@ impl<InpulseId: std::fmt::Debug + Clone, EntityId: std::hash::Hash + std::fmt::D
                         agent,
                         item_class,
                         amount,
-                    }.into(),
+                    }
+                    .into(),
                     pc,
                 )
             }
@@ -301,7 +334,11 @@ impl<InpulseId: std::fmt::Debug + Clone, EntityId: std::hash::Hash + std::fmt::D
             }
             Instruction::Or => {
                 if stack.len() < 2 {
-                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that 2 items on stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let tos = stack.pop().unwrap();
                 let nos = stack.pop().unwrap();
@@ -320,7 +357,11 @@ impl<InpulseId: std::fmt::Debug + Clone, EntityId: std::hash::Hash + std::fmt::D
             }
             Instruction::Rot => {
                 if stack.len() < 3 {
-                    return Err(format!("{}:{}:less that 3 items on stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that 3 items on stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let x = stack.remove(stack.len() - 3);
                 stack.push(x);
@@ -329,7 +370,11 @@ impl<InpulseId: std::fmt::Debug + Clone, EntityId: std::hash::Hash + std::fmt::D
             // like "!"'s stack diagram is "( n adr -- ). This uses TOS of the key and stores NOS under it
             Instruction::SetBlackboard => {
                 if stack.len() < 2 {
-                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that 2 items on stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let Some(StackItem::String(_)) = stack.last() else {
                     return Err(format!("{}:{}:tos not a string", file!(), line!()));
@@ -460,7 +505,11 @@ impl<InpulseId: std::fmt::Debug + Clone, EntityId: std::hash::Hash + std::fmt::D
             }
             Instruction::Swap => {
                 if stack.len() < 2 {
-                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that 2 items on stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let Some(_) = stack.get(stack.len() - 2) else {
                     return Err(format!("{}:{}:no nos", file!(), line!()));
@@ -485,7 +534,8 @@ impl<InpulseId: std::fmt::Debug + Clone, EntityId: std::hash::Hash + std::fmt::D
                         min_y,
                         max_x,
                         max_y,
-                    }.into(),
+                    }
+                    .into(),
                     pc,
                 )
             }
@@ -495,7 +545,11 @@ impl<InpulseId: std::fmt::Debug + Clone, EntityId: std::hash::Hash + std::fmt::D
                 };
                 let stack_str: &str = stack_string;
                 let Ok(item_type_from_stack) = stack_str.try_into() else {
-                    return Err(format!("{}:{}:couldn't convert {stack_str:?} to type", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:couldn't convert {stack_str:?} to type",
+                        file!(),
+                        line!()
+                    ));
                 };
                 stack.pop();
                 Self::next(Some(Prayer::RemoveEntitiesOfType(item_type_from_stack)), pc)
@@ -506,10 +560,17 @@ impl<InpulseId: std::fmt::Debug + Clone, EntityId: std::hash::Hash + std::fmt::D
                 };
                 let stack_str: &str = stack_string;
                 let Ok(item_type_from_stack) = stack_str.try_into() else {
-                    return Err(format!("{}:{}:couldn't convert {stack_str:?} to type", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:couldn't convert {stack_str:?} to type",
+                        file!(),
+                        line!()
+                    ));
                 };
                 stack.pop();
-                Self::next(Prayer::RetainEntitiesOfType(item_type_from_stack).into(), pc)
+                Self::next(
+                    Prayer::RetainEntitiesOfType(item_type_from_stack).into(),
+                    pc,
+                )
             }
         };
         println!("ending Stack is:");

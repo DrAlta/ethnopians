@@ -32,12 +32,20 @@ impl Instruction {
             }
             Instruction::Combine(a, b) => {
                 let Some(thing) = blackboard.get(a) else {
-                    return Err(format!("{}:{}:couldn't find first object:{a} in blackboard", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:couldn't find first object:{a} in blackboard",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let aa = thing.into();
 
                 let Some(thing) = blackboard.get(b) else {
-                    return Err(format!("{}:{}:couldn't find second object:{b} in blackboard", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:couldn't find second object:{b} in blackboard",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let bb = thing.into();
 
@@ -53,12 +61,18 @@ impl Instruction {
             }
             Instruction::Eat(x) => {
                 let Some(class_id) = blackboard.get(x) else {
-                    return Err(format!("{}:{}:couldn't find {x} in blackboard", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:couldn't find {x} in blackboard",
+                        file!(),
+                        line!()
+                    ));
                 };
                 match class_id {
-                    BlackboardValue::Coord { .. } | BlackboardValue::EntityId(_) => {
-                        Err(format!("{}:{}:{x} was an EntityId not a class", file!(), line!()))
-                    }
+                    BlackboardValue::Coord { .. } | BlackboardValue::EntityId(_) => Err(format!(
+                        "{}:{}:{x} was an EntityId not a class",
+                        file!(),
+                        line!()
+                    )),
                     BlackboardValue::String(y) => {
                         assert_eq!(Some(StackItem::init()), stack.pop()); // popping in init off the stack
                         let Some(parent_token) = return_stack.pop() else {
@@ -79,15 +93,27 @@ impl Instruction {
                 };
                 stack.pop();
                 let Some(&BlackboardValue::EntityId(agent)) = blackboard.get("self") else {
-                    return Err(format!("{}:{}:self not found in blackboard", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:self not found in blackboard",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let Some(BlackboardValue::String(item_class_string)) = blackboard.get(key) else {
-                    return Err(format!("{}:{}:{key} not found in blackboard", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:{key} not found in blackboard",
+                        file!(),
+                        line!()
+                    ));
                 };
 
                 let item_class_str: &str = &item_class_string;
                 let Ok(item_class) = item_class_str.try_into() else {
-                    return Err(format!("{}:{}:{item_class_string} is not a valid item class", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:{item_class_string} is not a valid item class",
+                        file!(),
+                        line!()
+                    ));
                 };
 
                 let Some(parent_token) = return_stack.pop() else {
@@ -125,13 +151,21 @@ impl Instruction {
             }
             Instruction::ForthDistance => {
                 if stack.len() < 2 {
-                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that 2 items on stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let Some(StackItem::Coord { .. }) = stack.last() else {
                     return Err(format!("{}:{}:top of stack not a number", file!(), line!()));
                 };
                 let Some(StackItem::Coord { .. }) = stack.get(stack.len() - 2) else {
-                    return Err(format!("{}:{}:next of stack not a number", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:next of stack not a number",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let Some(StackItem::Coord { x: tos_x, y: tos_y }) = stack.pop() else {
                     unreachable!()
@@ -165,7 +199,11 @@ impl Instruction {
             }
             Instruction::ForthEq => {
                 if stack.len() < 2 {
-                    return Err(format!("{}:{}:less that two items on the stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that two items on the stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let tos = stack.pop().unwrap();
                 let nos = stack.pop().unwrap();
@@ -209,7 +247,11 @@ impl Instruction {
             // ForthFindNearest should set up the CPU for runing the next instruction when it it ticked then pray for the answer to be put on the stack
             Instruction::ForthFindNearest => {
                 if stack.len() < 2 {
-                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that 2 items on stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let Some(StackItem::String(_)) = stack.last() else {
                     return Err(format!("{}:{}:tos wasn't a sting", file!(), line!()));
@@ -358,7 +400,11 @@ impl Instruction {
             }
             Instruction::ForthInventoryGE => {
                 if stack.len() < 2 {
-                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that 2 items on stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let Some(StackItem::String(_)) = stack.last() else {
                     return Err(format!("{}:{}:tos was not an string", file!(), line!()));
@@ -374,11 +420,19 @@ impl Instruction {
                 };
                 let item_class_str: &str = &item_class_string;
                 let Ok(item_class) = item_class_str.try_into() else {
-                    return Err(format!("{}:{}:{item_class_string} is not a valid item class", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:{item_class_string} is not a valid item class",
+                        file!(),
+                        line!()
+                    ));
                 };
 
                 let Some(&BlackboardValue::EntityId(agent)) = blackboard.get("self") else {
-                    return Err(format!("{}:{}:self not found in blackboard", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:self not found in blackboard",
+                        file!(),
+                        line!()
+                    ));
                 };
                 Self::next(
                     Status::GetIsInventoryGE {
@@ -445,7 +499,11 @@ impl Instruction {
             }
             Instruction::ForthOr => {
                 if stack.len() < 2 {
-                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that 2 items on stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let tos = stack.pop().unwrap();
                 let nos = stack.pop().unwrap();
@@ -464,7 +522,11 @@ impl Instruction {
             }
             Instruction::ForthRot => {
                 if stack.len() < 3 {
-                    return Err(format!("{}:{}:less that 3 items on stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that 3 items on stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let x = stack.remove(stack.len() - 3);
                 stack.push(x);
@@ -473,7 +535,11 @@ impl Instruction {
             // like "!"'s stack diagram is "( n adr -- ). This uses TOS of the key and stores NOS under it
             Instruction::ForthSetBlackboard => {
                 if stack.len() < 2 {
-                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that 2 items on stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let Some(StackItem::String(_)) = stack.last() else {
                     return Err(format!("{}:{}:tos not a string", file!(), line!()));
@@ -607,7 +673,11 @@ impl Instruction {
             }
             Instruction::ForthSwap => {
                 if stack.len() < 2 {
-                    return Err(format!("{}:{}:less that 2 items on stack", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:less that 2 items on stack",
+                        file!(),
+                        line!()
+                    ));
                 };
                 let Some(_) = stack.get(stack.len() - 2) else {
                     return Err(format!("{}:{}:no nos", file!(), line!()));
@@ -656,7 +726,11 @@ impl Instruction {
                 };
                 let stack_str: &str = stack_string;
                 let Ok(item_type_from_stack) = stack_str.try_into() else {
-                    return Err(format!("{}:{}:couldn't convert {stack_str:?} to type", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:couldn't convert {stack_str:?} to type",
+                        file!(),
+                        line!()
+                    ));
                 };
                 stack.pop();
                 Self::next(Status::RemoveEntitiesOfType(item_type_from_stack), pc)
@@ -688,7 +762,11 @@ impl Instruction {
                 };
                 let stack_str: &str = stack_string;
                 let Ok(item_type_from_stack) = stack_str.try_into() else {
-                    return Err(format!("{}:{}:couldn't convert {stack_str:?} to type", file!(), line!()));
+                    return Err(format!(
+                        "{}:{}:couldn't convert {stack_str:?} to type",
+                        file!(),
+                        line!()
+                    ));
                 };
                 stack.pop();
                 Self::next(Status::RetainEntitiesOfType(item_type_from_stack), pc)

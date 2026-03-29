@@ -32,11 +32,17 @@ impl CPU {
         };
 
         let Some(thread) = bt.get(token) else {
-            return Err(format!("{}:{}:failed to get thread {token}", file!(), line!()));
+            return Err(format!(
+                "{}:{}:failed to get thread {token}",
+                file!(),
+                line!()
+            ));
         };
         let Some(i) = thread.get(*idx) else {
-            return Err(format!("{}:{}:failed to get instruction{idx} from thread {token}"
-            , file!(), line!()
+            return Err(format!(
+                "{}:{}:failed to get instruction{idx} from thread {token}",
+                file!(),
+                line!()
             ));
         };
         i.tick(

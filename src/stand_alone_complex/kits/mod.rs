@@ -14,7 +14,6 @@ impl<'a, Tag> Kit<'a, Tag> {
     }
 }
 impl<'a, Tag: std::fmt::Debug> Kit<'a, Tag> {
-
     /// Returns a human-readable name for this kit.
     ///
     /// Primitive: returns the item name
@@ -24,15 +23,16 @@ impl<'a, Tag: std::fmt::Debug> Kit<'a, Tag> {
             Kit::Primitive(name, _) => (*name).to_string(),
 
             Kit::Constructed(kits, tags) => {
-
-                let mut parts: Vec<String> =
-                    tags.iter().map(|t| format!("{:?}", t)).collect();
+                let mut parts: Vec<String> = tags.iter().map(|t| format!("{:?}", t)).collect();
                 parts.sort();
 
-                let kitss: Vec<String> =
-                    kits.iter().map(|t| t.name()).collect();
+                let kitss: Vec<String> = kits.iter().map(|t| t.name()).collect();
                 parts.sort();
-                format!("Constructed({}) from [{}]", parts.join("+"), kitss.join(", "))
+                format!(
+                    "Constructed({}) from [{}]",
+                    parts.join("+"),
+                    kitss.join(", ")
+                )
             }
         }
     }
@@ -40,10 +40,7 @@ impl<'a, Tag: std::fmt::Debug> Kit<'a, Tag> {
         match self {
             Kit::Primitive(name, _) => vec![&name],
 
-            Kit::Constructed(kits, _) => {
-
-                kits.iter().map(|t| t.names()).flatten().collect()
-            }
+            Kit::Constructed(kits, _) => kits.iter().map(|t| t.names()).flatten().collect(),
         }
     }
 }
@@ -52,7 +49,6 @@ fn solve_recipe<'a, Tag: Clone + Ord>(
     available: &[Kit<'a, Tag>],
     recipes: &HashMap<BTreeSet<Tag>, BTreeSet<BTreeSet<Tag>>>,
 ) -> Option<Vec<Kit<'a, Tag>>> {
-
     let mut reqs: Vec<&BTreeSet<Tag>> = recipe_reqs.iter().collect();
     reqs.sort();
 
@@ -69,7 +65,6 @@ fn solve_recipe_backtrack<'a, Tag: Clone + Ord>(
     recipes: &HashMap<BTreeSet<Tag>, BTreeSet<BTreeSet<Tag>>>,
     used: &mut Vec<Kit<'a, Tag>>,
 ) -> bool {
-
     if reqs.is_empty() {
         return true;
     }
@@ -114,7 +109,6 @@ pub fn solve_requirement<'a, Tag: Clone + Ord>(
     available: &[Kit<'a, Tag>],
     recipes: &HashMap<BTreeSet<Tag>, BTreeSet<BTreeSet<Tag>>>,
 ) -> Option<Kit<'a, Tag>> {
-
     // 1. Try to satisfy using an existing primitive or constructed kit
     for kit in available {
         if kit.tags().is_superset(req) {
@@ -133,10 +127,9 @@ pub fn solve_requirement<'a, Tag: Clone + Ord>(
 
     None
 }
-fn kits_from<'a, Tag>(
-    items: &'a HashMap<String, BTreeSet<Tag>>
-) -> Vec<Kit<'a, Tag>> {
-    items.iter()
+fn kits_from<'a, Tag>(items: &'a HashMap<String, BTreeSet<Tag>>) -> Vec<Kit<'a, Tag>> {
+    items
+        .iter()
         .map(|(name, tags)| Kit::Primitive(name.as_str(), tags))
         .collect()
 }
@@ -145,8 +138,8 @@ mod tests {
     use super::*;
 
     #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-    enum Tag{
-        A, 
+    enum Tag {
+        A,
         B,
         C,
         D,
@@ -155,7 +148,6 @@ mod tests {
         G,
         H,
     }
-
 
     #[macro_export]
     macro_rules! btreeset {
@@ -190,10 +182,7 @@ mod tests {
         items.insert("item1".to_string(), btreeset![A, B]);
         items.insert("item2".to_string(), btreeset![B]);
 
-        let reqs = btreeset![
-            btreeset![A],
-            btreeset![B],
-        ];
+        let reqs = btreeset![btreeset![A], btreeset![B],];
 
         let result = solve_recipe(&reqs, &kits_from(&items), &HashMap::new());
         assert!(result.is_some());
@@ -219,10 +208,7 @@ mod tests {
         let mut recipes = Recipes::new();
         recipes.insert(
             btreeset![C], // output tags
-            btreeset![
-                btreeset![A],
-                btreeset![B],
-            ],
+            btreeset![btreeset![A], btreeset![B],],
         );
 
         let req = btreeset![C];
@@ -257,19 +243,13 @@ mod tests {
 
         // Recipe: A → C
         let mut recipes = Recipes::new();
-        recipes.insert(
-            btreeset![C],
-            btreeset![btreeset![A]],
-        );
+        recipes.insert(btreeset![C], btreeset![btreeset![A]]);
 
         // Goal: {C, B}
         // Correct solution:
         // - Use item1 for C (via recipe requiring A)
         // - Use item2 for B
-        let reqs = btreeset![
-            btreeset![C],
-            btreeset![B],
-        ];
+        let reqs = btreeset![btreeset![C], btreeset![B],];
 
         let result = solve_recipe(&reqs, &kits_from(&items), &recipes);
         assert!(result.is_some());
@@ -305,21 +285,15 @@ mod tests {
         let mut recipes = Recipes::new();
         recipes.insert(
             btreeset![D], // output tags
-            btreeset![
-                btreeset![C],
-            ],
+            btreeset![btreeset![C],],
         );
         recipes.insert(
             btreeset![C], // output tags
-            btreeset![
-                btreeset![B],
-            ],
+            btreeset![btreeset![B],],
         );
         recipes.insert(
             btreeset![B], // output tags
-            btreeset![
-                btreeset![A],
-            ],
+            btreeset![btreeset![A],],
         );
 
         let req = btreeset![D];
@@ -330,7 +304,6 @@ mod tests {
 
         let kit = result.unwrap();
         assert!(kit.tags().contains(&C));
-        
 
         // Ensure it was constructed, not primitive
         match kit {
