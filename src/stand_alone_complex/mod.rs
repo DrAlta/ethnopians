@@ -1,3 +1,5 @@
+pub mod cookcook;
+
 #[cfg(feature = "anger")]
 pub mod anger;
 #[cfg(feature = "behavior_tree")]
