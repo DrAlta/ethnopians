@@ -57,6 +57,7 @@ sandbox = []
 taskmaster = ["ai"]
 # SAC
 anger = []
+beauty = []
 behavior_tree = []
 brothel = []
 cleanliness = []
