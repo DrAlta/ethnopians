@@ -11,47 +11,34 @@ pub use preperation_methods::preperation_methods;
 mod tag;
 pub use tag::Tag;
 
-type TagPropagationRule = (
-    BTreeSet<Tag>, 
-    BTreeSet<Tag>
-);
+type TagPropagationRule = (BTreeSet<Tag>, BTreeSet<Tag>);
 
 ////////////////////////////////////////////////////////////////////////////////
 #[derive(Default, Debug, Clone)]
-struct DownPass {
-
-}
+pub struct DownPass {}
 
 #[derive(Default, Debug, Clone)]
-struct Characteristics {
+pub struct Characteristics {
     crunchiness: f32,
     moisture: f32,
 }
 
 #[derive(Default, Debug, Clone)]
 pub struct UpPass {
-    children: Vec::<Self>,
+    children: Vec<Self>,
 
     characteristics: Characteristics,
     tags: BTreeSet<Tag>,
 }
-
-
 
 fn main() {
     // Create a "Soggy Burger" (No Bun/Encapsulation)
     let mut burger = Component::new_assembled(
         PreperationMethod::Assemble,
         vec![
-            Component::new_raw(
-                Characteristics::default(),
-                BTreeSet::from([Tag::CrispyA]
-            )), // Fried Patty
-            Component::new_raw(
-                Characteristics::default(),
-                BTreeSet::from([Tag::Wet]
-            )), // Sauce
-        ]
+            Component::new_raw(Characteristics::default(), BTreeSet::from([Tag::CrispyA])), // Fried Patty
+            Component::new_raw(Characteristics::default(), BTreeSet::from([Tag::Wet])),     // Sauce
+        ],
     );
 
     // Pass 1

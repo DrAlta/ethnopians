@@ -14,37 +14,6 @@ pub fn bump(
     pleasure: Number,
     last_pleasure: Number,
 ) {
-    // Calculate the 'Taboo Weight': Both appeal and aversion (abs) increase mental load/arousal.
-    let moralethic_tension = compute_moralethic_tension(
-        moralethic_appeal,
-        moralethic_adversion,
-        moralethic_importance,
-    );
-
-    // The threshold for release is the sum of moral friction and physical/psychological fullness (satiety).
-    let tipping_point = moralethic_tension + satiety_threshold;
-
-    // Change in pleasure since the last tick.
-    let pleasure_spike = pleasure - last_pleasure;
-
-    // Trigger check: If current tension plus the new spike exceeds the limit, trigger immediate release.
-    if (tension + pleasure_spike) > tipping_point {
-        let moralethic_intesity =
-            (moralethic_appeal + moralethic_adversion.abs()) * moralethic_importance;
-        let orgasm_intensity = tension + moralethic_intesity;
-        orgasm(orgasm_intensity);
-    } else {
-        // Logistic dampening: Tension growth slows down as it approaches the tipping point.
-        if tipping_point != Number::ZERO {
-            tension *= (tipping_point - tension) / tipping_point;
-        };
-        // The 'Ache': Losing pleasure (abs spike) increases tension just as much as gaining it.
-        tension += pleasure_spike.abs() * (Number::ONE + moralethic_tension);
-    }
-    // Hedonic Adaptation: Base pleasure level provides a diminishing 'creep' to tension.
-    let pleasure_creep = pleasure.sqrt();
-
-    tension += pleasure_creep
 }
 
 /// P-Type (Pleasure-driven): The orgasm is a resonant state fueled by active pleasure input.
@@ -176,7 +145,7 @@ fn orgasm(_orgasm_intensity: Number) {}
 
 fn end_refactory_state() {}
 
-fn compute_moralethic_tension(
+pub fn compute_moralethic_tension(
     moralethic_appeal: Number,
     moralethic_adversion: Number,
     moralethic_importance: Number,

@@ -15,9 +15,8 @@ pub struct Customer {
 
     aromatics_ideal_relative_offsets: [f32; AROMATICS_SIZE],
     aromatics_extreme_prefs: [f32; AROMATICS_SIZE],
-
 }
-impl Customer{
+impl Customer {
     pub fn new(
         name: &'static str,
 
@@ -30,9 +29,16 @@ impl Customer{
 
         aromatics_ideal_relative_offsets: [f32; AROMATICS_SIZE],
         aromatics_extreme_prefs: [f32; AROMATICS_SIZE],
-
-    )-> Self {
-        Self { name, basel_joy_of_eating, target_intensity, technical_ideal_relative_offsets, technical_extreme_prefs, aromatics_ideal_relative_offsets, aromatics_extreme_prefs }
+    ) -> Self {
+        Self {
+            name,
+            basel_joy_of_eating,
+            target_intensity,
+            technical_ideal_relative_offsets,
+            technical_extreme_prefs,
+            aromatics_ideal_relative_offsets,
+            aromatics_extreme_prefs,
+        }
     }
     pub fn name(&self) -> &str {
         self.name

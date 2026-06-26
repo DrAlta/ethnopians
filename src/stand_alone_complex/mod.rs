@@ -2,6 +2,8 @@ pub mod cookcook;
 
 #[cfg(feature = "anger")]
 pub mod anger;
+#[cfg(feature = "beauty")]
+pub mod beauty;
 #[cfg(feature = "behavior_tree")]
 pub mod behavior_tree;
 #[cfg(feature = "brothel")]
@@ -12,12 +14,16 @@ pub mod cleanliness;
 pub mod combat;
 #[cfg(feature = "emotional_dysregulation")]
 pub mod emotional_dysregulation;
+#[cfg(feature = "erotic_agent")]
+pub mod erotic_agent;
 #[cfg(feature = "formation")]
 pub mod formation;
 #[cfg(feature = "general_specific_affinity")]
 pub mod general_specific_affinity;
 #[cfg(feature = "gossip")]
 pub mod gossip;
+#[cfg(feature = "item_uniqueness")]
+pub mod item_uniqueness;
 #[cfg(feature = "kelly_criterion")]
 pub mod kelly_criterion;
 #[cfg(feature = "kill_share")]

@@ -1,43 +1,47 @@
 use std::collections::BTreeSet;
 
-use crate::stand_alone_complex::cookcook::recipe::{Characteristics, PreperationMethod, Tag, UpPass, apply_rules};
+use crate::stand_alone_complex::cookcook::recipe::{
+    apply_rules, Characteristics, PreperationMethod, Tag, UpPass,
+};
 
 mod compute_scores;
 mod synthesize_characteristics;
 pub enum Component {
-    Assembled{
+    Assembled {
         method: PreperationMethod,
-//        tags: Vec<Tag>,
+        //        tags: Vec<Tag>,
         ingredients: Vec<Component>,
     },
-    Raw{
+    Raw {
         characteristics: Characteristics,
         tags: BTreeSet<Tag>,
-    }
+    },
 }
 
 impl Component {
     pub fn new_assembled(method: PreperationMethod, ingredients: Vec<Component>) -> Self {
-        Component::Assembled { method, ingredients } 
+        Component::Assembled {
+            method,
+            ingredients,
+        }
     }
-    pub fn new_raw(
-        characteristics: Characteristics,
-        tags: BTreeSet<Tag>,
-    ) -> Self {
-        Component::Raw { characteristics, tags }
+    pub fn new_raw(characteristics: Characteristics, tags: BTreeSet<Tag>) -> Self {
+        Component::Raw {
+            characteristics,
+            tags,
+        }
     }
-
 
     /*
     /// PASS 2: TOP-DOWN
     /// We pass a "branch" context down the tree.
     /// Why: A leaf ingredient (e.g., CrispyA) only becomes "Crunchy" if a parent was "Fry".
     fn compute_scores(
-        &mut self, 
+        &mut self,
         branch_methods: &mut Vec<PreperationMethod>, branch_tags: &mut Vec<BTreeSet<Tag>>) {
         // 1. Check for "Encapsulation" in the branch to handle shielding
         let is_shielded = branch_tags.iter().any(|tags| tags.contains(&Tag::Encapsulate));
-        
+
         let mut local_crunch = 0.0;
         let mut local_moisture = 0.0;
 
@@ -59,7 +63,7 @@ impl Component {
 
         // 3. Apply the "Soggy" penalty if moisture exists and we aren't shielded
         if local_moisture > 0.0 && !is_shielded {
-            local_crunch *= 0.2; 
+            local_crunch *= 0.2;
         }
 
         self.final_scores.crunchiness = local_crunch;
