@@ -1,8 +1,7 @@
 use std::collections::{BTreeSet, HashMap};
 
 use geometried::geometwo::{
-    broadphase::{Broadphase, SpatialId},
-    AARect,
+    AABB, broadphase::{Broadphase, SpatialId},
 };
 
 use crate::sandbox::{movement::Prev, EntityId};
@@ -17,7 +16,7 @@ use super::Avalibility;
 /// - `map`: Mutable reference to the spatial map for collision detection.
 /// - `prev`: Provides access to previous state information of entities.
 /// - `collisions`: Mutable reference to the set recording collision pairs.
-pub fn collision<T: Prev, B: Broadphase<SpatialId>>(
+pub fn collision<AARect: AABB, T: Prev, B: Broadphase<AARect, SpatialId>>(
     mut todo: BTreeSet<EntityId>,
     aval: &mut HashMap<SpatialId, Avalibility>,
     map: &mut B,

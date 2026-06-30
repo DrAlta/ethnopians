@@ -3,15 +3,14 @@ use std::collections::HashMap;
 //use broad_phase::{Entity, EntityId as SpatialId, SpatialBloom};
 
 use geometried::geometwo::{
-    broadphase::{Broadphase, SpatialId},
-    AARect,
+    AABB, broadphase::{Broadphase, SpatialId},
 };
 
 use crate::sandbox::EntityId;
 
 use super::moveit::Avalibility;
 
-pub fn setup_avals_map<B: Broadphase<SpatialId>>(
+pub fn setup_avals_map<AARect: AABB, B: Broadphase<AARect, SpatialId>>(
     collisions: HashMap<EntityId, AARect>,
     rearendings: HashMap<EntityId, AARect>,
 ) -> (HashMap<SpatialId, Avalibility>, B) {

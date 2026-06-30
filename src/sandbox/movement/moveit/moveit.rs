@@ -1,8 +1,7 @@
 use std::collections::{BTreeSet, HashMap};
 
 use geometried::geometwo::{
-    broadphase::{Broadphase, SpatialId},
-    AARect,
+    AABB, broadphase::{Broadphase, SpatialId},
 };
 
 use crate::Number;
@@ -37,7 +36,7 @@ use super::{collision, Avalibility, Prev};
 ///   - `[1]`: Entities involved in collisions.
 ///   - `[2]`: Entities that were rear-ended.
 /// - A Vec of tuples of `EntityId`s representing entities involved in collisions.
-pub fn moveit<T: Prev, B: Broadphase<SpatialId>>(
+pub fn moveit<AARect: AABB + Clone, T: Prev, B: Broadphase<AARect, SpatialId>>(
     desired: HashMap<EntityId, (Number, Number)>,
     mut avals: HashMap<SpatialId, Avalibility>,
     mut map: B,
