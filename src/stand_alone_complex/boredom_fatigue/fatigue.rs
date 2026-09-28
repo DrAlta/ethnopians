@@ -28,7 +28,7 @@ impl NoveltyScheduler {
     pub fn get_current_fatigue(&self, days_passed: f64) -> f64 {
         let recovery_halflife = 5.0 * self.burnout_resistance;
         let current_fatigue = self.last_fatigue * 0.5f64.powf(days_passed / recovery_halflife);
-        
+
         // Clamp between 0.0 and 1.0 to prevent floating-point anomalies
         current_fatigue.clamp(0.0, 1.0)
     }
@@ -41,7 +41,7 @@ impl NoveltyScheduler {
         // 2. Map the enum rating to a mathematical fatigue impact (0.0 to 1.0)
         let rating_val = rating as i32 as f64;
         let rating_impact = rating_val / 4.0;
-        
+
         // Cap maximum immediate fatigue at 100% (1.0)
         self.last_fatigue = (starting_fatigue + rating_impact).min(1.0);
 
@@ -65,7 +65,7 @@ impl NoveltyScheduler {
         if self.last_fatigue <= target {
             return 0.0;
         }
-        
+
         let recovery_halflife = 5.0 * self.burnout_resistance;
         // Half-life decay math: days = halflife * log0.5(target / current_fatigue)
         let days = recovery_halflife * (target / self.last_fatigue).log(0.5);
@@ -82,19 +82,25 @@ fn main() {
     println!("\n[Day 0] Listening to the song...");
     tracker.record_experience(0.0, NoveltyRating::Passing);
     println!("Fatigue level: {:.1}%", tracker.last_fatigue * 100.0);
-    println!("Days until 10% fatigue: {:.1} days", tracker.days_to_fresh(10.0));
+    println!(
+        "Days until 10% fatigue: {:.1} days",
+        tracker.days_to_fresh(10.0)
+    );
 
     // Day 1: Listen again, now you're tired of it
     println!("\n[Day 1] Listening again too soon...");
     tracker.record_experience(1.0, NoveltyRating::Overplayed);
     println!("Fatigue level: {:.1}%", tracker.last_fatigue * 100.0);
-    println!("Days until 10% fatigue: {:.1} days", tracker.days_to_fresh(10.0));
+    println!(
+        "Days until 10% fatigue: {:.1} days",
+        tracker.days_to_fresh(10.0)
+    );
 
     // Day 2: One more time, total burnout
     println!("\n[Day 2] Listened to it on repeat. Max Burnout!");
     tracker.record_experience(1.0, NoveltyRating::BurntOut);
     println!("Fatigue level: {:.1}%", tracker.last_fatigue * 100.0);
-    
+
     // Check how long we have to wait for the track to feel fresh again
     let wait_days = tracker.days_to_fresh(10.0);
     println!("Days until 10% fatigue: {:.1} days", wait_days);
