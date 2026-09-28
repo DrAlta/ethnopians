@@ -6,6 +6,8 @@ pub mod anger;
 pub mod beauty;
 #[cfg(feature = "behavior_tree")]
 pub mod behavior_tree;
+#[cfg(feature = "boredom_fatigue")]
+pub mod boredom_fatigue;
 #[cfg(feature = "brothel")]
 pub mod brothel;
 #[cfg(feature = "cleanliness")]
