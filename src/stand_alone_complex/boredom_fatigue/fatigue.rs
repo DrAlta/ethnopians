@@ -73,7 +73,7 @@ impl NoveltyScheduler {
     }
 }
 
-fn main() {
+pub fn main() {
     let mut tracker = NoveltyScheduler::new();
 
     println!("--- Simulation: Overplaying a Song ---");

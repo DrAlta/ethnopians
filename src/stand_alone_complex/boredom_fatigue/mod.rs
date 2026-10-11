@@ -1,6 +1,7 @@
 mod effective_fatigue;
 pub use effective_fatigue::effective_fatigue;
 mod fatigue;
+pub use fatigue::main;
 mod favorite;
 pub use favorite::favorite_fatigue;
 mod staple;
