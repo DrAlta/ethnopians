@@ -14,7 +14,7 @@ pub struct FlavorVector {
 }
 
 pub struct Ingredient {
-    name: &'static str,
+    pub name: &'static str,
     potential: FlavorVector,
 
     technical_fat_solubility: [f32; TECHNICAL_SIZE], // 0.0 to 1.0

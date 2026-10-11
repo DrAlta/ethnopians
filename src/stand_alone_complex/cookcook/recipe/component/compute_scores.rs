@@ -56,7 +56,12 @@ impl Component {
             Component::Raw {
                 characteristics,
                 tags,
-            } => todo!(),
+            } => {
+                // 1. You are at the absolute leaf ingredient layer.
+                // 2. Read what techniques were used above you via the `branch` vector.
+                // 3. Apply final attribute adjustments based on the ancestral path.
+                return; 
+            },
         }
         todo!("need to owrk out how this work, it goes up the tree passing tages and computing thr base charitieristics to the higher level then it goes back down altering the childresn haracterists based on the currnt level and the path down to it")
     }
