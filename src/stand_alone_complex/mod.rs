@@ -10,6 +10,7 @@ pub mod behavior_tree;
 pub mod boredom_fatigue;
 #[cfg(feature = "brothel")]
 pub mod brothel;
+pub mod catchelmy;
 #[cfg(feature = "cleanliness")]
 pub mod cleanliness;
 #[cfg(feature = "combat")]
@@ -24,6 +25,8 @@ pub mod formation;
 pub mod general_specific_affinity;
 #[cfg(feature = "gossip")]
 pub mod gossip;
+#[cfg(feature = "hunger")]
+pub mod hunger;
 #[cfg(feature = "item_uniqueness")]
 pub mod item_uniqueness;
 #[cfg(feature = "kelly_criterion")]
