@@ -4,6 +4,11 @@ version = "0.3.7"
 edition = "2021"
 
 [[bin]]
+name = "ai"
+path = "src/bin/ai.rs"
+required-features = ["ai"]
+
+[[bin]]
 name = "gossip"
 path = "src/bin/gossip.rs"
 required-features = ["gossip"]
