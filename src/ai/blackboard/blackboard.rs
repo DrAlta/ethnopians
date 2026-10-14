@@ -3,7 +3,7 @@ use std::{borrow::Borrow, collections::BTreeMap, fmt::Debug, hash::Hash};
 use super::Variable;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Blackboard<K: Debug + std::cmp::Eq + std::hash::Hash, V: Debug + std::hash::Hash> {
+pub struct Blackboard<K/*: Debug + std::cmp::Eq + std::hash::Hash*/, V/*: Debug + std::hash::Hash*/> {
     stack: Vec<BTreeMap<K, Variable<K, V>>>,
 }
 

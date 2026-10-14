@@ -10,9 +10,9 @@ pub use status::Status;
 #[cfg(feature = "taskmaster")]
 mod task_master;
 #[cfg(feature = "taskmaster")]
-pub use task_master::{TaskMaster, TastMasterReport};
+pub use task_master::{Branch, SubSystemState, TaskMaster, TastMasterReport};
 
 pub type BlackboardKey = String;
 
-#[cfg(test)]
+//#[cfg(test)]
 pub mod test;
